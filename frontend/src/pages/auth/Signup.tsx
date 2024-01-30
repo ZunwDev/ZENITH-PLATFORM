@@ -1,0 +1,52 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import MainInformationForm from "./signup-forms/MainInformationForm";
+import VerifyForm from "./signup-forms/VerifyForm";
+
+function Signup() {
+  const [firstPhase, setFirstPhase] = useState(false);
+  const [verifyCode, setVerifyCode] = useState("");
+  const [userId, setUserId] = useState(0);
+
+  // Main information
+  if (!firstPhase) {
+    return (
+      <div className="w-screen h-[100dvh] flex items-center justify-center">
+        <Card className="w-[450px]">
+          <CardHeader>
+            <CardTitle className="mb-2">Create Your Account</CardTitle>
+            <CardDescription className="font-semibold">Shopped with us before?</CardDescription>
+            <CardDescription>Use the information you provided in store.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MainInformationForm setFirstPhase={setFirstPhase} setVerifyCode={setVerifyCode} setUserId={setUserId} />
+            <CardFooter className="flex flex-col">
+              <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
+                Sign in another way
+              </Link>
+            </CardFooter>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Verify code, that was meant to be sent to email
+  return (
+    <div className="w-screen h-[100dvh] flex items-center justify-center">
+      <Card className="w-[450px]">
+        <CardContent>
+          <VerifyForm verifyCode={verifyCode} userId={userId} />
+          <CardFooter className="flex flex-col">
+            <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
+              Sign in another way
+            </Link>
+          </CardFooter>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default Signup;

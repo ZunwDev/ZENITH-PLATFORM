@@ -1,0 +1,82 @@
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { API_URL } from "@/lib/constants";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+interface VerifyFormProps {
+  verifyCode: string;
+  userId: number;
+}
+
+function VerifyForm({ verifyCode, userId }: VerifyFormProps) {
+  const VerifyCodeSchema = z
+    .object({
+      verify_code: z.string().min(6, "Your code must be 6 characters long"),
+    })
+    .refine((data) => data.verify_code === verifyCode, {
+      message: "Wrong code, try again",
+      path: ["verify_code"],
+    });
+
+  const verifyForm = useForm<z.infer<typeof VerifyCodeSchema>>({
+    mode: "onChange",
+    resolver: zodResolver(VerifyCodeSchema),
+    defaultValues: {
+      verify_code: "",
+    },
+  });
+
+  async function handleVerifyClick(values: z.infer<typeof VerifyCodeSchema>) {
+    try {
+      VerifyCodeSchema.parse(values);
+      const response = await fetch(`${API_URL}/users/verify/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to verify a user");
+      }
+    } catch (error) {
+      console.error("Something went wrong", error);
+    }
+  }
+
+  return (
+    <>
+      <h1 className="text-2xl mt-6 mb-6 font-semibold">
+        "A verification link has been sent to your email." (code: {verifyCode}).
+      </h1>
+      <h4 className="italic mb-4">
+        Since I can't find any free solution to send emails to anyone, this is only thing I can do.
+      </h4>
+      <Form {...verifyForm}>
+        <form className="space-y-8">
+          <FormField
+            control={verifyForm.control}
+            name="verify_code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Verify Code</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter 6-digit code" maxLength={6} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button className="w-full" type="submit" onClick={verifyForm.handleSubmit(handleVerifyClick)}>
+            VERIFY
+          </Button>
+        </form>
+      </Form>
+    </>
+  );
+}
+
+export default VerifyForm;
