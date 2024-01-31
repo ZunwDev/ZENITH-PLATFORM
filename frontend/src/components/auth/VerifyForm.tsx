@@ -2,16 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { API_URL } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 interface VerifyFormProps {
   verifyCode: string;
   userId: number;
+  setVerifyState: (value: boolean) => void;
+  verifyState: boolean;
 }
 
-function VerifyForm({ verifyCode, userId }: VerifyFormProps) {
+function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyFormProps) {
   const VerifyCodeSchema = z
     .object({
       verify_code: z.string().min(6, "Your code must be 6 characters long"),
@@ -30,21 +34,19 @@ function VerifyForm({ verifyCode, userId }: VerifyFormProps) {
   });
 
   async function handleVerifyClick(values: z.infer<typeof VerifyCodeSchema>) {
-    try {
-      VerifyCodeSchema.parse(values);
-      const response = await fetch(`${API_URL}/users/verify/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    VerifyCodeSchema.parse(values);
+    const response = await fetch(`${API_URL}/users/verify/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to verify a user");
-      }
-    } catch (error) {
-      console.error("Something went wrong", error);
+    if (!response.ok) {
+      throw new Error("Failed to verify a user");
     }
+
+    setVerifyState(true);
   }
 
   return (
@@ -70,7 +72,12 @@ function VerifyForm({ verifyCode, userId }: VerifyFormProps) {
               </FormItem>
             )}
           />
-          <Button className="w-full" type="submit" onClick={verifyForm.handleSubmit(handleVerifyClick)}>
+          <Button
+            className={cn("w-full flex flex-row gap-1")}
+            type="submit"
+            onClick={verifyForm.handleSubmit(handleVerifyClick)}
+            disabled={verifyState}>
+            {verifyState && <CheckCircle />}
             VERIFY
           </Button>
         </form>

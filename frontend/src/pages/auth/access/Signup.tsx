@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import MainInformationForm from "./signup-forms/MainInformationForm";
-import VerifyForm from "./signup-forms/VerifyForm";
+import MainInformationForm from "@/components/auth/MainInformationForm";
+import VerifyForm from "@/components/auth/VerifyForm";
 
 function Signup() {
   const [firstPhase, setFirstPhase] = useState(false);
   const [verifyCode, setVerifyCode] = useState("");
   const [userId, setUserId] = useState(0);
+  const [verifyState, setVerifyState] = useState(false);
 
   // Main information
   if (!firstPhase) {
@@ -37,12 +38,14 @@ function Signup() {
     <div className="w-screen h-[100dvh] flex items-center justify-center">
       <Card className="w-[450px]">
         <CardContent>
-          <VerifyForm verifyCode={verifyCode} userId={userId} />
-          <CardFooter className="flex flex-col">
-            <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
-              Sign in another way
-            </Link>
-          </CardFooter>
+          <VerifyForm verifyCode={verifyCode} userId={userId} setVerifyState={setVerifyState} verifyState={verifyState} />
+          {verifyState && (
+            <CardFooter className="flex flex-col">
+              <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
+                Sign in another way
+              </Link>
+            </CardFooter>
+          )}
         </CardContent>
       </Card>
     </div>
