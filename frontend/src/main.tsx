@@ -22,8 +22,10 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <div className="w-screen h-[100dvh] flex items-center justify-center">
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+  </div>
 );
 document.getElementsByTagName("html")[0].classList.add("dark");
