@@ -5,12 +5,12 @@ import dev.zunw.ecommerce.dto.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static org.springframework.security.crypto.bcrypt.BCrypt.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,6 +28,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getUserById(@PathVariable Long id) {
         Optional<User> userOptional = userService.getUserById(id);
@@ -36,6 +37,48 @@ public class UserController {
             return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: User not found");
+        }
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/email")
+    public ResponseEntity<Object> getUserByEmailAddress(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ERR: Email parameter is missing");
+        }
+
+        Optional<User> userOptional = userService.getUserByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: User not found");
+        }
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/check-login")
+    public ResponseEntity<Object> checkUserLogin(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        String password = requestBody.get("password");
+
+        Optional<User> userOptional = userService.getUserByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: User not found");
+        }
+
+        User user = userOptional.get();
+        Optional<UserCredentials> credentialsOptional = userService.getUserCredentialsById(user.getUserId());
+        if (credentialsOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
+        }
+
+        UserCredentials credentials = credentialsOptional.get();
+        if (BCrypt.checkpw(password, credentials.getPasswordHash()))  {
+            return ResponseEntity.ok("Login successful");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
         }
     }
 

@@ -58,7 +58,7 @@ function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyF
         Since I can't find any free solution to send emails to anyone, this is only thing I can do.
       </h4>
       <Form {...verifyForm}>
-        <form className="space-y-8">
+        <form className="space-y-6">
           <FormField
             control={verifyForm.control}
             name="verify_code"

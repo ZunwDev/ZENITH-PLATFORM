@@ -29,6 +29,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public Optional<UserCredentials> getUserCredentialsById(Long id) {
+        return userCredentialsRepository.findById(id);
+    }
+
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmailIgnoreCase(email);
     }

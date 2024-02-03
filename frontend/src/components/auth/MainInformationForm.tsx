@@ -17,7 +17,7 @@ interface MainInfoFormProps {
 function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainInfoFormProps) {
   const FormSchema = z
     .object({
-      email: z.string().email("Invalid email."),
+      email: z.string().email("Invalid email format."),
       firstName: z.string().min(2, "First name must be at least 2 characters long"),
       lastName: z.string().min(2, "Last name must be at least 2 characters long"),
       password: z
@@ -141,7 +141,7 @@ function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainIn
 
   return (
     <Form {...form}>
-      <form className="space-y-8">
+      <form className="space-y-6">
         {fields.map((element) => (
           <FormField
             key={element.name}
