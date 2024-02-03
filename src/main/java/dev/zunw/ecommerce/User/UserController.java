@@ -76,7 +76,10 @@ public class UserController {
 
         UserCredentials credentials = credentialsOptional.get();
         if (BCrypt.checkpw(password, credentials.getPasswordHash()))  {
-            return ResponseEntity.ok("Login successful");
+            Map<String, Object> response = new HashMap<>();
+            response.put("userId", user.getUserId());
+            response.put("username", user.getFirstName());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
         }

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { API_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -59,19 +59,14 @@ function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyF
       </h4>
       <Form {...verifyForm}>
         <form className="space-y-6">
-          <FormField
-            control={verifyForm.control}
-            name="verify_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Verify Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter 6-digit code" maxLength={6} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel>Verify Code</FormLabel>
+            <FormControl>
+              <Input placeholder="Enter 6-digit code" maxLength={6} {...verifyForm.register("verify_code")} />
+            </FormControl>
+            <FormMessage>{verifyForm.formState.errors.verify_code?.message}</FormMessage>
+          </FormItem>
+
           <Button
             className={cn("w-full flex flex-row gap-1")}
             type="submit"

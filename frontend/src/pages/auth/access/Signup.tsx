@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import MainInformationForm from "@/components/auth/MainInformationForm";
 import VerifyForm from "@/components/auth/VerifyForm";
+import Cookies from "js-cookie";
 
 function Signup() {
   const [firstPhase, setFirstPhase] = useState(false);
   const [verifyCode, setVerifyCode] = useState("");
   const [userId, setUserId] = useState(0);
   const [verifyState, setVerifyState] = useState(false);
+
+  useEffect(() => {
+    if (Cookies.get("firstName") !== undefined) {
+      window.location.href = "/";
+    }
+  }, []);
 
   // Main information
   if (!firstPhase) {

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -128,40 +128,66 @@ function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainIn
   const fields: {
     name: "email" | "firstName" | "lastName" | "password" | "confirmPassword";
     label: string;
-    isPassword: boolean;
+    isPassword?: boolean;
     placeholder: string;
     length: number;
+    errorMsg: string | undefined;
   }[] = [
-    { name: "email", label: "Email", isPassword: false, placeholder: "alan.turing@example.com", length: 255 },
-    { name: "firstName", label: "First Name", isPassword: false, placeholder: "Riley", length: 32 },
-    { name: "lastName", label: "Last Name", isPassword: false, placeholder: "Thompson", length: 48 },
-    { name: "password", label: "Password", isPassword: true, placeholder: "••••••••", length: 255 },
-    { name: "confirmPassword", label: "Confirm Password", isPassword: true, placeholder: "••••••••", length: 255 },
+    {
+      name: "email",
+      label: "Email",
+      placeholder: "alan.turing@example.com",
+      length: 255,
+      errorMsg: form.formState.errors.email?.message,
+    },
+    {
+      name: "firstName",
+      label: "First Name",
+      placeholder: "Riley",
+      length: 32,
+      errorMsg: form.formState.errors.firstName?.message,
+    },
+    {
+      name: "lastName",
+      label: "Last Name",
+      placeholder: "Thompson",
+      length: 48,
+      errorMsg: form.formState.errors.lastName?.message,
+    },
+    {
+      name: "password",
+      label: "Password",
+      isPassword: true,
+      placeholder: "••••••••",
+      length: 255,
+      errorMsg: form.formState.errors.password?.message,
+    },
+    {
+      name: "confirmPassword",
+      label: "Confirm Password",
+      isPassword: true,
+      placeholder: "••••••••",
+      length: 255,
+      errorMsg: form.formState.errors.confirmPassword?.message,
+    },
   ];
 
   return (
     <Form {...form}>
       <form className="space-y-6">
         {fields.map((element) => (
-          <FormField
-            key={element.name}
-            control={form.control}
-            name={element.name}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{element.label}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={element.placeholder}
-                    type={element.isPassword ? "password" : "text"}
-                    maxLength={element.length}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel>{element.label}</FormLabel>
+            <FormControl>
+              <Input
+                placeholder={element.placeholder}
+                type={element.isPassword ? "password" : "text"}
+                maxLength={element.length}
+                {...form.register(element.name)}
+              />
+            </FormControl>
+            <FormMessage>{element.errorMsg}</FormMessage>
+          </FormItem>
         ))}
         <Button className="w-full" type="submit" onClick={form.handleSubmit(handleEmailClick)}>
           CREATE ACCOUNT & CONTINUE
