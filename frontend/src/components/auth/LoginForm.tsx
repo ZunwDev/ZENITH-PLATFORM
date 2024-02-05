@@ -45,6 +45,8 @@ const LoginForm = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (response.status === 401) {
         form.setFocus("email");
         form.setError("email", { message: "Invalid email or password. Please check your credentials and try again." });
@@ -54,23 +56,22 @@ const LoginForm = () => {
         return false;
       }
 
-      const data = await response.json();
-
       if (response.ok) {
         setIsLogged(true);
         if (isChecked) {
           Cookies.set("firstName", data.username, { expires: 77777 });
           Cookies.set("userId", data.userId, { expires: 77777 });
         } else {
-          Cookies.set("firstName", data.username, { expires: 1 });
-          Cookies.set("userId", data.userId, { expires: 1 });
+          Cookies.set("firstName", data.username, { expires: 0.5 });
+          Cookies.set("userId", data.userId, { expires: 0.5 });
         }
         setTimeout(() => {
-          window.open("/");
+          window.location.href = "/";
         }, 200);
       }
     } catch (error) {
       console.error("Login error", error);
+      setIsLogged(false);
     }
   };
 

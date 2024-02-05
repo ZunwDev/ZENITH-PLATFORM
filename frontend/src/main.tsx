@@ -5,6 +5,7 @@ import "./index.css";
 import Signup from "./pages/auth/access/Signup.tsx";
 import Login from "./pages/auth/signin/Login.tsx";
 import Homepage from "./pages/Homepage.tsx";
+import Header from "./components/global/Header.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,10 +23,12 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <div className="w-screen h-[100dvh] flex items-center justify-center">
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
-  </div>
+  <>
+    <Header />
+    <div className="flex items-center justify-center">
+      <React.StrictMode>
+        <RouterProvider router={router} />
+      </React.StrictMode>
+    </div>
+  </>
 );
-document.getElementsByTagName("html")[0].classList.add("dark");
