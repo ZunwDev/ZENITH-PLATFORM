@@ -16,7 +16,7 @@ const FormSchema = z.object({
   password: z.string().min(8, "Please enter a password"),
 });
 
-const LoginForm = () => {
+export default function LoginForm() {
   const [isChecked, setIsChecked] = useState(false);
   const [isLogged, setIsLogged] = useState(false);
 
@@ -104,11 +104,9 @@ const LoginForm = () => {
           type="submit"
           disabled={isLogged}
           onClick={form.handleSubmit(handleLoginClick)}>
-          VERIFY
+          LOGIN
         </Button>
       </form>
     </Form>
   );
-};
-
-export default LoginForm;
+}

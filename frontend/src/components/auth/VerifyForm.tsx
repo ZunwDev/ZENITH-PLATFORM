@@ -15,7 +15,7 @@ interface VerifyFormProps {
   verifyState: boolean;
 }
 
-function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyFormProps) {
+export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyFormProps) {
   const VerifyCodeSchema = z
     .object({
       verify_code: z.string().min(6, "Your code must be 6 characters long"),
@@ -80,5 +80,3 @@ function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyF
     </>
   );
 }
-
-export default VerifyForm;

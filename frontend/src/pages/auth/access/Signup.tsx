@@ -5,7 +5,7 @@ import MainInformationForm from "@/components/auth/MainInformationForm";
 import VerifyForm from "@/components/auth/VerifyForm";
 import Cookies from "js-cookie";
 
-function Signup() {
+export default function Signup() {
   const [firstPhase, setFirstPhase] = useState(false);
   const [verifyCode, setVerifyCode] = useState("");
   const [userId, setUserId] = useState(0);
@@ -20,39 +20,41 @@ function Signup() {
   // Main information
   if (!firstPhase) {
     return (
-      <Card className="w-[450px]">
-        <CardHeader>
-          <CardTitle className="mb-2">Create Your Account</CardTitle>
-          <CardDescription className="font-semibold">Shopped with us before?</CardDescription>
-          <CardDescription>Use the information you provided in store.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <MainInformationForm setFirstPhase={setFirstPhase} setVerifyCode={setVerifyCode} setUserId={setUserId} />
-          <CardFooter className="flex flex-col">
-            <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
-              Sign in another way
-            </Link>
-          </CardFooter>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-screen">
+        <Card className="w-[450px]">
+          <CardHeader>
+            <CardTitle className="mb-2">Create Your Account</CardTitle>
+            <CardDescription className="font-semibold">Shopped with us before?</CardDescription>
+            <CardDescription>Use the information you provided in store.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MainInformationForm setFirstPhase={setFirstPhase} setVerifyCode={setVerifyCode} setUserId={setUserId} />
+            <CardFooter className="flex flex-col">
+              <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
+                Sign in another way
+              </Link>
+            </CardFooter>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   // Verify code, that was meant to be sent to email
   return (
-    <Card className="w-[450px]">
-      <CardContent>
-        <VerifyForm verifyCode={verifyCode} userId={userId} setVerifyState={setVerifyState} verifyState={verifyState} />
-        {verifyState && (
-          <CardFooter className="flex flex-col">
-            <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
-              Sign in another way
-            </Link>
-          </CardFooter>
-        )}
-      </CardContent>
-    </Card>
+    <div className="flex items-center justify-center h-screen">
+      <Card className="w-[450px]">
+        <CardContent>
+          <VerifyForm verifyCode={verifyCode} userId={userId} setVerifyState={setVerifyState} verifyState={verifyState} />
+          {verifyState && (
+            <CardFooter className="flex flex-col">
+              <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
+                Sign in another way
+              </Link>
+            </CardFooter>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
-
-export default Signup;

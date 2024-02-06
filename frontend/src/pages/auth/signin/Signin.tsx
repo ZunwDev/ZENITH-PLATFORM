@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import LoginForm from "@/components/auth/LoginForm";
 
-function Login() {
+export default function Login() {
   useEffect(() => {
     if (Cookies.get("firstName") !== undefined) {
       window.location.href = "/";
     }
   }, []);
   return (
-    <>
+    <div className="flex items-center justify-center h-screen">
       <Card className="w-[450px]">
         <CardHeader>
           <CardTitle className="mb-2">Sign In</CardTitle>
@@ -34,8 +34,6 @@ function Login() {
           </Link>
         </CardFooter>
       </Card>
-    </>
+    </div>
   );
 }
-
-export default Login;

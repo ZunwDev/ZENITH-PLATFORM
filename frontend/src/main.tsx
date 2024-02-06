@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import Signup from "./pages/auth/access/Signup.tsx";
-import Login from "./pages/auth/signin/Login.tsx";
+import Login from "./pages/auth/signin/Signin.tsx";
 import Homepage from "./pages/Homepage.tsx";
 import Header from "./components/global/Header.tsx";
 

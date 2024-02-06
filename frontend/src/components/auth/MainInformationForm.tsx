@@ -14,7 +14,7 @@ interface MainInfoFormProps {
   setUserId: (value: number) => void;
 }
 
-function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainInfoFormProps) {
+export default function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainInfoFormProps) {
   const FormSchema = z
     .object({
       email: z.string().email("Invalid email format."),
@@ -176,7 +176,7 @@ function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainIn
     <Form {...form}>
       <form className="space-y-6">
         {fields.map((element) => (
-          <FormItem>
+          <FormItem key={element.name}>
             <FormLabel>{element.label}</FormLabel>
             <FormControl>
               <Input
@@ -196,5 +196,3 @@ function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainIn
     </Form>
   );
 }
-
-export default MainInformationForm;
