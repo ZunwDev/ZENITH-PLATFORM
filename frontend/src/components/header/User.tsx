@@ -20,6 +20,7 @@ const redirectToSignIn = () => {
 const signOut = () => {
   Cookies.remove("firstName");
   Cookies.remove("userId");
+  Cookies.remove("roleID");
   window.location.reload();
 };
 
@@ -37,28 +38,32 @@ const items: MenuItem[] = [
 ];
 
 export default function User() {
+  const isLoggedIn = firstName !== undefined;
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex flex-row gap-1 items-center">
+      <DropdownMenuTrigger
+        className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition rounded-md px-4"
+        onClick={isLoggedIn ? undefined : redirectToSignIn}>
         <UserRound className="w-7 h-7" />
-        <p className="hidden md:block">
-          Hello, <strong>{firstName !== undefined ? firstName : "Sign in"}</strong>
+        <p className="hidden md:block text-sm">
+          Hello, <strong>{isLoggedIn ? firstName! : "Sign in"}</strong>
         </p>
         <ChevronDown className="w-3 h-3" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="z-[9999]">
         <DropdownMenuLabel>My account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {items.map((item) => (
-          <DropdownMenuItem key={item.name} onClick={redirectToSignIn}>
+          <DropdownMenuItem key={item.name} onClick={isLoggedIn ? undefined : redirectToSignIn}>
             {item.icon}
             {item.name}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={firstName === undefined ? redirectToSignIn : signOut}>
-          {firstName !== undefined ? <DoorClosed className="mr-2 h-4 w-4" /> : <DoorOpen className="mr-2 h-4 w-4" />}
-          <strong>{firstName !== undefined ? "Sign Out" : "Sign In"}</strong>
+        <DropdownMenuItem onClick={isLoggedIn ? signOut : redirectToSignIn}>
+          {isLoggedIn ? <DoorClosed className="mr-2 h-4 w-4" /> : <DoorOpen className="mr-2 h-4 w-4" />}
+          <strong>{isLoggedIn ? "Sign Out" : "Sign In"}</strong>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

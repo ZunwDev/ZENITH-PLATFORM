@@ -79,6 +79,7 @@ public class UserController {
             Map<String, Object> response = new HashMap<>();
             response.put("userId", user.getUserId());
             response.put("username", user.getFirstName());
+            response.put("roleID", user.getUserRoleId());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");

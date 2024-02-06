@@ -25,7 +25,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
     <Header />
-    <div className="flex items-center justify-center">
+    <div className="flex flex-col md:min-w-[1200px] min-w-[360px] min-h-[100dvh] max-w-[1200px] mx-auto items-center">
       <React.StrictMode>
         <RouterProvider router={router} />
       </React.StrictMode>
