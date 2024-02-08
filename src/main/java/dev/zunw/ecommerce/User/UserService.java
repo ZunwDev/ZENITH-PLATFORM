@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -25,11 +26,11 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(UUID id) {
         return userRepository.findById(id);
     }
 
-    public Optional<UserCredentials> getUserCredentialsById(Long id) {
+    public Optional<UserCredentials> getUserCredentialsById(UUID id) {
         return userCredentialsRepository.findById(id);
     }
 
@@ -57,7 +58,7 @@ public class UserService {
     }
 
     @Transactional
-    public User deleteUser(Long id) {
+    public User deleteUser(UUID id) {
         userRepository.deleteById(id);
         return null;
     }

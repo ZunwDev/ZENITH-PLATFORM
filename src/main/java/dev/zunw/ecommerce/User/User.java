@@ -4,15 +4,17 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Setter
 @Getter
 @Entity
 @Table(name = "\"user\"")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long userId;
+    @GeneratedValue(generator = "uuid2")
+    @Column(name = "user_id", columnDefinition = "CHAR(36)")
+    private UUID userId;
 
     @Column(name = "first_name")
     private String firstName;

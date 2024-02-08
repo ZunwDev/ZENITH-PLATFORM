@@ -6,13 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @NonNullApi
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     // Find user by id
-    Optional<User> findById(Long id);
+    Optional<User> findById(UUID id);
 
     // Custom query to find users by email
     Optional<User> findByEmailIgnoreCase(String email);

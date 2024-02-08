@@ -7,6 +7,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Setter
 @Getter
 @Entity
@@ -14,7 +16,7 @@ import lombok.Setter;
 public class UserCredentials {
     @Id
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
     @Column(name = "password_hash")
     private String passwordHash;

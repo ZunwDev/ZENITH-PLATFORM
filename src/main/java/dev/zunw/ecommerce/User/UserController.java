@@ -30,7 +30,7 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -113,7 +113,7 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @PutMapping("/verify/{id}")
-    public ResponseEntity<Map<String, Object>> verifyUser(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> verifyUser(@PathVariable UUID id) {
         try {
             Optional<User> userOptional = userService.getUserById(id);
             if (userOptional.isPresent()) {
@@ -131,7 +131,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<User> deleteUser(@PathVariable UUID id) {
         User deletedUser = userService.deleteUser(id);
         return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
     }

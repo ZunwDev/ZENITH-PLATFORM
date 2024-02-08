@@ -58,13 +58,13 @@ export default function ViewCategories() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold md:px-0 px-4">What are you looking for?</h1>
-      <div className="flex flex-wrap gap-4 items-center justify-center">
+      <div className="flex flex-wrap gap-4">
         {categories.map((item) => (
           <Button
             key={item.name}
-            className="md:w-[250px] w-[150px] flex items-center justify-center md:h-48 h-32 flex-col border hover:scale-105 transition group"
+            className="md:w-[227px] w-[150px] flex md:h-40 h-24 flex-col border hover:scale-105 hover:shadow-xl transition group"
             variant="ghost"
             asChild>
             <Link to={`/category/${item.name.toLowerCase().replace(/\s/g, "-")}`}>

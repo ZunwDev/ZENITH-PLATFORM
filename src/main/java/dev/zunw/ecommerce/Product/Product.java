@@ -10,8 +10,8 @@ import lombok.Setter;
 @Table(name = "product")
 public class Product {
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "product_id")
+        @GeneratedValue(generator = "uuid2")
+        @Column(name = "product_id", columnDefinition = "CHAR(36)")
         private Long productId;
 
         private String name;
@@ -26,4 +26,9 @@ public class Product {
         private String specifications;
 
         private Integer quantity;
+
+        private Integer discount;
+
+        @Column(name = "brand_id")
+        private Integer brandId;
 }

@@ -26,6 +26,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.0",
+    "embla-carousel-autoplay": "^8.0.0-rc22",
+    "embla-carousel-react": "^8.0.0-rc22",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.314.0",
     "react": "^18.2.0",
