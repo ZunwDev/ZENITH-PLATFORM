@@ -61,11 +61,11 @@ export default function LoginForm() {
         if (isChecked) {
           Cookies.set("firstName", data.username, { expires: 77777 });
           Cookies.set("userId", data.userId, { expires: 77777 });
-          Cookies.set("roleID", data.roleID, { expires: 77777 });
+          Cookies.set("roleId", data.roleId, { expires: 77777 });
         } else {
           Cookies.set("firstName", data.username, { expires: 0.5 });
           Cookies.set("userId", data.userId, { expires: 0.5 });
-          Cookies.set("roleID", data.roleID, { expires: 0.5 });
+          Cookies.set("roleId", data.roleId, { expires: 0.5 });
         }
         setTimeout(() => {
           window.location.href = "/";

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import LoginForm from "@/components/auth/LoginForm";
+import { LoginForm } from "@/components/auth";
 
 export default function Login() {
   useEffect(() => {

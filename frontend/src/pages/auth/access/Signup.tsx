@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import MainInformationForm from "@/components/auth/MainInformationForm";
-import VerifyForm from "@/components/auth/VerifyForm";
 import Cookies from "js-cookie";
+import { MainInformationForm, VerifyForm } from "@/components/auth";
 
 export default function Signup() {
   const [firstPhase, setFirstPhase] = useState(false);

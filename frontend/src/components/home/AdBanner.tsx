@@ -8,7 +8,7 @@ const images = [
   "https://i.postimg.cc/rDnYLKn2/OIG2-S9-FS9v-RG.jpg",
 ];
 
-export default function Advertisement() {
+export default function AdBanner() {
   return (
     <Carousel
       className="w-full max-h-96"
