@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import Cookies from "js-cookie";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,4 +23,10 @@ export function formatDate(date: Date) {
 
   const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}Z`;
   return formattedDate;
+}
+
+export default function removeAllCookies() {
+  Object.keys(Cookies.get()).forEach(function (cookieName) {
+    Cookies.remove(cookieName);
+  });
 }

@@ -19,17 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import Cookies from "js-cookie";
-import removeAllCookies from "@/utils/cookies/removeAllCookies";
+import removeAllCookies from "@/lib/utils";
 const firstName = Cookies.get("firstName");
 const roleID = Cookies.get("roleID");
-
-const redirectToSignIn = () => {
-  if (firstName === undefined) {
-    window.location.href = "http://localhost:5173/auth/signin";
-  } else {
-    return;
-  }
-};
 
 const signOut = () => {
   removeAllCookies();
@@ -57,9 +49,7 @@ export default function User() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition-all rounded-md px-4 group data-[state=open]:bg-accent/50"
-        onClick={isLoggedIn ? undefined : redirectToSignIn}>
+      <DropdownMenuTrigger className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition-all rounded-md px-4 group data-[state=open]:bg-accent/50">
         <UserRound className="w-7 h-7" />
         <p className="hidden md:block text-sm">
           Hello, <strong>{isLoggedIn ? firstName! : "Sign in"}</strong>
