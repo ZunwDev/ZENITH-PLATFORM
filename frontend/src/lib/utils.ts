@@ -25,8 +25,27 @@ export function formatDate(date: Date) {
   return formattedDate;
 }
 
-export default function removeAllCookies() {
+export function removeAllCookies() {
   Object.keys(Cookies.get()).forEach(function (cookieName) {
     Cookies.remove(cookieName);
   });
+  window.location.reload();
+}
+
+interface UserData {
+  userId: number;
+  username: string;
+  roleId: number;
+}
+
+export function setCookies(data: UserData, duration: number) {
+  Cookies.set("firstName", data.username, { expires: duration });
+  Cookies.set("userId", String(data.userId), { expires: duration });
+  Cookies.set("roleId", String(data.roleId), { expires: duration });
+}
+
+export function goto(url: string, timeToProceed: number = 0) {
+  setTimeout(() => {
+    window.location.href = url;
+  }, timeToProceed);
 }

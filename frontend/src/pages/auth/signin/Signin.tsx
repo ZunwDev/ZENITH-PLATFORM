@@ -3,11 +3,12 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import { LoginForm } from "@/components/auth";
+import { goto } from "@/lib/utils";
 
 export default function Login() {
   useEffect(() => {
     if (Cookies.get("firstName") !== undefined) {
-      window.location.href = "/";
+      goto("/");
     }
   }, []);
   return (

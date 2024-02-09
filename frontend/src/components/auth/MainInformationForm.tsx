@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { formatDate, generateOTP } from "@/lib/utils";
+import { generateOTP } from "@/lib/utils";
 import { API_URL } from "@/lib/constants";
 
 interface MainInfoFormProps {
@@ -50,13 +50,11 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
       firstName: string;
       lastName: string;
       email: string;
-      password: string;
     };
-    formattedDate: string;
     hashedPassword: string;
   }
 
-  const createUser = async ({ values, formattedDate, hashedPassword }: CreateUserParams) => {
+  const createUser = async ({ values, hashedPassword }: CreateUserParams) => {
     try {
       const response = await fetch(`${API_URL}/users/create`, {
         method: "POST",
@@ -68,9 +66,6 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
             firstName: values.firstName,
             lastName: values.lastName,
             email: values.email,
-            userRoleId: 1,
-            createdAt: formattedDate,
-            verified: false,
           },
           credentials: {
             passwordHash: hashedPassword,
@@ -78,9 +73,8 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json();
         if (data.errorCode === 409) {
           form.setFocus("email");
           form.setError("email", { message: "User with this email already exists" });
@@ -88,33 +82,22 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
         throw new Error("Failed to create user");
       }
 
-      return { data, error: null };
+      return await response.json();
     } catch (error) {
-      return { data: null, error: (error as Error).message };
+      console.error("Failed to create user", error);
+      throw error;
     }
   };
 
   const handleEmailClick = async (values: z.infer<typeof FormSchema>) => {
     try {
       FormSchema.parse(values);
-      const verifyCode = generateOTP();
-      setVerifyCode(verifyCode);
+      setVerifyCode(generateOTP());
 
-      const currentDate = new Date();
-      const formattedDate = formatDate(currentDate);
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(values.password, salt);
 
-      const { data, error } = await createUser({
-        values,
-        formattedDate,
-        hashedPassword,
-      });
-
-      if (error) {
-        throw new Error((error as unknown as Error).message);
-      }
-
+      const data = await createUser({ values, hashedPassword });
       setUserId(data.user.userId);
 
       setTimeout(() => {
@@ -128,65 +111,31 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
   const fields: {
     name: "email" | "firstName" | "lastName" | "password" | "confirmPassword";
     label: string;
-    isPassword?: boolean;
     placeholder: string;
     length: number;
-    errorMsg: string | undefined;
   }[] = [
-    {
-      name: "email",
-      label: "Email",
-      placeholder: "alan.turing@example.com",
-      length: 255,
-      errorMsg: form.formState.errors.email?.message,
-    },
-    {
-      name: "firstName",
-      label: "First Name",
-      placeholder: "Riley",
-      length: 32,
-      errorMsg: form.formState.errors.firstName?.message,
-    },
-    {
-      name: "lastName",
-      label: "Last Name",
-      placeholder: "Thompson",
-      length: 48,
-      errorMsg: form.formState.errors.lastName?.message,
-    },
-    {
-      name: "password",
-      label: "Password",
-      isPassword: true,
-      placeholder: "••••••••",
-      length: 255,
-      errorMsg: form.formState.errors.password?.message,
-    },
-    {
-      name: "confirmPassword",
-      label: "Confirm Password",
-      isPassword: true,
-      placeholder: "••••••••",
-      length: 255,
-      errorMsg: form.formState.errors.confirmPassword?.message,
-    },
+    { name: "email", label: "Email", placeholder: "alan.turing@example.com", length: 255 },
+    { name: "firstName", label: "First Name", placeholder: "Riley", length: 32 },
+    { name: "lastName", label: "Last Name", placeholder: "Thompson", length: 48 },
+    { name: "password", label: "Password", placeholder: "••••••••", length: 255 },
+    { name: "confirmPassword", label: "Confirm Password", placeholder: "••••••••", length: 255 },
   ];
 
   return (
     <Form {...form}>
       <form className="space-y-6">
-        {fields.map((element) => (
-          <FormItem key={element.name}>
-            <FormLabel>{element.label}</FormLabel>
+        {fields.map((field) => (
+          <FormItem key={field.name}>
+            <FormLabel>{field.label}</FormLabel>
             <FormControl>
               <Input
-                placeholder={element.placeholder}
-                type={element.isPassword ? "password" : "text"}
-                maxLength={element.length}
-                {...form.register(element.name)}
+                placeholder={field.placeholder}
+                type={field.name === "password" || field.name === "confirmPassword" ? "password" : "text"}
+                maxLength={field.length}
+                {...form.register(field.name)}
               />
             </FormControl>
-            <FormMessage>{element.errorMsg}</FormMessage>
+            <FormMessage>{form.formState.errors[field.name]?.message}</FormMessage>
           </FormItem>
         ))}
         <Button className="w-full" type="submit" onClick={form.handleSubmit(handleEmailClick)}>

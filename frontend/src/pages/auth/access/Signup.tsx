@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import { MainInformationForm, VerifyForm } from "@/components/auth";
+import { goto } from "@/lib/utils";
 
 export default function Signup() {
   const [firstPhase, setFirstPhase] = useState(false);
@@ -12,7 +13,7 @@ export default function Signup() {
 
   useEffect(() => {
     if (Cookies.get("firstName") !== undefined) {
-      window.location.href = "/";
+      goto("/");
     }
   }, []);
 
@@ -45,13 +46,6 @@ export default function Signup() {
       <Card className="w-[450px]">
         <CardContent>
           <VerifyForm verifyCode={verifyCode} userId={userId} setVerifyState={setVerifyState} verifyState={verifyState} />
-          {verifyState && (
-            <CardFooter className="flex flex-col">
-              <Link className="w-full justify-center flex mt-2 text-primary hover:underline text-sm" to={"/auth/signin"}>
-                Sign in another way
-              </Link>
-            </CardFooter>
-          )}
         </CardContent>
       </Card>
     </div>

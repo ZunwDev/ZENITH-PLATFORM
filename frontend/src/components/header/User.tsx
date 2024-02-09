@@ -19,16 +19,11 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import Cookies from "js-cookie";
-import removeAllCookies from "@/lib/utils";
+import { removeAllCookies } from "@/lib/utils";
 import { BASE_URL } from "@/lib/constants";
 const firstName = Cookies.get("firstName");
 const roleId = Cookies.get("roleId");
 const userId = Cookies.get("userId");
-
-const signOut = () => {
-  removeAllCookies();
-  window.location.reload();
-};
 
 interface MenuItem {
   name: string;
@@ -47,7 +42,7 @@ const items: MenuItem[] = [
 
 export default function User() {
   const isLoggedIn = firstName !== undefined; //firstName is undefined, return false, if else then true
-  const isAdmin = roleId === "2";
+  const isAdmin = roleId === "2"; // 2 = true
 
   return (
     <DropdownMenu>
@@ -74,7 +69,7 @@ export default function User() {
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Administrator</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <a href={`/${userId}/dashboard`} className="flex flex-row items-center">
+              <a href={`/${userId}/dashboard/overview`} className="flex flex-row items-center">
                 <UserRoundCog className="mr-2 h-4 w-4" />
                 Dashboard
               </a>
@@ -85,7 +80,7 @@ export default function User() {
         <DropdownMenuItem asChild>
           <a
             href={!isLoggedIn ? "/auth/signin" : undefined}
-            onClick={isLoggedIn ? signOut : undefined}
+            onClick={isLoggedIn ? removeAllCookies : undefined}
             className="flex flex-row items-center">
             {isLoggedIn ? (
               <DoorClosed className="mr-2 h-4 w-4 stroke-destructive" />

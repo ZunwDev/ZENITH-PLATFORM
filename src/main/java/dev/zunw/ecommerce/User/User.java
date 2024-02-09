@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Setter
@@ -29,6 +30,12 @@ public class User {
     private Integer userRoleId;
 
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
+
+    public User() {
+        this.createdAt = LocalDateTime.now();
+        this.verified = false;
+        this.userRoleId = 1;
+    }
 }
 

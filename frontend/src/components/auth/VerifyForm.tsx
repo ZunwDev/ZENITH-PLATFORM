@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { API_URL } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, goto } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -16,6 +17,7 @@ interface VerifyFormProps {
 }
 
 export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyState }: VerifyFormProps) {
+  const [buttonText, setButtonText] = useState("VERIFY");
   const VerifyCodeSchema = z
     .object({
       verify_code: z.string().min(6, "Your code must be 6 characters long"),
@@ -47,6 +49,8 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
     }
 
     setVerifyState(true);
+    setButtonText("REDIRECTING...");
+    goto("/auth/signin", 2000);
   }
 
   return (
@@ -54,9 +58,6 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
       <h1 className="text-2xl mt-6 mb-6 font-semibold">
         "A verification link has been sent to your email." (code: {verifyCode}).
       </h1>
-      <h4 className="italic mb-4">
-        Since I can't find any free solution to send emails to anyone, this is only thing I can do.
-      </h4>
       <Form {...verifyForm}>
         <form className="space-y-6">
           <FormItem>
@@ -73,7 +74,7 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
             onClick={verifyForm.handleSubmit(handleVerifyClick)}
             disabled={verifyState}>
             {verifyState && <CheckCircle />}
-            VERIFY
+            {buttonText}
           </Button>
         </form>
       </Form>
