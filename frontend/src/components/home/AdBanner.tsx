@@ -27,7 +27,7 @@ export default function AdBanner() {
             <div className="p-1">
               <Card>
                 <CardContent className="flex h-96 items-center justify-center !p-0 rounded-lg">
-                  <img src={img} className="object-fill block h-full w-full rounded-lg" />
+                  <img src={img} className="object-fill block h-full w-full rounded-lg" loading="lazy" alt={"ad" + index} />
                 </CardContent>
               </Card>
             </div>

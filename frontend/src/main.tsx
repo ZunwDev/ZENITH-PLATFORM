@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import "./index.css";
 import Signup from "./pages/auth/access/Signup.tsx";
 import Login from "./pages/auth/signin/Signin.tsx";
@@ -44,15 +44,20 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "*",
+    element: <Navigate to="/" replace />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
     <Header />
-    <div className="flex flex-col md:min-w-[1200px] min-w-[360px] min-h-[100dvh] max-w-[1200px] mx-auto items-center">
+    <div className="flex flex-col md:min-w-[1200px] min-w-[360px] min-h-[100dvh] max-w-[1200px] mx-auto items-center bg-background">
       <React.StrictMode>
         <RouterProvider router={router} />
       </React.StrictMode>
     </div>
   </>
 );
+document.getElementById("root")?.classList.add(/* "dark",*/ "bg-background");

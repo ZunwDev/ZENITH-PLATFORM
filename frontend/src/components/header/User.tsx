@@ -21,6 +21,7 @@ import {
 import Cookies from "js-cookie";
 import { removeAllCookies } from "@/lib/utils";
 import { BASE_URL } from "@/lib/constants";
+
 const firstName = Cookies.get("firstName");
 const roleId = Cookies.get("roleId");
 const userId = Cookies.get("userId");
@@ -55,10 +56,10 @@ export default function User() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="z-[9999]">
         <DropdownMenuLabel>My account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="" />
         {items.map((item, index) => (
           <DropdownMenuItem key={index} asChild>
-            <a className="flex flex-row items-center" href={{ BASE_URL } + item.goto}>
+            <a className="flex flex-row items-center" href={BASE_URL + item.goto}>
               {item.icon}
               {item.name}
             </a>
