@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static org.springframework.security.crypto.bcrypt.BCrypt.*;
-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -23,9 +21,15 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @CrossOrigin(origins = "*")
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        if (users.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(users);
+        }
     }
 
     @CrossOrigin(origins = "*")

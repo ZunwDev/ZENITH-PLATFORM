@@ -13,16 +13,15 @@ export function generateOTP() {
   return randomOTP.toString();
 }
 
-export function formatDate(date: Date) {
+export function formatDateTime(dateTimeString: string) {
+  const date = new Date(dateTimeString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
-
-  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}Z`;
-  return formattedDate;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 export function removeAllCookies() {
@@ -33,19 +32,26 @@ export function removeAllCookies() {
 }
 
 interface UserData {
-  userId: number;
+  userId: string;
   username: string;
-  roleId: number;
+  roleId: string;
 }
 
-export function setCookies(data: UserData, duration: number) {
+export function setCookies(data: UserData, duration: number, remember: string) {
   Cookies.set("firstName", data.username, { expires: duration });
-  Cookies.set("userId", String(data.userId), { expires: duration });
-  Cookies.set("roleId", String(data.roleId), { expires: duration });
+  Cookies.set("userId", data.userId, { expires: duration });
+  Cookies.set("roleId", data.roleId, { expires: duration });
+  Cookies.set("rememberMe", remember, { expires: duration });
 }
 
 export function goto(url: string, timeToProceed: number = 0) {
   setTimeout(() => {
     window.location.href = url;
   }, timeToProceed);
+}
+
+export function applyDiscount(price: number, discount: number) {
+  let discountedPrice = Math.floor(price * (1 - discount / 100));
+  discountedPrice = discountedPrice - (discountedPrice % 1) + 0.99;
+  return discount >= 20 ? discountedPrice : price;
 }

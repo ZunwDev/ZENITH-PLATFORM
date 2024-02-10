@@ -21,7 +21,7 @@ export default function Header() {
     <header className="h-16 border-b px-8 w-full bg-background shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] text-accent-foreground">
       <nav className={cn("flex items-center h-full flex-row", { "justify-between": !isAdminDashboard })}>
         <a className="flex flex-row gap-4 items-center" href="/">
-          <img src={logo} alt="logo" role="img" className="md:h-12 h-8 select-none" loading="lazy" />
+          <img src={logo} alt="logo" role="img" className="md:h-12 h-8 select-none" loading="lazy" width={64} height={64} />
           <p className="md:text-2xl text-lg tracking-widest font-semibold select-none logoClass">ZENITH</p>
         </a>
         {!isAdminDashboard ? (
@@ -41,7 +41,13 @@ export default function Header() {
               <div>
                 {adminButtons.map((item, index) => (
                   <Button variant="ghost" key={index} asChild>
-                    <a className="font-semibold text-accent-foreground" href={`/${userId}/dashboard${item.goto}`}>
+                    <a
+                      className="font-semibold text-accent-foreground cursor-pointer"
+                      href={`/${userId}/dashboard${item.goto}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.replace(`/${userId}/dashboard${item.goto}`);
+                      }}>
                       {item.name}
                     </a>
                   </Button>

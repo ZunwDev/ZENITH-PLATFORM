@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +17,22 @@ public class ProductController {
     @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping
+    public ResponseEntity<List<Product>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) Long filterId
+    ) {
+        List<Product> products = productService.getProductsByAttributeId(page, limit, filterId, filterBy);
+        if (products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(products);
+        }
     }
 
     @CrossOrigin(origins = "*")

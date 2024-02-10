@@ -48,7 +48,7 @@ export default function LoginForm() {
         const data = await response.json();
         setIsLogged(true);
 
-        isChecked ? setCookies(data, 77777) : setCookies(data, 0.25); //If user checks remember me, set the cookies for really long time, if not only quarter of a day
+        isChecked ? setCookies(data, 77777, "true") : setCookies(data, 0.25, "false"); //If user checks remember me, set the cookies for really long time, if not only quarter of a day
         goto("/", 200); //Redirect user to "/" in 200ms
       } else if (response.status === 404 || response.status === 401) {
         form.setError("email", { message: LOGIN_ERROR_MESSAGE });

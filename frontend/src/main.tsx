@@ -7,7 +7,6 @@ import Login from "./pages/auth/signin/Signin.tsx";
 import Homepage from "./pages/Homepage.tsx";
 import Header from "./components/global/Header.tsx";
 import Dashboard from "./components/dashboard/Dashboard.tsx";
-import { Overview, Orders, Products, Settings } from "./components/dashboard";
 
 const router = createBrowserRouter([
   {
@@ -23,26 +22,8 @@ const router = createBrowserRouter([
     element: <Homepage />,
   },
   {
-    path: `/:userId/dashboard`,
+    path: `/:userId/dashboard/:path`,
     element: <Dashboard />,
-    children: [
-      {
-        path: "overview",
-        element: <Overview />,
-      },
-      {
-        path: "orders",
-        element: <Orders />,
-      },
-      {
-        path: "products",
-        element: <Products />,
-      },
-      {
-        path: "settings",
-        element: <Settings />,
-      },
-    ],
   },
   {
     path: "*",
