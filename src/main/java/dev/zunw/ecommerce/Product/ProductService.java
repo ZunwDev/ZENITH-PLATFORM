@@ -1,5 +1,7 @@
 package dev.zunw.ecommerce.Product;
 
+import dev.zunw.ecommerce.ProductBrand.ProductBrand;
+import dev.zunw.ecommerce.ProductBrand.ProductBrandRepository;
 import dev.zunw.ecommerce.ProductCategory.ProductCategory;
 import dev.zunw.ecommerce.ProductCategory.ProductCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +18,30 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductCategoryRepository productCategoryRepository;
+    private final ProductBrandRepository productBrandRepository;
 
 
     @Autowired
-    public ProductService(ProductRepository productRepository, ProductCategoryRepository productCategoryRepository) {
+    public ProductService(ProductRepository productRepository, ProductCategoryRepository productCategoryRepository, ProductBrandRepository productBrandRepository) {
         this.productRepository = productRepository;
         this.productCategoryRepository = productCategoryRepository;
+        this.productBrandRepository = productBrandRepository;
     }
 
-    public List<Product> getProductsByAttributeId(int page, int limit, Long id, String attribute) {
-        Pageable pageable = PageRequest.of(page, limit);
-        if (attribute == null) {
-            return productRepository.findAll(pageable).getContent(); //Return all if attribute isn't set
+    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> isArchived, Pageable pageable) {
+        if (categoryIds == null && brandIds == null && isArchived == null) {
+            return productRepository.findAll(pageable);
+        } else {
+            return productRepository.findAll(ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, isArchived), pageable);
         }
-
-        return switch (attribute) { //Return all if any filter is set in attribute
-            case "category" -> productRepository.findByCategoryProductCategoryId(pageable, id);
-            case "brand" -> productRepository.findByBrandBrandId(pageable, id);
-            default -> productRepository.findAll(pageable).getContent();
-        };
     }
 
     public List<ProductCategory> getAllProductCategories() {
         return productCategoryRepository.findAll();
+    }
+
+    public List<ProductBrand> getAllProductBrands() {
+        return productBrandRepository.findAll();
     }
 
     public Optional<Product> getProductById(UUID id) {
