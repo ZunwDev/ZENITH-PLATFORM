@@ -48,7 +48,7 @@ export default function User() {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition-all rounded-md px-4 group data-[state=open]:bg-accent/50">
-        <UserRound className="w-7 h-7" />
+        <UserRound className="size-7" />
         <p className="hidden md:block text-sm">
           Hello, <strong>{isLoggedIn ? firstName! : "Sign in"}</strong>
         </p>

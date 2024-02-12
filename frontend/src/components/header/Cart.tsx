@@ -16,7 +16,7 @@ export default function Cart() {
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger className="flex flex-row gap-1">
-            <ShoppingCart className="w-7 h-7" />
+            <ShoppingCart className="size-7" />
             <p className="hidden md:block">Cart</p>
           </NavigationMenuTrigger>
           <NavigationMenuContent className="p-4">
