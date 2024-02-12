@@ -7,10 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function generateOTP() {
-  const min = 100000;
-  const max = 999999;
-  const randomOTP = Math.floor(Math.random() * (max - min + 1)) + min;
-  return randomOTP.toString();
+  return (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString(); //Return random number between 100000-999999
 }
 
 export function formatDateTime(dateTimeString: string) {

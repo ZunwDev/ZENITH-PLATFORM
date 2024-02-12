@@ -16,7 +16,7 @@ export default function Dashboard() {
     }
   }, []);
   return (
-    <div className="mt-32 flex flex-col gap-12 px-8 text-accent-foreground md:min-w-[1600px] min-w-[360px] min-h-[100dvh] max-w-[1600px]">
+    <div className="mt-32 flex flex-col gap-12 px-8 text-accent-foreground md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
       {path === "products" && <Products />}
     </div>
   );

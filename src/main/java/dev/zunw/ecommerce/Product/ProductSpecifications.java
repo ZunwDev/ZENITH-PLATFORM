@@ -7,10 +7,10 @@ import java.util.List;
 public class ProductSpecifications {
 
     public static Specification<Product> withCategoryAndBrandAndArchived(
-            List<Long> categoryIds, List<Long> brandIds, List<Boolean> isArchived) {
+            List<Long> categoryIds, List<Long> brandIds, List<Boolean> archivedIds) {
         return Specification.where(withCategories(categoryIds))
                 .and(withBrands(brandIds))
-                .and(withArchived(isArchived));
+                .and(withArchived(archivedIds));
     }
 
     public static Specification<Product> withCategories(List<Long> categoryIds) {
@@ -31,10 +31,10 @@ public class ProductSpecifications {
         };
     }
 
-    public static Specification<Product> withArchived(List<Boolean> isArchived) {
+    public static Specification<Product> withArchived(List<Boolean> archivedIds) {
         return (root, query, builder) -> {
-            if (isArchived != null && !isArchived.isEmpty()) {
-                return root.get("archived").in(isArchived);
+            if (archivedIds != null && !archivedIds.isEmpty()) {
+                return root.get("archived").in(archivedIds);
             }
             return null;
         };

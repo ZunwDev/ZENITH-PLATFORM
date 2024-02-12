@@ -1,10 +1,10 @@
 import { API_URL } from "@/lib/constants";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useCallback, useEffect, useState } from "react";
-import { formatDateTime } from "@/lib/utils";
-import { applyDiscount } from "../../lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { cn, formatDateTime } from "@/lib/utils";
+import { applyDiscount } from "../../../lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -18,8 +18,11 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   DropdownMenuRadioItem,
-} from "../ui/dropdown-menu";
-import { ArrowDownUp, ChevronDown, Filter, X } from "lucide-react";
+} from "../../ui/dropdown-menu";
+import { ArrowDownUp, ChevronDown, FileDigit, Filter, X } from "lucide-react";
+import Cookies from "js-cookie";
+
+const userId = Cookies.get("userId");
 
 interface Product {
   productId: string;
@@ -57,6 +60,8 @@ interface FilterString {
   archived: string;
 }
 
+const productEntries = ["10", "25", "50", "100"];
+
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -67,13 +72,13 @@ export default function Products() {
     category: "",
     archived: "",
   });
-  const [productAPIURL, setProductAPIURL] = useState(`${API_URL}/products?limit=10&`);
+  const [limit, setLimit] = useState("10");
+  const [productAPIURL, setProductAPIURL] = useState(`${API_URL}/products?limit=${limit}&`);
   const [combinedFilterString, setCombinedFilterString] = useState("");
-  const [checkedArchived, setCheckedArchived] = useState<string[]>([]);
+  const [checkedArchived, setCheckedArchived] = useState<number[]>([]);
   const [checkedCategories, setCheckedCategories] = useState<number[]>([]);
   const [checkedBrands, setCheckedBrands] = useState<number[]>([]);
-
-  const [filterCount, setFilterCount] = useState(0);
+  const [filterAmount, setFilterAmount] = useState(0);
 
   const getProducts = async (productAPIURL: string) => {
     const response = await fetch(productAPIURL, {
@@ -83,7 +88,7 @@ export default function Products() {
       },
     });
 
-    console.log(response);
+    console.log(response.url);
 
     if (response.ok) {
       const data = await response.json();
@@ -106,60 +111,15 @@ export default function Products() {
     return data;
   };
 
-  const handleArchivedChange = useCallback(
-    (archived: string) => {
-      setCheckedArchived((prevArchived) => {
-        const updatedArchived = prevArchived.includes(archived)
-          ? prevArchived.filter((text) => text !== archived)
-          : [...prevArchived, archived];
-
-        const updatedFilterPairs = updatedArchived.map((text) => `archived=${text}`);
-        const newFilterString = updatedFilterPairs.join("&");
-        setFilterString((prevFilter) => ({
-          ...prevFilter,
-          archived: newFilterString,
-        }));
-
-        return updatedArchived;
+  const handleFilterChange = useCallback(
+    (type: string, id: number, setChecked: Dispatch<SetStateAction<number[]>>) => {
+      setChecked((prev: number[]) => {
+        const updated = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+        setFilterString((prevFilter) => ({ ...prevFilter, [type]: updated.map((item) => `${type}=${item}&`).join("") }));
+        return updated;
       });
     },
-    [setCheckedArchived, setFilterString]
-  );
-
-  const handleCategoryChange = useCallback(
-    (id: number) => {
-      setCheckedCategories((prevCategories) => {
-        const updatedCategories = prevCategories.includes(id)
-          ? prevCategories.filter((categoryId) => categoryId !== id)
-          : [...prevCategories, id];
-
-        const updatedFilterPairs = updatedCategories.map((categoryId) => `categories=${categoryId}`);
-        const newFilterString = updatedFilterPairs.join("&");
-        setFilterString((prevFilter) => ({
-          ...prevFilter,
-          category: newFilterString,
-        }));
-
-        return updatedCategories;
-      });
-    },
-    [setCheckedCategories, setFilterString]
-  );
-
-  const handleBrandChange = useCallback(
-    (id: number) => {
-      setCheckedBrands((prevBrands) => {
-        const updatedBrands = prevBrands.includes(id) ? prevBrands.filter((brandId) => brandId !== id) : [...prevBrands, id];
-        const updatedFilterPairs = updatedBrands.map((brandId) => `brands=${brandId}`);
-        const newFilterString = updatedFilterPairs.join("&");
-        setFilterString((prevFilter) => ({
-          ...prevFilter,
-          brand: newFilterString,
-        }));
-        return updatedBrands;
-      });
-    },
-    [setCheckedBrands, setFilterString]
+    [setFilterString]
   );
 
   const resetFilters = useCallback(() => {
@@ -184,7 +144,6 @@ export default function Products() {
         console.error("Error fetching categories and brands:", error);
       }
     };
-
     fetchData();
   }, []);
 
@@ -198,26 +157,24 @@ export default function Products() {
   }, [productAPIURL]);
 
   useEffect(() => {
-    setFilterCount(checkedArchived.length + checkedBrands.length + checkedCategories.length);
-  }, [checkedArchived, checkedBrands, checkedCategories]);
-
-  useEffect(() => {
     const { brand, category, archived } = filterString;
     const combined = `${brand}${category}${archived}`;
     setCombinedFilterString(combined);
-  }, [filterString]);
+    setFilterAmount(checkedArchived.length + checkedBrands.length + checkedCategories.length);
+  }, [filterString, checkedArchived, checkedBrands, checkedCategories]);
 
   useEffect(() => {
     const updateUrl = () => {
       if (combinedFilterString) {
-        setProductAPIURL((prevUrl) => `${prevUrl}&${combinedFilterString}`);
+        const updatedUrl = `${API_URL}/products?limit=${limit}&${combinedFilterString}`;
+        setProductAPIURL(updatedUrl);
       } else {
-        setProductAPIURL(`${API_URL}/products?limit=10`);
+        setProductAPIURL(`${API_URL}/products?limit=${limit}&`);
       }
     };
 
     updateUrl();
-  }, [combinedFilterString]);
+  }, [combinedFilterString, limit]);
 
   return (
     <div className="flex flex-col gap-20">
@@ -226,27 +183,43 @@ export default function Products() {
           <h1 className="text-3xl font-bold w-full">Products ({products.length})</h1>
           <h2>Manage products for ZENITH store</h2>
         </div>
-        <Button className="flex flex-row gap-2 items-center justify-center">
-          <span className="text-xl">+</span>New Product
+        <Button className="flex flex-row gap-2 items-center justify-center" asChild>
+          <a
+            href={`/${userId}/dashboard/products/new`}
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.replace(`/${userId}/dashboard/products/new`);
+            }}>
+            <span className="text-2xl">+</span>New Product
+          </a>
         </Button>
       </div>
       <div className="flex flex-col gap-4">
         <div className="w-full flex flex-row justify-between gap-1">
-          <div className="flex flex-row gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild className="group data-[state=open]:bg-accent/50">
-                <Button variant="outline" className="flex flex-row gap-1">
-                  <Filter className="h-4 w-4" />
+          <div className="flex flex-row gap-1.5">
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild className="group">
+                <Button
+                  variant="outline"
+                  className={cn("flex flex-row gap-1 transition-all", {
+                    "bg-primary/10 border-primary transition-all duration-100": filterAmount > 0,
+                  })}>
+                  <Filter className="size-4" />
                   Filter By
-                  <ChevronDown className="w-3 h-3 group-data-[state=open]:rotate-180 transition duration-200" />
+                  {filterAmount > 0 && (
+                    <div className="bg-primary px-2 rounded-full flex items-center justify-center text-accent">
+                      {filterAmount}
+                    </div>
+                  )}
+                  <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
                 <DropdownMenuLabel>Available Filters</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    <span>Brand</span>
+                    <span>Brand {checkedBrands.length > 0 && "(" + checkedBrands.length + ")"}</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="h-96 overflow-auto">
@@ -254,7 +227,9 @@ export default function Products() {
                         <DropdownMenuCheckboxItem
                           key={index}
                           checked={checkedBrands.includes(item.brandId)}
-                          onCheckedChange={() => handleBrandChange(item.brandId)}>
+                          onCheckedChange={() =>
+                            handleFilterChange("brand", item.brandId, setCheckedBrands as Dispatch<SetStateAction<number[]>>)
+                          }>
                           {item.name}
                         </DropdownMenuCheckboxItem>
                       ))}
@@ -263,7 +238,7 @@ export default function Products() {
                 </DropdownMenuSub>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    <span>Category</span>
+                    <span>Category {checkedCategories.length > 0 && "(" + checkedCategories.length + ")"}</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
@@ -271,7 +246,13 @@ export default function Products() {
                         <DropdownMenuCheckboxItem
                           key={index}
                           checked={checkedCategories.includes(item.productCategoryId)}
-                          onCheckedChange={() => handleCategoryChange(item.productCategoryId)}>
+                          onCheckedChange={() =>
+                            handleFilterChange(
+                              "category",
+                              item.productCategoryId,
+                              setCheckedCategories as Dispatch<SetStateAction<number[]>>
+                            )
+                          }>
                           {item.name}
                         </DropdownMenuCheckboxItem>
                       ))}
@@ -280,18 +261,22 @@ export default function Products() {
                 </DropdownMenuSub>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    <span>Archived</span>
+                    <span>Archived {checkedArchived.length > 0 && "(" + checkedArchived.length + ")"}</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
                       <DropdownMenuCheckboxItem
-                        checked={checkedArchived.includes("archived")}
-                        onCheckedChange={() => handleArchivedChange("archived")}>
+                        checked={checkedArchived.includes(0)}
+                        onCheckedChange={() =>
+                          handleFilterChange("archived", 0, setCheckedArchived as Dispatch<SetStateAction<number[]>>)
+                        }>
                         Show Archived Products
                       </DropdownMenuCheckboxItem>
                       <DropdownMenuCheckboxItem
-                        checked={checkedArchived.includes("active")}
-                        onCheckedChange={() => handleArchivedChange("active")}>
+                        checked={checkedArchived.includes(1)}
+                        onCheckedChange={() =>
+                          handleFilterChange("archived", 1, setCheckedArchived as Dispatch<SetStateAction<number[]>>)
+                        }>
                         Show Active Products
                       </DropdownMenuCheckboxItem>
                     </DropdownMenuSubContent>
@@ -300,39 +285,43 @@ export default function Products() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild className="group data-[state=open]:bg-accent/50">
                 <Button variant="outline" className="flex flex-row gap-1">
-                  <ArrowDownUp className="h-4 w-4" />
+                  <ArrowDownUp className="size-4" />
                   Sort By
-                  <ChevronDown className="w-3 h-3 group-data-[state=open]:rotate-180 transition duration-200" />
+                  <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
                 <DropdownMenuLabel>Rating</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup>
                   <DropdownMenuRadioItem value="rating_ascending">Ascending</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="rating_descending">Descending</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel>Original Price</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup>
                   <DropdownMenuRadioItem value="original_ascending">Ascending</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="original_descending">Descending</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel>Discounted Price</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup>
                   <DropdownMenuRadioItem value="discounted_ascending">Ascending</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="discounted_descending">Descending</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel>Quantity</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup>
                   <DropdownMenuRadioItem value="quantity_ascending">Ascending</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="quantity_descending">Descending</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel>Creation Date</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup>
@@ -342,15 +331,39 @@ export default function Products() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {filterCount > 0 && (
-            <Button variant="link" className="text-destructive" onClick={resetFilters}>
-              <X className="w-3 h-3 mr-2" />
-              Clear filters ({filterCount})
-            </Button>
-          )}
+          <div className="flex flex-row gap-1.5">
+            {filterAmount > 0 && (
+              <Button variant="link" className="text-destructive" onClick={resetFilters}>
+                <X className="size-3 mr-2" />
+                Clear filters
+              </Button>
+            )}
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild className="group data-[state=open]:bg-accent/50">
+                <Button variant="outline" className="flex flex-row gap-1">
+                  <FileDigit className="size-4" />
+                  Limit
+                  <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
+                <DropdownMenuLabel>Change limit</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup value={limit} onValueChange={setLimit}>
+                  {productEntries.map((item, index) => (
+                    <DropdownMenuRadioItem key={index} value={`${item}`}>
+                      {item} Products
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         <Table>
-          <TableCaption>A list of existing products.</TableCaption>
+          <TableCaption>
+            {products.length > 0 ? "A list of existing products." : "No products found. Try changing/removing filters."}
+          </TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="text-start">Name</TableHead>

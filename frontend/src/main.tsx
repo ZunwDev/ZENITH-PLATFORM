@@ -7,6 +7,7 @@ import Login from "./pages/auth/signin/Signin.tsx";
 import Homepage from "./pages/Homepage.tsx";
 import Header from "./components/global/Header.tsx";
 import Dashboard from "./components/dashboard/Dashboard.tsx";
+import { ThemeProvider } from "next-themes";
 
 const router = createBrowserRouter([
   {
@@ -34,11 +35,12 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
     <Header />
-    <div className="flex flex-col md:min-w-[1200px] min-w-[360px] min-h-[100dvh] max-w-[1200px] mx-auto items-center bg-background">
+    <div className="flex flex-col md:min-w-[1200px] min-w-[360px] h-[100dvh] max-w-[1200px] mx-auto items-center bg-background">
       <React.StrictMode>
-        <RouterProvider router={router} />
+        <ThemeProvider forcedTheme="light">
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </React.StrictMode>
     </div>
   </>
 );
-document.getElementById("root")?.classList.add(/* "dark",*/ "bg-background");

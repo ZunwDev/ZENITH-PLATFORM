@@ -26,13 +26,13 @@ public class ProductController {
     public ResponseEntity<Object> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false) List<Long> brands,
-            @RequestParam(required = false) List<Long> categories,
-            @RequestParam(required = false) List<String> archived
+            @RequestParam(required = false) List<Long> brand,
+            @RequestParam(required = false) List<Long> category,
+            @RequestParam(required = false) List<Long> archived
     ) {
         Pageable pageable = PageRequest.of(page, limit);
         List<Boolean> finalArchived = getFinalArchived(archived);
-        Page<Product> products = productService.findByFilters(categories, brands, finalArchived, pageable);
+        Page<Product> products = productService.findByFilters(category, brand, finalArchived, pageable);
 
         if (products.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
@@ -66,13 +66,14 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
     }
-    private List<Boolean> getFinalArchived(List<String> archived) {
+
+    private List<Boolean> getFinalArchived(List<Long> archived) {
         List<Boolean> finalArchived = new ArrayList<>();
-        if (archived != null) {
-            if (archived.contains("active") && archived.contains("archived")) {
+        if (archived != null && !archived.isEmpty()) {
+            if (archived.contains(1L) && archived.contains(0L)) {
                 finalArchived.add(true);
                 finalArchived.add(false);
-            } else if (archived.contains("archived")) {
+            } else if (archived.contains(0L)) {
                 finalArchived.add(true);
             }
         }

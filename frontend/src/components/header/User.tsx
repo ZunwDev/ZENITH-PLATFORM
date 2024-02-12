@@ -34,11 +34,11 @@ interface MenuItem {
 }
 
 const items: MenuItem[] = [
-  { name: "Favorites", icon: <Heart className="mr-2 h-4 w-4" />, redirect: false, goto: "/account/favorites" },
-  { name: "Orders", icon: <Receipt className="mr-2 h-4 w-4" />, redirect: true, goto: "/account/orders" },
-  { name: "Returns", icon: <Undo2 className="mr-2 h-4 w-4" />, redirect: true, goto: "/account/returns" },
-  { name: "Recent Products", icon: <List className="mr-2 h-4 w-4" />, redirect: false, goto: "/account/recent" },
-  { name: "Settings", icon: <Settings className="mr-2 h-4 w-4" />, redirect: true, goto: "/account/settings" },
+  { name: "Favorites", icon: <Heart className="mr-2 size-4" />, redirect: false, goto: "/account/favorites" },
+  { name: "Orders", icon: <Receipt className="mr-2 size-4" />, redirect: true, goto: "/account/orders" },
+  { name: "Returns", icon: <Undo2 className="mr-2 size-4" />, redirect: true, goto: "/account/returns" },
+  { name: "Recent Products", icon: <List className="mr-2 size-4" />, redirect: false, goto: "/account/recent" },
+  { name: "Settings", icon: <Settings className="mr-2 size-4" />, redirect: true, goto: "/account/settings" },
 ];
 
 export default function User() {
@@ -46,15 +46,15 @@ export default function User() {
   const isAdmin = roleId === "2"; // 2 = true
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition-all rounded-md px-4 group data-[state=open]:bg-accent/50">
         <UserRound className="w-7 h-7" />
         <p className="hidden md:block text-sm">
           Hello, <strong>{isLoggedIn ? firstName! : "Sign in"}</strong>
         </p>
-        <ChevronDown className="w-3 h-3 group-data-[state=open]:rotate-180 transition duration-200" />
+        <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="z-[9999]">
+      <DropdownMenuContent className="z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()}>
         <DropdownMenuLabel>My account</DropdownMenuLabel>
         <DropdownMenuSeparator className="" />
         {items.map((item, index) => (
@@ -71,7 +71,7 @@ export default function User() {
             <DropdownMenuLabel>Administrator</DropdownMenuLabel>
             <DropdownMenuItem asChild>
               <a href={`/${userId}/dashboard/overview`} className="flex flex-row items-center">
-                <UserRoundCog className="mr-2 h-4 w-4" />
+                <UserRoundCog className="mr-2 size-4" />
                 Dashboard
               </a>
             </DropdownMenuItem>
@@ -84,9 +84,9 @@ export default function User() {
             onClick={isLoggedIn ? removeAllCookies : undefined}
             className="flex flex-row items-center">
             {isLoggedIn ? (
-              <DoorClosed className="mr-2 h-4 w-4 stroke-destructive" />
+              <DoorClosed className="mr-2 size-4 stroke-destructive" />
             ) : (
-              <DoorOpen className="mr-2 h-4 w-4 stroke-primary" />
+              <DoorOpen className="mr-2 size-4 stroke-primary" />
             )}
             <strong className={isLoggedIn ? "text-destructive" : "text-primary"}>{isLoggedIn ? "Sign Out" : "Sign In"}</strong>
           </a>

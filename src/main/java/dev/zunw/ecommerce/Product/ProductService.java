@@ -28,11 +28,11 @@ public class ProductService {
         this.productBrandRepository = productBrandRepository;
     }
 
-    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> isArchived, Pageable pageable) {
-        if (categoryIds == null && brandIds == null && isArchived == null) {
+    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> archiveIds, Pageable pageable) {
+        if (categoryIds == null && brandIds == null && archiveIds == null) {
             return productRepository.findAll(pageable);
         } else {
-            return productRepository.findAll(ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, isArchived), pageable);
+            return productRepository.findAll(ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, archiveIds), pageable);
         }
     }
 
