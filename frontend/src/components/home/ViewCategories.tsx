@@ -3,16 +3,10 @@ import { Battery, Cable, Camera, Cpu, Gamepad, Headphones, Laptop, Printer, Smar
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const getCategories = async () => {
-  const response = await fetch(`${API_URL}/products/category`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const data = await response.json();
-
+  const response = await axios.get(`${API_URL}/products/category`);
   type IconMapping = {
     [key: string]: JSX.Element;
   };
@@ -30,13 +24,12 @@ const getCategories = async () => {
     ["Wearable Technology"]: <Watch />,
   };
 
-  const categoriesWithIcons = data.map((category: { name: string | number }) => ({
+  const categoriesWithIcons = response.data.map((category: { name: string | number }) => ({
     name: category.name,
     icon: React.cloneElement(iconMapping[category.name], {
       className: "md:w-16 md:h-16 w-12 h-12 group-hover:stroke-primary transition",
     }),
   }));
-
   return categoriesWithIcons;
 };
 

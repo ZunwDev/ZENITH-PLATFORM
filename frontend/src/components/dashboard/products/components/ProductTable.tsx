@@ -6,7 +6,9 @@ export default function ProductTable({ data }) {
   return (
     <Table>
       <TableCaption>
-        {data.products.length > 0 ? "A list of existing products." : "No products found. Try changing/removing filters."}
+        {data.products && data.products.length > 0
+          ? "A list of existing products."
+          : "No products found. Try changing/removing filters."}
       </TableCaption>
       <TableHeader>
         <TableRow>
@@ -43,31 +45,32 @@ export default function ProductTable({ data }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.products.map((item, index) => (
-          <TableRow key={index} className="cursor-pointer">
-            <TableCell className="font-bold text-start w-[216px]">{item.name}</TableCell>
-            <TableCell className="text-end">{item.category.name}</TableCell>
-            <TableCell className="text-ellipsis text-end">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger className="text-end">
-                    {item.description.length > 40 ? `${item.description.slice(0, 40)}...` : item.description}
-                  </TooltipTrigger>
-                  <TooltipContent>{item.description}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </TableCell>
-            <TableCell className="text-end">{item.rating}</TableCell>
-            <TableCell className="font-bold text-end">${item.price}</TableCell>
-            <TableCell className="font-bold text-end">${applyDiscount(item.price, item.discount)}</TableCell>
-            <TableCell className="text-end">{item.discount}%</TableCell>
-            <TableCell className="text-end">Open to view</TableCell>
-            <TableCell className="text-end">{item.quantity}</TableCell>
-            <TableCell className="text-end">{item.brand.name}</TableCell>
-            <TableCell className="text-end">{formatDateTime(item.createdAt)}</TableCell>
-            <TableCell className="text-end">{item.archived ? "Yes" : "No"}</TableCell>
-          </TableRow>
-        ))}
+        {data.products &&
+          data.products.map((item, index) => (
+            <TableRow key={index} className="cursor-pointer">
+              <TableCell className="font-bold text-start w-[216px]">{item.name}</TableCell>
+              <TableCell className="text-end">{item.category.name}</TableCell>
+              <TableCell className="text-ellipsis text-end">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="text-end">
+                      {item.description.length > 40 ? `${item.description.slice(0, 40)}...` : item.description}
+                    </TooltipTrigger>
+                    <TooltipContent>{item.description}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableCell>
+              <TableCell className="text-end">{item.rating}</TableCell>
+              <TableCell className="font-bold text-end">${item.price}</TableCell>
+              <TableCell className="font-bold text-end">${applyDiscount(item.price, item.discount)}</TableCell>
+              <TableCell className="text-end">{item.discount}%</TableCell>
+              <TableCell className="text-end">Open to view</TableCell>
+              <TableCell className="text-end">{item.quantity}</TableCell>
+              <TableCell className="text-end">{item.brand.name}</TableCell>
+              <TableCell className="text-end">{formatDateTime(item.createdAt)}</TableCell>
+              <TableCell className="text-end">{item.archived ? "Yes" : "No"}</TableCell>
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
   );

@@ -52,3 +52,9 @@ export function applyDiscount(price: number, discount: number) {
   discountedPrice = discountedPrice - (discountedPrice % 1) + 0.99;
   return discount >= 20 ? discountedPrice : price;
 }
+
+export function setStateDelayed(setState: void, time: number) {
+  setTimeout(() => {
+    setState;
+  }, time);
+}

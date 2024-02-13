@@ -5,8 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { generateOTP } from "@/lib/utils";
-import { API_URL } from "@/lib/constants";
+import { generateOTP, setStateDelayed } from "@/lib/utils";
+import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS, API_URL } from "@/lib/constants";
+import axios from "axios";
 
 interface MainInfoFormProps {
   setFirstPhase: (value: boolean) => void;
@@ -56,35 +57,24 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
 
   const createUser = async ({ values, hashedPassword }: CreateUserParams) => {
     try {
-      const response = await fetch(`${API_URL}/users/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.post(`${API_URL}/users/create`, {
+        user: {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
         },
-        body: JSON.stringify({
-          user: {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            email: values.email,
-          },
-          credentials: {
-            passwordHash: hashedPassword,
-          },
-        }),
+        credentials: {
+          passwordHash: hashedPassword,
+        },
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        if (data.errorCode === 409) {
-          form.setFocus("email");
-          form.setError("email", { message: "User with this email already exists" });
-        }
-        throw new Error("Failed to create user");
-      }
-
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error("Failed to create user", error);
+      const errorMessage =
+        (error.response && { 409: ACCOUNT_CREATE_USER_EXISTS }[error.response.status]) || ACCOUNT_CREATE_SERVER_ERROR_MESSAGE;
+      form.setFocus("email");
+      form.setError("email", { message: errorMessage });
       throw error;
     }
   };
@@ -99,10 +89,7 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
 
       const data = await createUser({ values, hashedPassword });
       setUserId(data.user.userId);
-
-      setTimeout(() => {
-        setFirstPhase(true);
-      }, 200);
+      setStateDelayed(setFirstPhase(true), 200);
     } catch (error) {
       console.error("Email validation error", error);
     }

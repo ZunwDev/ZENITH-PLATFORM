@@ -1,7 +1,8 @@
 import { API_URL, DEFAULT_LIMIT } from "@/lib/constants";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Data, FilterString } from "./interfaces";
 import { NewProductButton, ProductFilter, ProductLimit, ProductSort, ProductTable, ResetFilter } from "./components";
+import axios from "axios";
 
 export default function Products() {
   const [filterString, setFilterString] = useState<FilterString>({
@@ -11,45 +12,42 @@ export default function Products() {
   });
 
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [productAPIURL, setProductAPIURL] = useState(`${API_URL}/products?limit=${limit}&`);
-  const [combinedFilterString, setCombinedFilterString] = useState("");
   const [checkedArchived, setCheckedArchived] = useState<number[]>([]);
   const [checkedCategories, setCheckedCategories] = useState<number[]>([]);
   const [checkedBrands, setCheckedBrands] = useState<number[]>([]);
-  const [filterAmount, setFilterAmount] = useState(0);
   const [data, setData] = useState<Data>({ products: [], categories: [], brands: [] });
 
-  const getProducts = async (productAPIURL: string) => {
-    const response = await fetch(productAPIURL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const productAPIURL = useMemo(() => {
+    const { brand, category, archived } = filterString;
+    const combined = `${API_URL}/products?limit=${limit}&${brand}${category}${archived}`;
+    return combined;
+  }, [filterString, limit]);
 
-    if (response.ok) {
-      const data = await response.json();
-      return data.content;
-    } else {
-      const data = await response.json();
-      console.error("Error fetching products:", data.message);
+  const filterAmount = useMemo(() => {
+    return checkedArchived.length + checkedBrands.length + checkedCategories.length;
+  }, [checkedArchived, checkedBrands, checkedCategories]);
+
+  const getProducts = async (productAPIURL: string) => {
+    try {
+      const response = await axios.get(productAPIURL);
+      return response.data.content;
+    } catch (error) {
+      console.error("Error fetching products:", error.response?.data?.message || error.message);
       return [];
     }
   };
 
   const getFilterData = async (filterUrl: string) => {
-    const response = await fetch(`${API_URL}/products/${filterUrl}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    return data;
+    try {
+      const response = await axios.get(`${API_URL}/products/${filterUrl}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching filter data:", error.response?.data?.message || error.message);
+      return [];
+    }
   };
 
   const handleResetFilters = () => {
-    setCombinedFilterString("");
     setFilterString({
       brand: "",
       category: "",
@@ -70,9 +68,9 @@ export default function Products() {
         ]);
 
         setData({
+          products: productsData,
           categories: categoriesData,
           brands: brandsData,
-          products: productsData,
         });
       } catch (error) {
         console.error("Error fetching categories, brands, and products:", error);
@@ -80,31 +78,13 @@ export default function Products() {
     };
 
     fetchData();
-  }, [productAPIURL]);
-
-  useEffect(() => {
-    const { brand, category, archived } = filterString;
-    const combined = `${brand}${category}${archived}`;
-    setCombinedFilterString(combined);
-    setFilterAmount(checkedArchived.length + checkedBrands.length + checkedCategories.length);
-
-    const updateUrl = () => {
-      if (combinedFilterString) {
-        const updatedUrl = `${API_URL}/products?limit=${limit}&${combinedFilterString}`;
-        setProductAPIURL(updatedUrl);
-      } else {
-        setProductAPIURL(`${API_URL}/products?limit=${limit}&`);
-      }
-    };
-
-    updateUrl();
-  }, [checkedArchived.length, checkedBrands.length, checkedCategories.length, filterString, limit, combinedFilterString]);
+  }, [productAPIURL, limit]);
 
   return (
     <div className="flex flex-col gap-20">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold w-full">Products ({data.products.length})</h1>
+          {data.products && <h1 className="text-3xl font-bold w-full">Products ({data.products.length})</h1>}
           <h2>Manage products for ZENITH store</h2>
         </div>
         {/* Button to create a new project */}

@@ -8,6 +8,7 @@ import { CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import axios from "axios";
 
 interface VerifyFormProps {
   verifyCode: string;
@@ -36,21 +37,15 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
   });
 
   async function handleVerifyClick(values: z.infer<typeof VerifyCodeSchema>) {
-    VerifyCodeSchema.parse(values);
-    const response = await fetch(`${API_URL}/users/verify/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
+    try {
+      VerifyCodeSchema.parse(values);
+      await axios.put(`${API_URL}/users/verify/${userId}`);
+      setVerifyState(true);
+      setButtonText("REDIRECTING...");
+      goto("/auth/signin", 1000);
+    } catch (error) {
       throw new Error("Failed to verify a user");
     }
-
-    setVerifyState(true);
-    setButtonText("REDIRECTING...");
-    goto("/auth/signin", 2000);
   }
 
   return (

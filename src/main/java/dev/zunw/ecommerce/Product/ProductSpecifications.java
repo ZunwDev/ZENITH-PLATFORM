@@ -16,7 +16,7 @@ public class ProductSpecifications {
     public static Specification<Product> withCategories(List<Long> categoryIds) {
         return (root, query, builder) -> {
             if (categoryIds != null && !categoryIds.isEmpty()) {
-                return root.get("category").get("productCategoryId").in(categoryIds);
+                return root.get("category").get("categoryId").in(categoryIds);
             }
             return null;
         };

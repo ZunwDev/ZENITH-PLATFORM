@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { cn, goto, setCookies } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { API_URL, LOGIN_ERROR_MESSAGE } from "@/lib/constants";
+import { API_URL, LOGIN_ERROR_MESSAGE, LOGIN_INVALID_CREDENTIALS_MESSAGE, LOGIN_SERVER_ERROR_MESSAGE } from "@/lib/constants";
+import axios from "axios";
 
 const FormSchema = z.object({
   email: z.string().email("Invalid email format.").min(2, "Please enter an email address"),
@@ -33,31 +34,27 @@ export default function LoginForm() {
       FormSchema.parse(values);
       setIsLogged(true);
 
-      const response = await fetch(`${API_URL}/users/check-login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
+      const response = await axios.post(`${API_URL}/users/check-login`, {
+        email: values.email,
+        password: values.password,
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
         setIsLogged(true);
-
-        isChecked ? setCookies(data, 77777, "true") : setCookies(data, 0.25, "false"); //If user checks remember me, set the cookies for really long time, if not only quarter of a day
-        goto("/", 200); //Redirect user to "/" in 200ms
-      } else if (response.status === 404 || response.status === 401) {
-        form.setError("email", { message: LOGIN_ERROR_MESSAGE });
-        form.setError("password", { message: LOGIN_ERROR_MESSAGE });
-        setIsLogged(false);
-        return false;
+        isChecked ? setCookies(response.data, 77777, "true") : setCookies(response.data, 0.25, "false");
+        goto("/", 500); //Redirect user after successful login to homepage in 500ms
       }
     } catch (error) {
       console.error("Login error", error);
+      const errorMessage =
+        (error.response &&
+          {
+            401: LOGIN_INVALID_CREDENTIALS_MESSAGE,
+            404: LOGIN_ERROR_MESSAGE,
+          }[error.response.status]) ||
+        LOGIN_SERVER_ERROR_MESSAGE;
+      form.setError("email", { message: errorMessage });
+      form.setError("password", { message: errorMessage });
       setIsLogged(false);
     }
   };
@@ -91,7 +88,7 @@ export default function LoginForm() {
           type="submit"
           disabled={isLogged}
           onClick={form.handleSubmit(handleLoginClick)}>
-          LOGIN
+          {isLogged ? "REDIRECTING IN A MOMENT..." : "LOGIN"}
         </Button>
       </form>
     </Form>
