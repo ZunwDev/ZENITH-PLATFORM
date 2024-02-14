@@ -12,7 +12,7 @@ export default function Signup() {
   const [verifyState, setVerifyState] = useState(false);
 
   useEffect(() => {
-    if (Cookies.get("firstName") !== undefined) {
+    if (!Cookies.get("sessionToken")) {
       goto("/");
     }
   }, []);

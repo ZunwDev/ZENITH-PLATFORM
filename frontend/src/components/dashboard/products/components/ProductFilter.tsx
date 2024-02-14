@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
-import { Dispatch, SetStateAction, useCallback } from "react";
-import { Data, FilterString } from "../interfaces";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { Brand, Category, FilterString } from "../interfaces";
+import { API_URL } from "@/lib/constants";
+import axios from "axios";
 
 interface ProductFilter {
   setFilterString: (value: FilterString) => void;
   filterAmount: number;
-  data: Data;
   checkedBrands: number[];
   setCheckedBrands: (value: number[]) => void;
   checkedCategories: number[];
@@ -31,7 +32,6 @@ interface ProductFilter {
 export default function ProductFilter({
   setFilterString,
   filterAmount,
-  data,
   checkedBrands,
   setCheckedBrands,
   checkedCategories,
@@ -39,6 +39,9 @@ export default function ProductFilter({
   checkedArchived,
   setCheckedArchived,
 }: ProductFilter) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+
   const handleFilterChange = useCallback(
     (type: string, id: number, setChecked: Dispatch<SetStateAction<number[]>>) => {
       setChecked((prev: number[]) => {
@@ -51,6 +54,43 @@ export default function ProductFilter({
     },
     [setFilterString]
   );
+
+  const debounce = useCallback((fn, delay) => {
+    let timeoutId;
+    return function (...args) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => {
+        fn.apply(this, args);
+      }, delay);
+    };
+  }, []);
+
+  const debouncedFetchFilters = useMemo(
+    () =>
+      debounce(async () => {
+        try {
+          const [categoriesResponse, brandsResponse] = await Promise.all([
+            axios.get(`${API_URL}/products/category`),
+            axios.get(`${API_URL}/products/brand`),
+          ]);
+          setCategories(categoriesResponse.data);
+          setBrands(brandsResponse.data);
+        } catch (error) {
+          console.error("Error fetching products:", error.response?.data?.message || error.message);
+          setCategories([]);
+          setBrands([]);
+        }
+      }, 250),
+    [debounce]
+  );
+
+  useEffect(() => {
+    debouncedFetchFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="group">
@@ -63,10 +103,10 @@ export default function ProductFilter({
           Filter By
           {filterAmount > 0 && (
             <div
-              className={cn("bg-primary size-5 rounded-full flex items-center justify-center text-accent", {
+              className={cn("bg-primary size-5 rounded-full flex items-center justify-center", {
                 "px-4": filterAmount > 9,
               })}>
-              {filterAmount > 99 ? "99" : filterAmount}
+              {filterAmount > 99 ? "99+" : filterAmount}
             </div>
           )}
           <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
@@ -81,7 +121,7 @@ export default function ProductFilter({
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent className="h-96 overflow-auto">
-              {data.brands.map((item, index) => (
+              {brands.map((item, index) => (
                 <DropdownMenuCheckboxItem
                   key={index}
                   checked={checkedBrands.includes(item.brandId)}
@@ -100,7 +140,7 @@ export default function ProductFilter({
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              {data.categories.map((item, index) => (
+              {categories.map((item, index) => (
                 <DropdownMenuCheckboxItem
                   key={index}
                   checked={checkedCategories.includes(item.categoryId)}

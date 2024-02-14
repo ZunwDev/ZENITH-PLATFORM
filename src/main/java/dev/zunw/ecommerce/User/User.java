@@ -1,10 +1,12 @@
 package dev.zunw.ecommerce.User;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Setter
@@ -26,8 +28,8 @@ public class User {
     private Boolean verified;
     private String email;
 
-    @Column(name = "user_role_id")
-    private Integer userRoleId;
+    @Column(name = "role_id")
+    private UUID roleId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -35,7 +37,9 @@ public class User {
     public User() {
         this.createdAt = LocalDateTime.now();
         this.verified = false;
-        this.userRoleId = 1;
+
+        Dotenv dotenv = Dotenv.load();
+        this.roleId = UUID.fromString(Objects.requireNonNull(dotenv.get("BASE_UUID_FOR_USER_ROLE")));
     }
 }
 

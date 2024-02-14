@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { cn, goto, setCookies } from "@/lib/utils";
+import { cn, goto } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { API_URL, LOGIN_ERROR_MESSAGE, LOGIN_INVALID_CREDENTIALS_MESSAGE, LOGIN_SERVER_ERROR_MESSAGE } from "@/lib/constants";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const FormSchema = z.object({
   email: z.string().email("Invalid email format.").min(2, "Please enter an email address"),
@@ -37,11 +38,13 @@ export default function LoginForm() {
       const response = await axios.post(`${API_URL}/users/check-login`, {
         email: values.email,
         password: values.password,
+        isChecked: String(isChecked),
       });
 
       if (response.status === 200) {
         setIsLogged(true);
-        isChecked ? setCookies(response.data, 77777, "true") : setCookies(response.data, 0.25, "false");
+        const duration = isChecked ? 30 : 0.25;
+        Cookies.set("sessionToken", response.data.sessionToken, { expires: duration, secure: true });
         goto("/", 500); //Redirect user after successful login to homepage in 500ms
       }
     } catch (error) {

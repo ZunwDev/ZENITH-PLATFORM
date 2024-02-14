@@ -7,7 +7,7 @@ import { goto } from "@/lib/utils";
 
 export default function Login() {
   useEffect(() => {
-    if (Cookies.get("firstName") !== undefined) {
+    if (!Cookies.get("sessionToken")) {
       goto("/");
     }
   }, []);

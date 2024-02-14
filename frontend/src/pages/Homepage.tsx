@@ -2,7 +2,7 @@ import { Benefits, AdBanner, FeaturedProductsInEachCategory, ViewCategories } fr
 
 export default function Homepage() {
   return (
-    <div className="mt-32 flex flex-col gap-12 px-8 text-accent-foreground">
+    <div className="mt-32 flex flex-col gap-12 px-8">
       <Benefits />
       <AdBanner />
       <FeaturedProductsInEachCategory />

@@ -1,5 +1,6 @@
 package dev.zunw.ecommerce.User;
 
+import dev.zunw.ecommerce.Session.Session;
 import dev.zunw.ecommerce.UserCredentials.UserCredentials;
 import dev.zunw.ecommerce.dto.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -29,6 +31,18 @@ public class UserController {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(users);
+        }
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/session/{id}")
+    public ResponseEntity<Object> getSessionById(@PathVariable UUID id) {
+        Optional<Session> sessionOptional = userService.getSessionById(id);
+        if (sessionOptional.isPresent()) {
+            Session session = sessionOptional.get();
+            return ResponseEntity.ok(session);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: Session not found");
         }
     }
 
@@ -66,6 +80,14 @@ public class UserController {
     public ResponseEntity<Object> checkUserLogin(@RequestBody Map<String, String> requestBody) {
         String email = requestBody.get("email");
         String password = requestBody.get("password");
+        String isChecked = requestBody.get("isChecked");
+
+        LocalDateTime expirationTime;
+        if (Boolean.parseBoolean(isChecked)) {
+            expirationTime = LocalDateTime.now().plusDays(30);
+        } else {
+            expirationTime = LocalDateTime.now().plusHours(6);
+        }
 
         Optional<User> userOptional = userService.getUserByEmail(email);
         if (userOptional.isEmpty()) {
@@ -79,11 +101,10 @@ public class UserController {
         }
 
         UserCredentials credentials = credentialsOptional.get();
-        if (BCrypt.checkpw(password, credentials.getPasswordHash()))  {
+        if (BCrypt.checkpw(password, credentials.getPasswordHash())) {
+            UUID sessionId = userService.createSession(user.getUserId(), user.getRoleId(), expirationTime, user.getFirstName());
             Map<String, Object> response = new HashMap<>();
-            response.put("userId", user.getUserId());
-            response.put("username", user.getFirstName());
-            response.put("roleId", user.getUserRoleId());
+            response.put("sessionToken", sessionId);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
@@ -133,10 +154,17 @@ public class UserController {
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @CrossOrigin(origins = "*")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable UUID id) {
         User deletedUser = userService.deleteUser(id);
         return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
+    }
+
+    @CrossOrigin(origins = "*")
+    @DeleteMapping("/session/delete/{id}")
+    public ResponseEntity<Object> deleteSession(@PathVariable UUID id) {
+        userService.deleteSession(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted a session");
     }
 }

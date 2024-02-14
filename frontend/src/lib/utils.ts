@@ -10,15 +10,17 @@ export function generateOTP() {
   return (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString(); //Return random number between 100000-999999
 }
 
-export function formatDateTime(dateTimeString: string) {
-  const date = new Date(dateTimeString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const currentDate = new Date();
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    year: date.getFullYear() === currentDate.getFullYear() ? "numeric" : undefined,
+  };
+
+  return date.toLocaleDateString("en-US", options);
 }
 
 export function removeAllCookies() {
@@ -26,19 +28,6 @@ export function removeAllCookies() {
     Cookies.remove(cookieName);
   });
   window.location.reload();
-}
-
-interface UserData {
-  userId: string;
-  username: string;
-  roleId: string;
-}
-
-export function setCookies(data: UserData, duration: number, remember: string) {
-  Cookies.set("firstName", data.username, { expires: duration });
-  Cookies.set("userId", data.userId, { expires: duration });
-  Cookies.set("roleId", data.roleId, { expires: duration });
-  Cookies.set("rememberMe", remember, { expires: duration });
 }
 
 export function goto(url: string, timeToProceed: number = 0) {

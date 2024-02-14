@@ -1,14 +1,12 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { applyDiscount, formatDateTime } from "@/lib/utils";
+import { applyDiscount, formatDate } from "@/lib/utils";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
 
 export default function ProductTable({ data }) {
   return (
     <Table>
       <TableCaption>
-        {data.products && data.products.length > 0
-          ? "A list of existing products."
-          : "No products found. Try changing/removing filters."}
+        {data && data.length > 0 ? "A list of existing products." : "No products found. Try changing/removing filters."}
       </TableCaption>
       <TableHeader>
         <TableRow>
@@ -45,8 +43,8 @@ export default function ProductTable({ data }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.products &&
-          data.products.map((item, index) => (
+        {data &&
+          data.map((item, index) => (
             <TableRow key={index} className="cursor-pointer">
               <TableCell className="font-bold text-start w-[216px]">{item.name}</TableCell>
               <TableCell className="text-end">{item.category.name}</TableCell>
@@ -67,7 +65,7 @@ export default function ProductTable({ data }) {
               <TableCell className="text-end">Open to view</TableCell>
               <TableCell className="text-end">{item.quantity}</TableCell>
               <TableCell className="text-end">{item.brand.name}</TableCell>
-              <TableCell className="text-end">{formatDateTime(item.createdAt)}</TableCell>
+              <TableCell className="text-end w-[130px]">{formatDate(item.createdAt)}</TableCell>
               <TableCell className="text-end">{item.archived ? "Yes" : "No"}</TableCell>
             </TableRow>
           ))}

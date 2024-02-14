@@ -3,11 +3,11 @@ import Cookies from "js-cookie";
 import logo from "@/assets/logo.svg";
 import { cn } from "@/lib/utils";
 import { Cart, SearchBar, User } from "../header";
+import { useEffect, useState } from "react";
+import { fetchSessionData } from "@/lib/api";
+import { SessionData } from "@/lib/interfaces";
 
-const userId = Cookies.get("userId");
-const roleId = Cookies.get("roleId");
-const urlPathName = window.location.pathname;
-const isAdminDashboard = urlPathName.startsWith(`/${userId}/dashboard`);
+const sessionToken = Cookies.get("sessionToken");
 
 const adminButtons: { name: string; goto: string }[] = [
   { name: "Overview", goto: "/overview" },
@@ -17,14 +17,26 @@ const adminButtons: { name: string; goto: string }[] = [
 ];
 
 export default function Header() {
+  const [data, setData] = useState<SessionData>({ roleId: "", userId: "", firstName: "", isAdmin: false });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setData(await fetchSessionData(sessionToken));
+      } catch (error) {
+        return;
+      }
+    })();
+  }, []);
+
   return (
-    <header className="h-16 border-b px-8 w-full bg-background shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] text-accent-foreground">
-      <nav className={cn("flex items-center h-full flex-row", { "justify-between": !isAdminDashboard })}>
+    <header className="h-16 border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px]">
+      <nav className={cn("flex items-center h-full flex-row", { "justify-between": !data.isAdmin })}>
         <a className="flex flex-row gap-4 items-center" href="/">
           <img src={logo} alt="logo" role="img" className="md:h-12 h-8 select-none" loading="lazy" width={64} height={64} />
           <p className="md:text-2xl text-lg tracking-widest font-semibold select-none logoClass">ZENITH</p>
         </a>
-        {!isAdminDashboard ? (
+        {!data.isAdmin ? (
           <div className="flex md:gap-2 flex-row-reverse">
             {/* User */}
             <User />
@@ -36,17 +48,17 @@ export default function Header() {
             <SearchBar />
           </div>
         ) : (
-          roleId === "2" && (
+          data.isAdmin && (
             <div className="flex flex-row justify-between w-full pl-8">
               <div>
                 {adminButtons.map((item, index) => (
                   <Button variant="ghost" key={index} asChild>
                     <a
-                      className="font-semibold text-accent-foreground cursor-pointer"
-                      href={`/${userId}/dashboard${item.goto}`}
+                      className="font-semibold cursor-pointer"
+                      href={`/${data.userId}/dashboard${item.goto}`}
                       onClick={(e) => {
                         e.preventDefault();
-                        window.location.replace(`/${userId}/dashboard${item.goto}`);
+                        window.location.replace(`/${data.userId}/dashboard${item.goto}`);
                       }}>
                       {item.name}
                     </a>

@@ -20,6 +20,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     // Custom query to find users by email ending with a specific domain
     List<User> findByEmailEndingWith(String domain);
-
-    List<User> findByUserRoleId(Integer role);
 }

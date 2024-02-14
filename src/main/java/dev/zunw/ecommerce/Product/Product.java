@@ -34,6 +34,25 @@ public class Product {
 
     @Transient
     private transient JsonNode parsedSpecifications;
+    private String description;
+    private Float rating;
+    private Float price;
+    @JsonIgnore
+    private String specifications;
+    private Integer quantity;
+    private Integer discount;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    private Boolean archived;
+
+    public Product() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.archived = false;
+        this.rating = 0.0f;
+    }
 
     @PostLoad
     public void parseSpecifications() {
@@ -43,30 +62,5 @@ public class Product {
         } catch (Exception e) {
             this.parsedSpecifications = mapper.createObjectNode().put("message", "No specifications");
         }
-    }
-
-    private String description;
-    private Float rating;
-    private Float price;
-
-    @JsonIgnore
-    private String specifications;
-
-    private Integer quantity;
-    private Integer discount;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    private Boolean archived;
-
-    public Product() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-        this.archived = false;
-        this.rating = 0.0f;
     }
 }
