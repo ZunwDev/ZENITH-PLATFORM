@@ -37,7 +37,7 @@ export default function LoginForm() {
 
       const response = await axios.post(`${API_URL}/users/check-login`, {
         email: values.email,
-        password: values.password,
+        password: btoa(values.password),
         isChecked: String(isChecked),
       });
 

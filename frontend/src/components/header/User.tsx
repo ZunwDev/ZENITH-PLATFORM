@@ -54,6 +54,7 @@ export default function User() {
       await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`);
       removeAllCookies();
     } catch (error) {
+      removeAllCookies();
       return;
     }
   };
@@ -78,7 +79,7 @@ export default function User() {
             </a>
           </DropdownMenuItem>
         ))}
-        {data.isAdmin && (
+        {sessionToken && data.isAdmin && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Administrator</DropdownMenuLabel>

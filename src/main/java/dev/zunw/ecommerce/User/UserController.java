@@ -77,16 +77,20 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/check-login")
-    public ResponseEntity<Object> checkUserLogin(@RequestBody Map<String, String> requestBody) {
-        String email = requestBody.get("email");
-        String password = requestBody.get("password");
-        String isChecked = requestBody.get("isChecked");
+    public ResponseEntity<Object> checkUserLogin(@RequestBody Map<String, Object> requestBody) throws Exception {
+        System.out.println(requestBody);
+        String email = (String) requestBody.get("email");
+        String base64EncodedPassword = (String) requestBody.get("password");
+        String isChecked = (String) requestBody.get("isChecked");
 
-        LocalDateTime expirationTime;
+        byte[] decodedBytes = Base64.getDecoder().decode(base64EncodedPassword);
+        String decodedString = new String(decodedBytes);
+
+        LocalDateTime expirationTime = LocalDateTime.now();
         if (Boolean.parseBoolean(isChecked)) {
-            expirationTime = LocalDateTime.now().plusDays(30);
+            expirationTime = expirationTime.plusDays(30);
         } else {
-            expirationTime = LocalDateTime.now().plusHours(6);
+            expirationTime = expirationTime.plusHours(6);
         }
 
         Optional<User> userOptional = userService.getUserByEmail(email);
@@ -101,11 +105,11 @@ public class UserController {
         }
 
         UserCredentials credentials = credentialsOptional.get();
-        if (BCrypt.checkpw(password, credentials.getPasswordHash())) {
+        if (BCrypt.checkpw(decodedString, credentials.getPasswordHash())) {
             UUID sessionId = userService.createSession(user.getUserId(), user.getRoleId(), expirationTime, user.getFirstName());
             Map<String, Object> response = new HashMap<>();
             response.put("sessionToken", sessionId);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
         }
