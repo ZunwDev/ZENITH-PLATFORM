@@ -6,7 +6,10 @@ import dev.zunw.ecommerce.ProductCategory.ProductCategory;
 import dev.zunw.ecommerce.ProductCategory.ProductCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,11 +30,13 @@ public class ProductService {
         this.productBrandRepository = productBrandRepository;
     }
 
-    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> archiveIds, Pageable pageable) {
+    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> archiveIds, Pageable pageable, String sortBy, String sortDirection) {
+        Sort sort = Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         if (categoryIds == null && brandIds == null && archiveIds == null) {
             return productRepository.findAll(pageable);
         } else {
-            return productRepository.findAll(ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, archiveIds), pageable);
+            Specification<Product> specification = ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, archiveIds);
+            return productRepository.findAll(specification, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
         }
     }
 

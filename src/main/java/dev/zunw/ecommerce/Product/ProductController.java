@@ -28,11 +28,13 @@ public class ProductController {
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) List<Long> brand,
             @RequestParam(required = false) List<Long> category,
-            @RequestParam(required = false) List<Long> archived
+            @RequestParam(required = false) List<Long> archived,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDirection
     ) {
         Pageable pageable = PageRequest.of(page, limit);
         List<Boolean> finalArchived = getFinalArchived(archived);
-        Page<Product> products = productService.findByFilters(category, brand, finalArchived, pageable);
+        Page<Product> products = productService.findByFilters(category, brand, finalArchived, pageable, sortBy, sortDirection);
 
         if (products.isEmpty()) {
             Map<String, Object> response = new HashMap<>();

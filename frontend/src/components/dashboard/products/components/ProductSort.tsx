@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,8 +10,66 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
+import React from "react";
 
-export default function ProductSort() {
+const sorts = [
+  {
+    name: "Rating",
+    sortOptions: {
+      name: "rating",
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
+  {
+    name: "Original Price",
+    sortOptions: {
+      name: "price",
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
+  {
+    name: "Quantity",
+    sortOptions: {
+      name: "quantity",
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
+  {
+    name: "Discount",
+    sortOptions: {
+      name: "discount",
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
+  {
+    name: "Creation Date",
+    sortOptions: {
+      name: "createdAt",
+      asc: "Oldest",
+      desc: "Newest",
+    },
+  },
+];
+
+export default function ProductSort({ sortBy, setSortBy }) {
+  const dropdownMenuItems = useMemo(
+    () =>
+      sorts.map((item, index) => (
+        <React.Fragment key={index}>
+          <DropdownMenuLabel>{item.name}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioItem value={`${item.sortOptions.name}_asc`}>{item.sortOptions.asc}</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value={`${item.sortOptions.name}_desc`}>{item.sortOptions.desc}</DropdownMenuRadioItem>
+          {index !== sorts.length - 1 && <DropdownMenuSeparator key={`separator-${index}`} />}
+        </React.Fragment>
+      )),
+    []
+  );
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="group data-[state=open]:bg-accent/50">
@@ -21,39 +80,8 @@ export default function ProductSort() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
-        <DropdownMenuLabel>Rating</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup>
-          <DropdownMenuRadioItem value="rating_ascending">Ascending</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="rating_descending">Descending</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Original Price</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup>
-          <DropdownMenuRadioItem value="original_ascending">Ascending</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="original_descending">Descending</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Discounted Price</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup>
-          <DropdownMenuRadioItem value="discounted_ascending">Ascending</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="discounted_descending">Descending</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Quantity</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup>
-          <DropdownMenuRadioItem value="quantity_ascending">Ascending</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="quantity_descending">Descending</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Creation Date</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup>
-          <DropdownMenuRadioItem value="quantity_ascending">Newest</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="quantity_descending">Oldest</DropdownMenuRadioItem>
+        <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
+          {dropdownMenuItems}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

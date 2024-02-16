@@ -1,4 +1,4 @@
-export interface Product {
+interface Product {
   productId: string;
   name: string;
   category: {
@@ -38,4 +38,45 @@ export interface Data {
   brands: Brand[];
   categories: Category[];
   products: Product[];
+}
+
+export interface Checked {
+  brands: number[];
+  categories: number[];
+  archived: number[];
+}
+
+export const initialCheckedState: Checked = {
+  archived: [],
+  categories: [],
+  brands: [],
+};
+
+interface Sort {
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
+}
+
+interface Pageable {
+  offset: number;
+  pageNumber: number;
+  pageSize: number;
+  paged: boolean;
+  sort: Sort;
+  unpaged: boolean;
+}
+
+export interface Page {
+  content: Product;
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: Pageable;
+  size: number;
+  sort: Sort;
+  totalElements: number;
+  totalPages: number;
 }
