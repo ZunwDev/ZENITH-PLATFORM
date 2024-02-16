@@ -78,7 +78,6 @@ public class UserController {
     @CrossOrigin(origins = "*")
     @PostMapping("/check-login")
     public ResponseEntity<Object> checkUserLogin(@RequestBody Map<String, Object> requestBody) throws Exception {
-        System.out.println(requestBody);
         String email = (String) requestBody.get("email");
         String base64EncodedPassword = (String) requestBody.get("password");
         String isChecked = (String) requestBody.get("isChecked");

@@ -78,7 +78,8 @@ public class UserService {
         session.setFirstName(firstName);
 
         Dotenv dotenv = Dotenv.load();
-        session.setIsAdmin(roleId == UUID.fromString(Objects.requireNonNull(dotenv.get("BASE_UUID_FOR_ADMIN_ROLE"))));
+        session.setRoleId(UUID.fromString(Objects.requireNonNull(dotenv.get("BASE_UUID_FOR_ADMIN_ROLE"))));
+        session.setIsAdmin(session.getRoleId().equals(UUID.fromString(Objects.requireNonNull(dotenv.get("BASE_UUID_FOR_ADMIN_ROLE")))));
 
         sessionRepository.save(session);
         return session.getSessionId();

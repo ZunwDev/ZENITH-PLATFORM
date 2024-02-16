@@ -30,6 +30,10 @@ export default function LoginForm() {
     },
   });
 
+  const handleRememberMeClick = () => {
+    setIsChecked((prev) => !prev);
+  };
+
   const handleLoginClick = async (values: z.infer<typeof FormSchema>) => {
     try {
       FormSchema.parse(values);
@@ -82,7 +86,7 @@ export default function LoginForm() {
         </FormItem>
 
         <div className="flex items-center justify-end space-x-2">
-          <Checkbox id="KS" onChange={() => setIsChecked(!isChecked)} />
+          <Checkbox id="KS" onClick={handleRememberMeClick} />
           <Label htmlFor="KS">Remember me</Label>
         </div>
 
