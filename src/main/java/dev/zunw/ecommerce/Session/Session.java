@@ -1,10 +1,12 @@
 package dev.zunw.ecommerce.Session;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Setter

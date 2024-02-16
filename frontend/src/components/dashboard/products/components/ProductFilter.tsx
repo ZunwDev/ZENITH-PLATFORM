@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,47 +14,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { Brand, Category, FilterString } from "../interfaces";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Brand, Category, Checked, FilterString } from "../interfaces";
 import { API_URL } from "@/lib/constants";
 import axios from "axios";
 
 interface ProductFilter {
   setFilterString: (value: FilterString) => void;
+  setFilterAmount: (value: number) => void;
   filterAmount: number;
-  checkedBrands: number[];
-  setCheckedBrands: (value: number[]) => void;
-  checkedCategories: number[];
-  setCheckedCategories: (value: number[]) => void;
-  checkedArchived: number[];
-  setCheckedArchived: (value: number[]) => void;
+  checked: Checked;
+  setChecked: (value: Checked) => void;
 }
 
-export default function ProductFilter({
-  setFilterString,
-  filterAmount,
-  checkedBrands,
-  setCheckedBrands,
-  checkedCategories,
-  setCheckedCategories,
-  checkedArchived,
-  setCheckedArchived,
-}: ProductFilter) {
+export default function ProductFilter({ setFilterString, setFilterAmount, filterAmount, checked, setChecked }: ProductFilter) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
 
-  const handleFilterChange = useCallback(
-    (type: string, id: number, setChecked: Dispatch<SetStateAction<number[]>>) => {
-      setChecked((prev: number[]) => {
-        const updated = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        setFilterString((prevFilter) => ({ ...prevFilter, [type]: updated.map((item) => `${type}=${item}&`).join("") }));
-        return updated;
-      });
-    },
-    [setFilterString]
-  );
+  const handleFilterChange = useCallback((type: keyof Checked, id: number, s: string) => {
+    //@ts-expect-error
+    setChecked((prevState) => {
+      const updated = prevState[type].includes(id) ? prevState[type].filter((item) => item !== id) : [...prevState[type], id];
+
+      const updatedFilterString = {
+        ...prevState,
+        [type]: updated,
+      };
+
+      const updatedFilterStringValues = updatedFilterString[type].map((item) => `${s}=${item}`).join("&");
+
+      //@ts-expect-error
+      setFilterString((prev: FilterString) => ({ ...prev, [s]: updatedFilterStringValues }));
+      return updatedFilterString;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const debounce = useCallback((fn, delay) => {
     let timeoutId;
@@ -86,10 +81,23 @@ export default function ProductFilter({
     [debounce]
   );
 
+  const getFilterAmountLabel = (type: string) => {
+    return checked[type].length > 0 && "(" + checked[type].length + ")";
+  };
+
+  const checkedIncludes = (type: string, id: number) => {
+    return checked[type].includes(id);
+  };
+
   useEffect(() => {
     debouncedFetchFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setFilterAmount(checked.archived.length + checked.brands.length + checked.categories.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checked.archived, checked.brands, checked.categories]);
 
   return (
     <DropdownMenu modal={false}>
@@ -103,7 +111,7 @@ export default function ProductFilter({
           Filter By
           {filterAmount > 0 && (
             <div
-              className={cn("bg-primary size-5 rounded-full flex items-center justify-center", {
+              className={cn("bg-primary size-5 rounded-full flex items-center justify-center text-accent", {
                 "px-4": filterAmount > 9,
               })}>
               {filterAmount > 99 ? "99+" : filterAmount}
@@ -117,17 +125,15 @@ export default function ProductFilter({
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <span>Brand {checkedBrands.length > 0 && "(" + checkedBrands.length + ")"}</span>
+            <span>Brand {getFilterAmountLabel("brands")}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent className="h-96 overflow-auto">
               {brands.map((item, index) => (
                 <DropdownMenuCheckboxItem
                   key={index}
-                  checked={checkedBrands.includes(item.brandId)}
-                  onCheckedChange={() =>
-                    handleFilterChange("brand", item.brandId, setCheckedBrands as Dispatch<SetStateAction<number[]>>)
-                  }>
+                  checked={checkedIncludes("brands", item.brandId)}
+                  onCheckedChange={() => handleFilterChange("brands", item.brandId, "brand")}>
                   {item.name}
                 </DropdownMenuCheckboxItem>
               ))}
@@ -136,17 +142,15 @@ export default function ProductFilter({
         </DropdownMenuSub>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <span>Category {checkedCategories.length > 0 && "(" + checkedCategories.length + ")"}</span>
+            <span>Category {getFilterAmountLabel("categories")}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               {categories.map((item, index) => (
                 <DropdownMenuCheckboxItem
                   key={index}
-                  checked={checkedCategories.includes(item.categoryId)}
-                  onCheckedChange={() =>
-                    handleFilterChange("category", item.categoryId, setCheckedCategories as Dispatch<SetStateAction<number[]>>)
-                  }>
+                  checked={checkedIncludes("categories", item.categoryId)}
+                  onCheckedChange={() => handleFilterChange("categories", item.categoryId, "category")}>
                   {item.name}
                 </DropdownMenuCheckboxItem>
               ))}
@@ -155,22 +159,18 @@ export default function ProductFilter({
         </DropdownMenuSub>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <span>Archived {checkedArchived.length > 0 && "(" + checkedArchived.length + ")"}</span>
+            <span>Archived {getFilterAmountLabel("archived")}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               <DropdownMenuCheckboxItem
-                checked={checkedArchived.includes(0)}
-                onCheckedChange={() =>
-                  handleFilterChange("archived", 0, setCheckedArchived as Dispatch<SetStateAction<number[]>>)
-                }>
+                checked={checkedIncludes("archived", 0)}
+                onCheckedChange={() => handleFilterChange("archived", 0, "archived")}>
                 Show Archived Products
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={checkedArchived.includes(1)}
-                onCheckedChange={() =>
-                  handleFilterChange("archived", 1, setCheckedArchived as Dispatch<SetStateAction<number[]>>)
-                }>
+                checked={checkedIncludes("archived", 1)}
+                onCheckedChange={() => handleFilterChange("archived", 1, "archived")}>
                 Show Active Products
               </DropdownMenuCheckboxItem>
             </DropdownMenuSubContent>
