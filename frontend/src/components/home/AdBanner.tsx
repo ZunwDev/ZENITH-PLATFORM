@@ -11,7 +11,7 @@ const images = [
 export default function AdBanner() {
   return (
     <Carousel
-      className="w-full max-h-96"
+      className="w-full md:max-h-[640px] max-h-96"
       opts={{
         align: "start",
         loop: true,
@@ -26,7 +26,7 @@ export default function AdBanner() {
           <CarouselItem key={index} className="rounded-lg">
             <div className="p-1">
               <Card>
-                <CardContent className="flex h-96 items-center justify-center !p-0 rounded-lg">
+                <CardContent className="flex h-96 md:h-[640px] items-center justify-center !p-0 rounded-lg">
                   <img src={img} className="object-fill block h-full w-full rounded-lg" loading="lazy" alt={"ad" + index} />
                 </CardContent>
               </Card>
