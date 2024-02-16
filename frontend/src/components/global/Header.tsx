@@ -18,6 +18,7 @@ const adminButtons: { name: string; goto: string }[] = [
 
 export default function Header() {
   const [data, setData] = useState<SessionData>({ roleId: "", userId: "", firstName: "", isAdmin: false });
+  const urlContainsDashboard = window.location.pathname.includes("dashboard");
 
   useEffect(() => {
     (async () => {
@@ -30,13 +31,16 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-16 border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px]">
-      <nav className={cn("flex items-center h-full flex-row", { "justify-between": !data.isAdmin || sessionToken })}>
+    <header className="h-16 border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] bg-background">
+      <nav
+        className={cn("flex items-center h-full flex-row", {
+          "justify-between": !urlContainsDashboard,
+        })}>
         <a className="flex flex-row gap-4 items-center" href="/">
           <img src={logo} alt="logo" role="img" className="md:h-12 h-8 select-none" loading="lazy" width={64} height={64} />
           <p className="md:text-2xl text-lg tracking-widest font-semibold select-none logoClass">ZENITH</p>
         </a>
-        {!window.location.pathname.includes("dashboard") ? (
+        {!urlContainsDashboard ? (
           <div className="flex md:gap-2 flex-row-reverse">
             {/* User */}
             <User />
@@ -48,6 +52,7 @@ export default function Header() {
             <SearchBar />
           </div>
         ) : (
+          data &&
           data.isAdmin && (
             <div className="flex flex-row justify-between w-full pl-8">
               <div>
