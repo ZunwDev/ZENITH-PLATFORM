@@ -38,7 +38,7 @@ export default function Header() {
         })}>
         <a className="flex flex-row gap-4 items-center" href="/">
           <img src={logo} alt="logo" role="img" className="md:h-12 h-8 select-none" loading="lazy" width={64} height={64} />
-          <p className="md:text-2xl text-lg tracking-widest font-semibold select-none logoClass">ZENITH</p>
+          <p className="md:text-2xl sm:text-lg sm:block hidden tracking-widest font-semibold select-none logoClass">ZENITH</p>
         </a>
         {!urlContainsDashboard ? (
           <div className="flex md:gap-2 flex-row-reverse">
