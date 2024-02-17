@@ -52,6 +52,12 @@ export const initialCheckedState: Checked = {
   brands: [],
 };
 
+export const initialFilterString: FilterString = {
+  brand: "",
+  category: "",
+  archived: "",
+};
+
 interface Sort {
   empty: boolean;
   sorted: boolean;

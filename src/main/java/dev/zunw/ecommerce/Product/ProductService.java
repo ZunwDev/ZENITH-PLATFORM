@@ -30,14 +30,10 @@ public class ProductService {
         this.productBrandRepository = productBrandRepository;
     }
 
-    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> archiveIds, Pageable pageable, String sortBy, String sortDirection) {
+    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Boolean> archiveIds, Pageable pageable, String sortBy, String sortDirection, String searchQuery) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        if (categoryIds == null && brandIds == null && archiveIds == null) {
-            return productRepository.findAll(pageable);
-        } else {
-            Specification<Product> specification = ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, archiveIds);
-            return productRepository.findAll(specification, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
-        }
+        Specification<Product> specification = ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, archiveIds, searchQuery);
+        return productRepository.findAll(specification, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
     }
 
     public List<ProductCategory> getAllProductCategories() {

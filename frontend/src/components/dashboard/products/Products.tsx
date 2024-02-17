@@ -1,36 +1,46 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import axios from "axios";
 import { API_URL, DEFAULT_LIMIT } from "@/lib/constants";
-import { Checked, FilterString, Page, initialCheckedState } from "./interfaces";
-import { NewProductButton, ProductFilter, ProductLimit, ProductSort, ProductTable, ResetFilter } from "./components";
+import { Checked, FilterString, Page, initialCheckedState, initialFilterString } from "./interfaces";
+import {
+  NewProductButton,
+  ProductFilter,
+  ProductLimit,
+  ProductSearch,
+  ProductSort,
+  ProductTable,
+  ResetFilter,
+} from "./components";
+import { useDebounce } from "use-debounce";
+import { newAbortSignal } from "@/lib/utils";
 
 export default function Products() {
-  const [filterString, setFilterString] = useState<FilterString>({
-    brand: "",
-    category: "",
-    archived: "",
-  });
+  const [filterString, setFilterString] = useState<FilterString>(initialFilterString);
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [debouncedFilterString, setDebouncedFilterString] = useState<FilterString>({} as FilterString);
+  const [debouncedFilterString, setDebouncedFilterString] = useState<FilterString>(initialFilterString);
   const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [sortBy, setSortBy] = useState("createdAt_desc");
   const [pageData, setPageData] = useState<Page>({} as Page);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dbcSearch] = useDebounce(searchQuery, 750);
+  const [dbcFilterString] = useDebounce(filterString, 250);
 
   const productAPIURL = useMemo(() => {
-    const { brand, category, archived } = filterString;
-    return `${API_URL}/products?limit=${limit}&sortBy=${sortBy.slice(0, sortBy.indexOf("_"))}&sortDirection=${sortBy.slice(
-      sortBy.indexOf("_") + 1,
-      sortBy.length
-    )}&${brand}${category}${archived}`;
-  }, [filterString, limit, sortBy]);
+    const { brand, category, archived } = dbcFilterString;
+    const params = new URLSearchParams({
+      limit: limit,
+      sortBy: sortBy.slice(0, sortBy.indexOf("_")),
+      sortDirection: sortBy.slice(sortBy.indexOf("_") + 1, sortBy.length),
+    });
+    if (dbcSearch.length > 0) {
+      params.append("searchQuery", dbcSearch);
+    }
+    return `${API_URL}/products?${params.toString()}&${brand}${category}${archived}`;
+  }, [dbcFilterString, limit, sortBy, dbcSearch]);
 
   const handleResetFilters = useCallback(() => {
-    setFilterString({
-      brand: "",
-      category: "",
-      archived: "",
-    });
+    setFilterString(initialFilterString);
     setChecked(initialCheckedState);
   }, []);
 
@@ -50,7 +60,9 @@ export default function Products() {
     () =>
       debounce(async () => {
         try {
-          const response = await axios.get(`${API_URL}/products?limit=${limit}&${productAPIURL}`);
+          const response = await axios.get(`${API_URL}/products?limit=${limit}&${productAPIURL}`, {
+            signal: newAbortSignal(5000),
+          });
           setPageData(response.data);
         } catch (error) {
           console.error("Error fetching products:", error.response?.data?.message || error.message);
@@ -94,6 +106,9 @@ export default function Products() {
             />
             {/* Product sort button */}
             <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
+
+            {/* Product search */}
+            <ProductSearch setSearchQuery={setSearchQuery} />
           </div>
           <div className="flex flex-row gap-1.5">
             {/* Reset filters button */}

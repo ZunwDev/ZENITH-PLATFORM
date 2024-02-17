@@ -12,7 +12,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn, newAbortSignal } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Brand, Category, Checked, FilterString } from "../interfaces";
@@ -41,7 +41,7 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
         [type]: updated,
       };
 
-      const updatedFilterStringValues = updatedFilterString[type].map((item) => `${s}=${item}`).join("&");
+      const updatedFilterStringValues = updatedFilterString[type].map((item) => `${s}=${item}&`).join("");
 
       //@ts-expect-error
       setFilterString((prev: FilterString) => ({ ...prev, [s]: updatedFilterStringValues }));
@@ -67,8 +67,12 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
       debounce(async () => {
         try {
           const [categoriesResponse, brandsResponse] = await Promise.all([
-            axios.get(`${API_URL}/products/category`),
-            axios.get(`${API_URL}/products/brand`),
+            axios.get(`${API_URL}/products/category`, {
+              signal: newAbortSignal(5000),
+            }),
+            axios.get(`${API_URL}/products/brand`, {
+              signal: newAbortSignal(5000),
+            }),
           ]);
           setCategories(categoriesResponse.data);
           setBrands(brandsResponse.data);
