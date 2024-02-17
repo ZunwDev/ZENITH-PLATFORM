@@ -8,7 +8,7 @@ interface ProductSearchProps {
 export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
   return (
     <>
-      <div className="w-80 h-10 items-center rounded-md border border-border pl-3 text-sm flex">
+      <div className="sm:w-80 w-40 h-10 items-center rounded-md border border-border pl-3 text-sm flex">
         <Search className="size-4" />
         <Input
           type="search"

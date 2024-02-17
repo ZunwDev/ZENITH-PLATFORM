@@ -25,8 +25,8 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="mt-32 flex flex-col gap-12 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
+    <section className="mt-32 flex flex-col gap-12 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
       {path === "products" && <Products />}
-    </div>
+    </section>
   );
 }

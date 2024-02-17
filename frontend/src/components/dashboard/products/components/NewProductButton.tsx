@@ -4,7 +4,7 @@ const userId = Cookies.get("userId");
 
 export default function NewProductButton() {
   return (
-    <Button className="flex flex-row gap-2 items-center justify-center" asChild>
+    <Button className="sm:flex flex-row gap-2 items-center justify-center hidden" asChild>
       <a
         href={`/${userId}/dashboard/products/new`}
         onClick={(e) => {

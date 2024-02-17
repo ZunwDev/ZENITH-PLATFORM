@@ -1,19 +1,22 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { applyDiscount, formatDate } from "@/lib/utils";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
+import { Check, X } from "lucide-react";
 
 export default function ProductTable({ data }) {
   return (
-    <Table>
-      <TableCaption>
-        {data && data.length > 0 ? "A list of existing products." : "No products found. Try changing/removing filters."}
+    <Table className="relative xs:w-full xs:justify-center xs:px-4">
+      <TableCaption className="text-wrap">
+        {data && data.length > 0
+          ? `A list of existing products - viewing ${data.length} products.`
+          : "No products found. Try changing/removing filters."}
       </TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-start">Name</TableHead>
-          <TableHead className="text-end">Category</TableHead>
-          <TableHead className="text-end">Description</TableHead>
-          <TableHead className="text-end">Rating</TableHead>
+          <TableHead className="sm:text-start text-end">Name</TableHead>
+          <TableHead className="text-end hidden sm:table-cell">Category</TableHead>
+          <TableHead className="text-end md:table-cell hidden">Description</TableHead>
+          <TableHead className="text-end hidden sm:table-cell">Rating</TableHead>
           <TableHead className="text-end">
             <TooltipProvider>
               <Tooltip>
@@ -24,7 +27,7 @@ export default function ProductTable({ data }) {
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          <TableHead className="text-end">
+          <TableHead className="text-end md:table-cell hidden">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>Discounted</TooltipTrigger>
@@ -34,39 +37,34 @@ export default function ProductTable({ data }) {
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          <TableHead className="text-end">Discount</TableHead>
-          <TableHead className="text-end">Specifications</TableHead>
-          <TableHead className="text-end">Quantity</TableHead>
-          <TableHead className="text-end">Brand</TableHead>
-          <TableHead className="text-end">Creation Date</TableHead>
-          <TableHead className="text-end">Archived?</TableHead>
+          <TableHead className="text-end md:table-cell hidden">Discount</TableHead>
+          <TableHead className="text-end">Qty</TableHead>
+          <TableHead className="text-end hidden sm:table-cell">Brand</TableHead>
+          <TableHead className="text-end hidden sm:table-cell">Creation Date</TableHead>
+          <TableHead className="text-end hidden sm:table-cell">Archived?</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data &&
           data.map((item, index) => (
             <TableRow key={index} className="cursor-pointer">
-              <TableCell className="font-bold text-start w-[216px]">{item.name}</TableCell>
-              <TableCell className="text-end">{item.category.name}</TableCell>
-              <TableCell className="text-ellipsis text-end">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger className="text-end">
-                      {item.description.length > 40 ? `${item.description.slice(0, 40)}...` : item.description}
-                    </TooltipTrigger>
-                    <TooltipContent>{item.description}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              <TableCell className="font-bold text-start sm:w-[216px] xs:w-32">{item.name}</TableCell>
+              <TableCell className="text-end hidden sm:table-cell">{item.category.name}</TableCell>
+              <TableCell className="text-ellipsis text-end md:table-cell hidden">
+                {item.description.length > 40 ? `${item.description.slice(0, 40)}...` : item.description}
               </TableCell>
-              <TableCell className="text-end">{item.rating}</TableCell>
+              <TableCell className="text-end hidden sm:table-cell">{item.rating}</TableCell>
               <TableCell className="font-bold text-end">${item.price}</TableCell>
-              <TableCell className="font-bold text-end">${applyDiscount(item.price, item.discount)}</TableCell>
-              <TableCell className="text-end">{item.discount}%</TableCell>
-              <TableCell className="text-end">Open to view</TableCell>
+              <TableCell className="font-bold text-end md:table-cell hidden">
+                ${applyDiscount(item.price, item.discount)}
+              </TableCell>
+              <TableCell className="text-end md:table-cell hidden">{item.discount}%</TableCell>
               <TableCell className="text-end">{item.quantity}</TableCell>
-              <TableCell className="text-end">{item.brand.name}</TableCell>
-              <TableCell className="text-end w-[130px]">{formatDate(item.createdAt)}</TableCell>
-              <TableCell className="text-end">{item.archived ? "Yes" : "No"}</TableCell>
+              <TableCell className="text-end hidden sm:table-cell">{item.brand.name}</TableCell>
+              <TableCell className="text-end w-[130px] hidden sm:table-cell">{formatDate(item.createdAt)}</TableCell>
+              <TableCell className="pl-12 hidden sm:table-cell">
+                {item.archived ? <Check className="size-5" /> : <X className="size-5" />}
+              </TableCell>
             </TableRow>
           ))}
       </TableBody>

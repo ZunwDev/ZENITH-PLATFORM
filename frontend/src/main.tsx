@@ -35,12 +35,12 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
     <Header />
-    <div className="flex flex-col md:min-w-[1200px] min-w-[360px] h-[100dvh] max-w-[1200px] mx-auto items-center">
+    <section className="flex flex-col min-w-[360px] h-[100dvh] mx-auto items-center">
       <React.StrictMode>
         <ThemeProvider forcedTheme="light">
           <RouterProvider router={router} />
         </ThemeProvider>
       </React.StrictMode>
-    </div>
+    </section>
   </>
 );

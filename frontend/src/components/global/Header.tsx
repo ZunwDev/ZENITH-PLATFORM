@@ -6,6 +6,7 @@ import { Cart, SearchBar, User } from "../header";
 import { useEffect, useState } from "react";
 import { fetchSessionData } from "@/lib/api";
 import { SessionData } from "@/lib/interfaces";
+import { Menu } from "lucide-react";
 
 const sessionToken = Cookies.get("sessionToken");
 
@@ -54,8 +55,8 @@ export default function Header() {
         ) : (
           data &&
           data.isAdmin && (
-            <div className="flex flex-row justify-between w-full pl-8">
-              <div>
+            <div className="flex flex-row sm:justify-between justify-end w-full pl-8">
+              <div className="sm:flex hidden">
                 {adminButtons.map((item, index) => (
                   <Button variant="ghost" key={index} asChild>
                     <a
@@ -70,6 +71,7 @@ export default function Header() {
                   </Button>
                 ))}
               </div>
+              <Menu className="sm:hidden block size-8" />
               <User />
             </div>
           )

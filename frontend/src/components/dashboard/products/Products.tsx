@@ -86,7 +86,7 @@ export default function Products() {
   return (
     <div className="flex flex-col gap-20">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 xs:mx-auto xs:text-center sm:mx-0 sm:text-start">
           {pageData && <h1 className="text-3xl font-bold w-full">Products ({pageData.totalElements})</h1>}
           <h2>Manage products for ZENITH store</h2>
         </div>
@@ -94,7 +94,7 @@ export default function Products() {
         <NewProductButton />
       </div>
       <div className="flex flex-col gap-4">
-        <div className="w-full flex flex-row justify-between gap-1">
+        <div className="w-full flex flex-row justify-between gap-1 flex-wrap xs:px-4 sm:px-0">
           <div className="flex flex-row gap-1.5">
             {/* Product filter button */}
             <ProductFilter
@@ -110,7 +110,7 @@ export default function Products() {
             {/* Product search */}
             <ProductSearch setSearchQuery={setSearchQuery} />
           </div>
-          <div className="flex flex-row gap-1.5">
+          <div className="flex flex-row gap-1.5 flex-wrap">
             {/* Reset filters button */}
             <ResetFilter onReset={handleResetFilters} filterAmount={filterAmount} />
             {/* Product limit button*/}

@@ -14,6 +14,9 @@ const config: Config = {
       },
     },
     extend: {
+      screens: {
+        xs: "360px",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
