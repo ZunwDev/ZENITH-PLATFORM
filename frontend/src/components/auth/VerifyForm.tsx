@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { API_URL } from "@/lib/constants";
-import { cn, goto } from "@/lib/utils";
+import { cn, goto, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle } from "lucide-react";
 import { useState } from "react";
@@ -39,7 +39,7 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
   async function handleVerifyClick(values: z.infer<typeof VerifyCodeSchema>) {
     try {
       VerifyCodeSchema.parse(values);
-      await axios.put(`${API_URL}/users/verify/${userId}`);
+      await axios.put(`${API_URL}/users/verify/${userId}`, { signal: newAbortSignal(5000) });
       setVerifyState(true);
       setButtonText("REDIRECTING...");
       goto("/auth/signin", 1000);

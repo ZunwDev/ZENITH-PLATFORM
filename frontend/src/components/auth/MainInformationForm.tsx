@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { generateOTP, setStateDelayed } from "@/lib/utils";
+import { generateOTP, newAbortSignal, setStateDelayed } from "@/lib/utils";
 import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS, API_URL } from "@/lib/constants";
 import axios from "axios";
 
@@ -58,6 +58,7 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
   const createUser = async ({ values, hashedPassword }: CreateUserParams) => {
     try {
       const response = await axios.post(`${API_URL}/users/create`, {
+        signal: newAbortSignal(5000),
         user: {
           firstName: values.firstName,
           lastName: values.lastName,

@@ -4,9 +4,12 @@ import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { newAbortSignal } from "@/lib/utils";
 
 const getCategories = async () => {
-  const response = await axios.get(`${API_URL}/products/category`);
+  const response = await axios.get(`${API_URL}/products/category`, {
+    signal: newAbortSignal(5000),
+  });
   type IconMapping = {
     [key: string]: JSX.Element;
   };

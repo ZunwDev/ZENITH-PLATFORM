@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import Cookies from "js-cookie";
-import { removeAllCookies } from "@/lib/utils";
+import { newAbortSignal, removeAllCookies } from "@/lib/utils";
 import { API_URL, BASE_URL } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -51,7 +51,7 @@ export default function User() {
 
   const logOut = async () => {
     try {
-      await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`);
+      await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`, { signal: newAbortSignal(5000) });
       removeAllCookies();
     } catch (error) {
       removeAllCookies();

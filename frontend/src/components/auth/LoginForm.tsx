@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { cn, goto } from "@/lib/utils";
+import { cn, goto, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { API_URL, LOGIN_ERROR_MESSAGE, LOGIN_INVALID_CREDENTIALS_MESSAGE, LOGIN_SERVER_ERROR_MESSAGE } from "@/lib/constants";
 import axios from "axios";
@@ -43,6 +43,7 @@ export default function LoginForm() {
         email: values.email,
         password: btoa(values.password),
         isChecked: String(isChecked),
+        signal: newAbortSignal(5000),
       });
 
       if (response.status === 200) {
