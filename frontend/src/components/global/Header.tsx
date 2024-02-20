@@ -11,7 +11,7 @@ import { Menu } from "lucide-react";
 const sessionToken = Cookies.get("sessionToken");
 
 const adminButtons: { name: string; goto: string }[] = [
-  { name: "Overview", goto: "/overview" },
+  { name: "Dashboard", goto: "/overview" },
   { name: "Orders", goto: "/orders" },
   { name: "Products", goto: "/products" },
   { name: "Settings", goto: "/settings" },

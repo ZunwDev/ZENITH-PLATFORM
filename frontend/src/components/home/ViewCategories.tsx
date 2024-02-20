@@ -54,7 +54,7 @@ export default function ViewCategories() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pb-32 md:min-w-[1200px]">
       <h1 className="text-3xl font-bold md:px-0 px-4">What are you looking for?</h1>
       <div className="flex flex-wrap gap-4">
         {categories.map((item) => (

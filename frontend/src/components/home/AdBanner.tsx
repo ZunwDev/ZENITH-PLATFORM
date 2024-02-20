@@ -11,7 +11,7 @@ const images = [
 export default function AdBanner() {
   return (
     <Carousel
-      className="w-full md:max-h-[640px] max-h-96"
+      className="w-full md:max-h-[640px] max-h-96 md:min-w-[1200px]"
       opts={{
         align: "start",
         loop: true,
