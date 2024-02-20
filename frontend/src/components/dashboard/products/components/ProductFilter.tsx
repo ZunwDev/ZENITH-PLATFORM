@@ -12,7 +12,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn, newAbortSignal } from "@/lib/utils";
+import { cn, debounce, newAbortSignal } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Brand, Category, Checked, FilterString } from "../interfaces";
@@ -50,18 +50,6 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const debounce = useCallback((fn, delay) => {
-    let timeoutId;
-    return function (...args) {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      timeoutId = setTimeout(() => {
-        fn.apply(this, args);
-      }, delay);
-    };
-  }, []);
-
   const debouncedFetchFilters = useMemo(
     () =>
       debounce(async () => {
@@ -82,7 +70,7 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
           setBrands([]);
         }
       }, 250),
-    [debounce]
+    []
   );
 
   const getFilterAmountLabel = (type: string) => {

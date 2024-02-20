@@ -71,7 +71,7 @@ export default function LoginForm() {
     <Form {...form}>
       <form className="space-y-6">
         <FormItem>
-          <FormLabel>Email</FormLabel>
+          <FormLabel isRequired>Email</FormLabel>
           <FormControl>
             <Input placeholder="alan.turing@example.com" {...form.register("email")} />
           </FormControl>
@@ -79,7 +79,7 @@ export default function LoginForm() {
         </FormItem>
 
         <FormItem>
-          <FormLabel>Password</FormLabel>
+          <FormLabel isRequired>Password</FormLabel>
           <FormControl>
             <Input placeholder="••••••••" type="password" {...form.register("password")} />
           </FormControl>

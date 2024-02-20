@@ -54,3 +54,15 @@ export function newAbortSignal(timeoutMs: number) {
 
   return abortController.signal;
 }
+
+export function debounce(fn, delay) {
+  let timeoutId;
+  return function (...args) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}

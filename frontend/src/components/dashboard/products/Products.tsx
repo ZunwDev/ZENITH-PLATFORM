@@ -12,7 +12,7 @@ import {
   ResetFilter,
 } from "./components";
 import { useDebounce } from "use-debounce";
-import { newAbortSignal } from "@/lib/utils";
+import { debounce, newAbortSignal } from "@/lib/utils";
 
 export default function Products() {
   const [filterString, setFilterString] = useState<FilterString>(initialFilterString);
@@ -44,18 +44,6 @@ export default function Products() {
     setChecked(initialCheckedState);
   }, []);
 
-  const debounce = useCallback((fn, delay) => {
-    let timeoutId;
-    return function (...args) {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      timeoutId = setTimeout(() => {
-        fn.apply(this, args);
-      }, delay);
-    };
-  }, []);
-
   const debouncedFetchProducts = useMemo(
     () =>
       debounce(async () => {
@@ -69,7 +57,7 @@ export default function Products() {
           setPageData({} as Page);
         }
       }, 250),
-    [debounce, limit, productAPIURL]
+    [limit, productAPIURL]
   );
 
   useEffect(() => {
@@ -77,7 +65,7 @@ export default function Products() {
     if (typeof debouncedFilterString === "object" && debouncedFilterString !== null) {
       setDebouncedFilterString(debouncedFilterString);
     }
-  }, [filterString, debounce]);
+  }, [filterString]);
 
   useEffect(() => {
     debouncedFetchProducts(debouncedFilterString);

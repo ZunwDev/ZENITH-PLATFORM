@@ -114,7 +114,7 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
       <form className="space-y-6">
         {fields.map((field) => (
           <FormItem key={field.name}>
-            <FormLabel>{field.label}</FormLabel>
+            <FormLabel isRequired>{field.label}</FormLabel>
             <FormControl>
               <Input
                 placeholder={field.placeholder}

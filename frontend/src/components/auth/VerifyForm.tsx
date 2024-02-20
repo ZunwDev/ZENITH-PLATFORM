@@ -56,7 +56,9 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
       <Form {...verifyForm}>
         <form className="space-y-6">
           <FormItem>
-            <FormLabel>Verify Code</FormLabel>
+            <FormLabel htmlFor="verify" isRequired>
+              Verify Code
+            </FormLabel>
             <FormControl>
               <Input placeholder="Enter 6-digit code" maxLength={6} {...verifyForm.register("verify_code")} />
             </FormControl>
