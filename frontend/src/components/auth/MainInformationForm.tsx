@@ -120,6 +120,7 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
                 placeholder={field.placeholder}
                 type={field.name === "password" || field.name === "confirmPassword" ? "password" : "text"}
                 maxLength={field.length}
+                className="border rounded-lg"
                 {...form.register(field.name)}
               />
             </FormControl>

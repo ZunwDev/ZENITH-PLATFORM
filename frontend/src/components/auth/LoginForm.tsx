@@ -49,7 +49,8 @@ export default function LoginForm() {
       if (response.status === 200) {
         setIsLogged(true);
         const duration = isChecked ? 30 : 0.25;
-        Cookies.set("sessionToken", response.data.sessionToken, { expires: duration, secure: true });
+        const expirationTime = new Date(new Date().getTime() + duration * 24 * 60 * 60 * 1000); // Calculate the expiration time
+        Cookies.set("sessionToken", response.data.sessionToken, { expires: expirationTime, secure: true });
         goto("/", 500); //Redirect user after successful login to homepage in 500ms
       }
     } catch (error) {
@@ -73,7 +74,7 @@ export default function LoginForm() {
         <FormItem>
           <FormLabel isRequired>Email</FormLabel>
           <FormControl>
-            <Input placeholder="alan.turing@example.com" {...form.register("email")} />
+            <Input placeholder="alan.turing@example.com" {...form.register("email")} className="border rounded-lg" />
           </FormControl>
           <FormMessage>{form.formState.errors.email?.message}</FormMessage>
         </FormItem>
@@ -81,7 +82,7 @@ export default function LoginForm() {
         <FormItem>
           <FormLabel isRequired>Password</FormLabel>
           <FormControl>
-            <Input placeholder="••••••••" type="password" {...form.register("password")} />
+            <Input placeholder="••••••••" type="password" {...form.register("password")} className="border rounded-lg" />
           </FormControl>
           <FormMessage>{form.formState.errors.password?.message}</FormMessage>
         </FormItem>
