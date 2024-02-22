@@ -132,11 +132,11 @@ export default function ProductImageManager({
               </Tooltip>
             </TooltipProvider>
           </div>
-          <span className="text-text">{`Selected ${selectedImages.length} of ${images.length}`}</span>
+          {images.length > 0 && <span className="text-text">{`Selected ${selectedImages.length} of ${images.length}`}</span>}
         </div>
         <ImageUploader setImages={setImages} />
         <div className="flex flex-row items-center pb-1">
-          <InfoIcon className="inline-block text-primary h-4 w-4" />
+          <InfoIcon className="inline-block text-primary size-4" />
           <span className="ml-1 text-primary">Blue border = thumbnail</span>
         </div>
       </CardFooter>

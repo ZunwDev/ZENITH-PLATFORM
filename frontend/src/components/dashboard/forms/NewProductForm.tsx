@@ -8,6 +8,7 @@ import { DebouncedBrandsAndCategories } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProductImageManager from "../products/components/ProductImageManager";
 import { InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util/FormItems";
+import PageHeader from "@/components/global/PageHeader";
 
 const FormSchema = z.object({
   name: z.string().min(1, {
@@ -83,12 +84,9 @@ export default function NewProductForm() {
   //const handleNewProjectClick = async (values: z.infer<typeof FormSchema>) => {};
 
   return (
-    <div className="flex flex-col gap-20">
+    <div className="flex flex-col gap-16">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
-        <div className="flex flex-col gap-1 xs:mx-auto xs:text-center sm:mx-0 sm:text-start">
-          <h1 className="text-3xl font-bold w-full">New Product</h1>
-          <h2>Add new product to ZENITH store</h2>
-        </div>
+        <PageHeader title="New Product" description="Add new product to the store" />
       </div>
       <div className="flex md:flex-row md:gap-8 gap-32 flex-col">
         <div className="flex flex-col md:w-80 w-full h-full">

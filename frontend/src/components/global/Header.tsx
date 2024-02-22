@@ -1,12 +1,12 @@
 import { Button } from "../ui/button";
 import Cookies from "js-cookie";
-import logo from "@/assets/logo.svg";
 import { cn } from "@/lib/utils";
 import { Cart, SearchBar, User } from "../header";
 import { useEffect, useState } from "react";
 import { fetchSessionData } from "@/lib/api";
 import { SessionData } from "@/lib/interfaces";
 import { Menu } from "lucide-react";
+import { Logo } from "./Logo";
 
 const sessionToken = Cookies.get("sessionToken");
 
@@ -39,7 +39,7 @@ export default function Header() {
           "justify-between": !urlContainsDashboard && !urlContainsAuth,
         })}>
         <a className="flex flex-row gap-4 items-center" href="/">
-          <img src={logo} alt="logo" role="img" className="md:h-12 h-8 select-none" loading="lazy" width={64} height={64} />
+          <Logo />
           <p className="md:text-2xl sm:text-lg sm:block hidden tracking-widest font-semibold select-none logoClass">ZENITH</p>
         </a>
         {!urlContainsDashboard && !urlContainsAuth ? (

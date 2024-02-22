@@ -22,7 +22,7 @@ export function InputFormItem({
 }) {
   return (
     <FormItem>
-      <FormLabel htmlFor={id} className="block font-medium text-gray-700" isRequired={required}>
+      <FormLabel htmlFor={id} className="block" isRequired={required}>
         {label}
       </FormLabel>
       <div className="flex flex-row items-center">
@@ -33,7 +33,7 @@ export function InputFormItem({
           type={type}
           placeholder={placeholder}
           {...form.register(id)}
-          className={cn("border border-gray-300 rounded-md p-2", {
+          className={cn("border border-border rounded-md p-2", {
             "rounded-tl-none rounded-bl-none border-l-0": prefix,
             "rounded-tr-none rounded-br-none border-r-0": suffix,
           })}
@@ -41,7 +41,7 @@ export function InputFormItem({
         />
         {suffix && <div className="bg-accent p-1.5 border rounded-tr-md rounded-br-md">{suffix}</div>}
       </div>
-      {description && <FormDescription className="text-sm text-gray-500 mt-1">{description}</FormDescription>}
+      {description && <FormDescription>{description}</FormDescription>}
       <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
     </FormItem>
   );
@@ -54,7 +54,7 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
         {label}
       </FormLabel>
       <Textarea id={id} name={id} placeholder={placeholder} {...form.register(id)} className="h-44" {...rest} />
-      {description && <FormDescription className="text-sm text-gray-500 mt-1">{description}</FormDescription>}
+      {description && <FormDescription>{description}</FormDescription>}
       <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
     </FormItem>
   );
@@ -115,7 +115,7 @@ export function SelectFormItem({
           </Command>
         </PopoverContent>
       </Popover>
-      <FormDescription className=" text-gray-500">{description}</FormDescription>
+      <FormDescription>{description}</FormDescription>
       <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
     </FormItem>
   );
