@@ -12,19 +12,18 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn, debounce, newAbortSignal } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Brand, Category, Checked, FilterString } from "../interfaces";
-import { API_URL } from "@/lib/constants";
-import axios from "axios";
+import { DebouncedBrandsAndCategories } from "@/lib/api";
 
 interface ProductFilter {
-  setFilterString: (value: FilterString) => void;
-  setFilterAmount: (value: number) => void;
+  setFilterString: React.Dispatch<React.SetStateAction<FilterString>>;
+  setFilterAmount: React.Dispatch<React.SetStateAction<number>>;
   filterAmount: number;
   checked: Checked;
-  setChecked: (value: Checked) => void;
+  setChecked: React.Dispatch<React.SetStateAction<Checked>>;
 }
 
 export default function ProductFilter({ setFilterString, setFilterAmount, filterAmount, checked, setChecked }: ProductFilter) {
@@ -32,7 +31,6 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
   const [brands, setBrands] = useState<Brand[]>([]);
 
   const handleFilterChange = useCallback((type: keyof Checked, id: number, s: string) => {
-    //@ts-expect-error
     setChecked((prevState) => {
       const updated = prevState[type].includes(id) ? prevState[type].filter((item) => item !== id) : [...prevState[type], id];
 
@@ -43,35 +41,11 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
 
       const updatedFilterStringValues = updatedFilterString[type].map((item) => `${s}=${item}&`).join("");
 
-      //@ts-expect-error
-      setFilterString((prev: FilterString) => ({ ...prev, [s]: updatedFilterStringValues }));
+      setFilterString((prev) => ({ ...prev, [s]: updatedFilterStringValues }));
       return updatedFilterString;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const debouncedFetchFilters = useMemo(
-    () =>
-      debounce(async () => {
-        try {
-          const [categoriesResponse, brandsResponse] = await Promise.all([
-            axios.get(`${API_URL}/products/category`, {
-              signal: newAbortSignal(5000),
-            }),
-            axios.get(`${API_URL}/products/brand`, {
-              signal: newAbortSignal(5000),
-            }),
-          ]);
-          setCategories(categoriesResponse.data);
-          setBrands(brandsResponse.data);
-        } catch (error) {
-          console.error("Error fetching products:", error.response?.data?.message || error.message);
-          setCategories([]);
-          setBrands([]);
-        }
-      }, 250),
-    []
-  );
 
   const getFilterAmountLabel = (type: string) => {
     return checked[type].length > 0 && "(" + checked[type].length + ")";
@@ -81,8 +55,14 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
     return checked[type].includes(id);
   };
 
+  const fetchData = async () => {
+    const [categoryData, brandData] = await DebouncedBrandsAndCategories();
+    setCategories(categoryData);
+    setBrands(brandData);
+  };
+
   useEffect(() => {
-    debouncedFetchFilters();
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

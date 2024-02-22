@@ -10,9 +10,9 @@ import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS, API_UR
 import axios from "axios";
 
 interface MainInfoFormProps {
-  setFirstPhase: (value: boolean) => void;
-  setVerifyCode: (value: string) => void;
-  setUserId: (value: number) => void;
+  setFirstPhase: React.Dispatch<React.SetStateAction<boolean>>;
+  setVerifyCode: React.Dispatch<React.SetStateAction<string>>;
+  setUserId: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function MainInformationForm({ setFirstPhase, setVerifyCode, setUserId }: MainInfoFormProps) {
@@ -48,9 +48,11 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
 
   interface CreateUserParams {
     values: {
+      email: string;
       firstName: string;
       lastName: string;
-      email: string;
+      password: string;
+      confirmPassword: string;
     };
     hashedPassword: string;
   }

@@ -13,7 +13,7 @@ import axios from "axios";
 interface VerifyFormProps {
   verifyCode: string;
   userId: number;
-  setVerifyState: (value: boolean) => void;
+  setVerifyState: React.Dispatch<React.SetStateAction<boolean>>;
   verifyState: boolean;
 }
 

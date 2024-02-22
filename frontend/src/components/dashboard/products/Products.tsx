@@ -15,14 +15,17 @@ import { useDebounce } from "use-debounce";
 import { debounce, newAbortSignal } from "@/lib/utils";
 
 export default function Products() {
-  const [filterString, setFilterString] = useState<FilterString>(initialFilterString);
+  //Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
+  const [filterString, setFilterString] = useState<FilterString>(initialFilterString);
   const [debouncedFilterString, setDebouncedFilterString] = useState<FilterString>(initialFilterString);
   const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [sortBy, setSortBy] = useState("createdAt_desc");
   const [pageData, setPageData] = useState<Page>({} as Page);
   const [searchQuery, setSearchQuery] = useState("");
+
+  //Debounced values
   const [dbcSearch] = useDebounce(searchQuery, 750);
   const [dbcFilterString] = useDebounce(filterString, 250);
 

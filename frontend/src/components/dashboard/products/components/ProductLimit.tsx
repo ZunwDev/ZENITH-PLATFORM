@@ -12,7 +12,7 @@ import { FileDigit, ChevronDown } from "lucide-react";
 
 interface ProductLimitProps {
   limit: string;
-  setLimit: (value: string) => void;
+  setLimit: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const productEntries = ["10", "25", "50", "100"];

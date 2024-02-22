@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 interface ProductSearchProps {
-  setSearchQuery: (value: string) => void;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
