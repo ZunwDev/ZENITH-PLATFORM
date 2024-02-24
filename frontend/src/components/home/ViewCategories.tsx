@@ -1,5 +1,5 @@
 import { API_URL } from "@/lib/constants";
-import { Battery, Cable, Camera, Cpu, Gamepad, Headphones, Laptop, Printer, Smartphone, Watch } from "lucide-react";
+import { Battery, Cable, Camera, Gamepad, Headphones, Laptop, Printer, Smartphone, Watch } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
@@ -23,7 +23,6 @@ const getCategories = async () => {
     ["Gaming & Consoles"]: <Gamepad />,
     ["Cables & Adapters"]: <Cable />,
     ["Power Banks & Chargers"]: <Battery />,
-    ["Electronics"]: <Cpu />,
     ["Wearable Technology"]: <Watch />,
   };
 

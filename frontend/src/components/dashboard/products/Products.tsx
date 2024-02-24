@@ -78,7 +78,10 @@ export default function Products() {
   return (
     <div className="flex flex-col gap-16">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4 items-center">
-        <PageHeader title={`Products (${pageData && pageData.totalElements})`} description="Manage products in the store" />
+        <PageHeader
+          title={`Products (${pageData.totalElements > 0 ? pageData.totalElements : 0})`}
+          description="Manage products in the store"
+        />
         <NewProductButton />
       </div>
       <div className="flex flex-col gap-4">
