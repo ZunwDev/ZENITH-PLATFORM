@@ -37,7 +37,7 @@ const ImageUploader = ({ setImages }: ImageUploaderProps) => {
   };
 
   const handleFiles = (files: File[]) => {
-    const imageTypes = ["image/png", "image/jpeg", "image/jpg"];
+    const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
     const validFiles = files.filter((file) => imageTypes.includes(file.type));
 
     if (validFiles.length !== files.length) {
@@ -69,7 +69,14 @@ const ImageUploader = ({ setImages }: ImageUploaderProps) => {
           {invalidFileType && <span className="text-red-500">We only support PNG, JPG and JPEG images.</span>}
         </p>
       </div>
-      <input className="sr-only" id="file" multiple type="file" accept=".png, .jpg, .jpeg" onChange={handleFileInputChange} />
+      <input
+        className="sr-only"
+        id="file"
+        multiple
+        type="file"
+        accept=".png, .jpg, .jpeg, .webp"
+        onChange={handleFileInputChange}
+      />
     </div>
   );
 };
