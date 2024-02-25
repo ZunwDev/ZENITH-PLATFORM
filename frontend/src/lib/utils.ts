@@ -1,6 +1,10 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import Cookies from "js-cookie";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "./configs";
+import { v4 as uuidv4 } from "uuid";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -65,4 +69,51 @@ export function debounce(fn, delay) {
       fn.apply(this, args);
     }, delay);
   };
+}
+
+export async function uploadImagesToFirebase(productId: string, images: string[], imageThumbnail) {
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  try {
+    const filteredImages = images.filter((image) => image !== imageThumbnail);
+
+    // Upload the imageThumbnail only if there are no regular images left
+    if (filteredImages.length === 0) {
+      const thumbnailImageResponse = await fetch(imageThumbnail);
+      const thumbnailBlob = await thumbnailImageResponse.blob();
+
+      const imageName = `image_${uuidv4()}_thumbnail`; // Include UUID in thumbnail image name
+      const thumbnailStorageRef = ref(storage, `images/${productId}/${imageName}`);
+      await uploadBytes(thumbnailStorageRef, thumbnailBlob);
+
+      const thumbnailImageUrl = await getDownloadURL(thumbnailStorageRef);
+      return [thumbnailImageUrl]; // Return thumbnail image URL
+    }
+
+    // Upload regular images
+    const regularImagePromises = filteredImages.map(async (blobUrl) => {
+      const response = await fetch(blobUrl);
+      const blob = await response.blob();
+
+      const imageName = `image_${uuidv4()}`;
+      const storageRef = ref(storage, `images/${productId}/${imageName}`);
+      await uploadBytes(storageRef, blob);
+    });
+
+    const regularImageUrls = await Promise.all(regularImagePromises);
+
+    // --------------------------
+    // Upload the thumbnail image
+    const thumbnailImageResponse = await fetch(imageThumbnail);
+    const thumbnailBlob = await thumbnailImageResponse.blob();
+
+    const thumbnailImageName = `image_${uuidv4()}_thumbnail`;
+    const thumbnailStorageRef = ref(storage, `images/${productId}/${thumbnailImageName}`);
+    await uploadBytes(thumbnailStorageRef, thumbnailBlob);
+
+    return regularImageUrls; // Return regular image URLs
+  } catch (error) {
+    console.error("Error uploading images:", error);
+    throw error;
+  }
 }
