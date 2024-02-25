@@ -50,7 +50,7 @@ export default function ProductTable({ data }) {
             <TableRow key={index} className="cursor-pointer">
               <TableCell className="font-bold text-start sm:w-[216px] xs:w-32">{item.name}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.category.name}</TableCell>
-              <TableCell className="text-ellipsis text-end md:table-cell hidden">
+              <TableCell className="text-end md:table-cell hidden">
                 {item.description.length > 40 ? `${item.description.slice(0, 40)}...` : item.description}
               </TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.rating}</TableCell>

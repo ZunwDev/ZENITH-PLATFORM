@@ -1,5 +1,6 @@
 package dev.zunw.ecommerce.Product;
 
+import dev.zunw.ecommerce.dto.CreateProductRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,6 +82,29 @@ public class ProductController {
             }
         }
         return finalArchived;
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/create")
+    public ResponseEntity<Map<String, Object>> createProduct(@RequestBody CreateProductRequest requestBody ) {
+        Product product = requestBody.getProduct();
+        if (productService.productExists(product)) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Product already exists");
+            errorResponse.put("errorCode", 409);
+            return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        }
+        try {
+            Product createdProduct = productService.createProduct(product);
+            Map<String, Object> response = new HashMap<>();
+            response.put("product", createdProduct);
+            response.put("message", "Product created successfully");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Failed to create product");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
 

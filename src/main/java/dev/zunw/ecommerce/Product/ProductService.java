@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,16 @@ public class ProductService {
         return productRepository.findAll(specification, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
     }
 
+    @Transactional
+    public Boolean productExists(Product product) {
+        Optional<Product> existingProduct = productRepository.findByName(product.getName());
+        return existingProduct.isPresent();
+    }
+
+    @Transactional
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
     public List<ProductCategory> getAllProductCategories() {
         return productCategoryRepository.findAll();
     }

@@ -6,5 +6,9 @@ export const LOGIN_INVALID_CREDENTIALS_MESSAGE = "Invalid email or password. Ple
 export const LOGIN_ERROR_MESSAGE = "An issue occurred. Please wait a moment and try again later.";
 export const LOGIN_SERVER_ERROR_MESSAGE = "Oops! It seems there's a problem on our end. Please try again later.";
 
-export const ACCOUNT_CREATE_USER_EXISTS = "User with this email already exists.";
+export const ACCOUNT_CREATE_USER_EXISTS_MESSAGE = "User with this email already exists.";
 export const ACCOUNT_CREATE_SERVER_ERROR_MESSAGE = "Oops! It seems there's a problem on our end. Please try again later.";
+
+export const NO_IMAGE_PROVIDED_MESSAGE = "Please ensure that you include at least one image to represent the product.";
+export const IS_PARSE_ERROR_MESSAGE = "There is a parse error in the product specifications. Please correct it.";
+export const NO_SPECS_PROVIDED_MESSAGE = "No product specifications were provided. Please add them.";

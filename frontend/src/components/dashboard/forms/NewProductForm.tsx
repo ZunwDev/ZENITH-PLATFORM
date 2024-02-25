@@ -16,6 +16,14 @@ import CodeMirror from "@uiw/react-codemirror";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import { templates } from "@/lib/enum/specsTemplates";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { API_URL, IS_PARSE_ERROR_MESSAGE, NO_IMAGE_PROVIDED_MESSAGE, NO_SPECS_PROVIDED_MESSAGE } from "@/lib/constants";
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { firebaseConfig } from "@/lib/configs";
+import axios from "axios";
+import { goto, newAbortSignal } from "@/lib/utils";
+import { v4 as uuidv4 } from "uuid";
 
 const FormSchema = z.object({
   name: z.string().min(1, {
@@ -24,19 +32,9 @@ const FormSchema = z.object({
   description: z.string().min(1, {
     message: "You must specify product description.",
   }),
-  price: z
-    .number()
-    .nullable()
-    .refine((val) => val !== null && val >= 1, {
-      message: "You must specify product price in USD",
-    }),
-  discount: z.number().optional(),
-  quantity: z
-    .number()
-    .nullable()
-    .refine((val) => val !== null && val >= 1, {
-      message: "You must specify the quantity of product.",
-    }),
+  price: z.coerce.number().min(1),
+  discount: z.coerce.number().min(0).max(90).optional(),
+  quantity: z.coerce.number().min(0),
   category: z.string().min(1, {
     message: "You must specify the category of product.",
   }),
@@ -58,6 +56,7 @@ const categoryTemplateMapping = {
 };
 
 export default function NewProductForm() {
+  const { toast } = useToast();
   //Data
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -78,7 +77,20 @@ export default function NewProductForm() {
   const [formattedJSON, setFormattedJSON] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
 
+  //Other
+  const [isProductCreated, setIsProductCreated] = useState(false);
+  const [productStage, setProductStage] = useState("Create");
+
+  function showErrorToast(desc: string) {
+    toast({
+      variant: "destructive",
+      title: "Product Creation Error",
+      description: desc,
+    });
+  }
+
   const form = useForm<z.infer<typeof FormSchema>>({
+    mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
@@ -121,6 +133,7 @@ export default function NewProductForm() {
 
   useEffect(() => {
     setImageThumbnail(images[0]);
+    //console.log(images);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
@@ -133,8 +146,108 @@ export default function NewProductForm() {
     }
   }, [categoriesSelectedValue]);
 
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+
+  const uploadImagesToFirebase = async (productId: string) => {
+    try {
+      const filteredImages = images.filter((image) => image !== imageThumbnail);
+
+      // Upload the imageThumbnail only if there are no regular images left
+      if (filteredImages.length === 0) {
+        const thumbnailImageResponse = await fetch(imageThumbnail);
+        const thumbnailBlob = await thumbnailImageResponse.blob();
+
+        const imageName = `image_${uuidv4()}_thumbnail`; // Include UUID in thumbnail image name
+        const thumbnailStorageRef = ref(storage, `images/${productId}/${imageName}`);
+        await uploadBytes(thumbnailStorageRef, thumbnailBlob);
+
+        const thumbnailImageUrl = await getDownloadURL(thumbnailStorageRef);
+        console.log("Thumbnail Image uploaded successfully:", thumbnailImageUrl);
+
+        return [thumbnailImageUrl]; // Return thumbnail image URL
+      }
+
+      // Upload regular images
+      const regularImagePromises = filteredImages.map(async (blobUrl) => {
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+
+        const imageName = `image_${uuidv4()}`;
+        const storageRef = ref(storage, `images/${productId}/${imageName}`);
+        await uploadBytes(storageRef, blob);
+      });
+
+      const regularImageUrls = await Promise.all(regularImagePromises);
+
+      // --------------------------
+      // Upload the thumbnail image
+      const thumbnailImageResponse = await fetch(imageThumbnail);
+      const thumbnailBlob = await thumbnailImageResponse.blob();
+
+      const thumbnailImageName = `image_${uuidv4()}_thumbnail`;
+      const thumbnailStorageRef = ref(storage, `images/${productId}/${thumbnailImageName}`);
+      await uploadBytes(thumbnailStorageRef, thumbnailBlob);
+
+      return regularImageUrls; // Return regular image URLs
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      throw error;
+    }
+  };
+
   const handleNewProjectClick = async (values: z.infer<typeof FormSchema>) => {
-    console.log(values);
+    await FormSchema.parseAsync(values);
+    if (images.length == 0) return showErrorToast(NO_IMAGE_PROVIDED_MESSAGE);
+    else if (jsonData === "") return showErrorToast(NO_SPECS_PROVIDED_MESSAGE);
+    else if (parseError) return showErrorToast(IS_PARSE_ERROR_MESSAGE);
+
+    setIsProductCreated(true); // make create button disabled if all checks passed for product creating
+    setProductStage("Storing in database...");
+
+    try {
+      axios
+        .post(`${API_URL}/products/create`, {
+          signal: newAbortSignal(5000),
+          product: {
+            name: values.name,
+            description: values.description,
+            price: values.price,
+            specifications: formattedJSON,
+            quantity: values.quantity,
+            discount: values.discount,
+            brand: brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
+            category: categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
+          },
+        })
+        .then((res) => {
+          setProductStage("Uploading images...");
+          uploadImagesToFirebase(res.data.product.productId)
+            .then(() => {
+              setProductStage("Images stored");
+              setTimeout(() => {
+                toast({
+                  title: "Product Creation Success",
+                  description: `Product ${values.name} successfully created.`,
+                });
+                setProductStage("REDIRECTING...");
+                goto("http://localhost:5173/5302c8ba-4df6-42d2-adae-022336aeff19/dashboard/products", 500);
+              }, 750);
+            })
+            .catch((error) => {
+              showErrorToast(String(error));
+            });
+        })
+        .catch((error) => {
+          setProductStage("Create");
+          setIsProductCreated(false);
+          if (error.response.data.errorCode === 409) {
+            form.setError("name", { message: "Product with this name already exists." });
+          }
+        });
+    } catch (error) {
+      console.error("Form validation failed:", error.errors);
+    }
   };
 
   return (
@@ -186,7 +299,7 @@ export default function NewProductForm() {
                       type="number"
                       placeholder="49.99"
                       required
-                      description="Specify the price of the product. Always end the price with 9 (e.g., 49)."
+                      description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
                       form={form}
                       prefix="$"></InputFormItem>
                     <InputFormItem
@@ -261,8 +374,12 @@ export default function NewProductForm() {
               />
             </CardContent>
           </Card>
-          <Button type="submit" onClick={form.handleSubmit(handleNewProjectClick)} className="w-24 ml-auto">
-            Create
+          <Button
+            type="button"
+            onClick={form.handleSubmit(handleNewProjectClick)}
+            className="ml-auto"
+            disabled={isProductCreated}>
+            {productStage}
           </Button>
         </div>
       </div>

@@ -37,7 +37,6 @@ public class Product {
     private String description;
     private Float rating;
     private Float price;
-    @JsonIgnore
     private String specifications;
     private Integer quantity;
     private Integer discount;

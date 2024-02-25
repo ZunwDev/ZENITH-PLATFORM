@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { generateOTP, newAbortSignal, setStateDelayed } from "@/lib/utils";
-import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS, API_URL } from "@/lib/constants";
+import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS_MESSAGE, API_URL } from "@/lib/constants";
 import axios from "axios";
 
 interface MainInfoFormProps {
@@ -75,7 +75,8 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
     } catch (error) {
       console.error("Failed to create user", error);
       const errorMessage =
-        (error.response && { 409: ACCOUNT_CREATE_USER_EXISTS }[error.response.status]) || ACCOUNT_CREATE_SERVER_ERROR_MESSAGE;
+        (error.response && { 409: ACCOUNT_CREATE_USER_EXISTS_MESSAGE }[error.response.status]) ||
+        ACCOUNT_CREATE_SERVER_ERROR_MESSAGE;
       form.setFocus("email");
       form.setError("email", { message: errorMessage });
       throw error;
@@ -90,6 +91,8 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(values.password, salt);
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
       const data = await createUser({ values, hashedPassword });
       setUserId(data.user.userId);
       setStateDelayed(setFirstPhase(true), 200);

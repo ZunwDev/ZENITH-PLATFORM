@@ -8,6 +8,7 @@ import Homepage from "./pages/Homepage.tsx";
 import Header from "./components/global/Header.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "./components/ui/toaster.tsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <React.StrictMode>
         <ThemeProvider forcedTheme="light">
           <RouterProvider router={router} />
+          <Toaster />
         </ThemeProvider>
       </React.StrictMode>
     </section>
