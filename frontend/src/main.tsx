@@ -6,9 +6,11 @@ import Signup from "./pages/auth/access/Signup.tsx";
 import Login from "./pages/auth/signin/Signin.tsx";
 import Homepage from "./pages/Homepage.tsx";
 import Header from "./components/global/Header.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "./components/ui/toaster.tsx";
+import { Orders, Overview, Products, Settings } from "./components/dashboard/index.ts";
+import NewProductForm from "./components/dashboard/forms/NewProductForm.tsx";
+const dashboard = "/:userId/dashboard";
 
 const router = createBrowserRouter([
   {
@@ -24,12 +26,24 @@ const router = createBrowserRouter([
     element: <Homepage />,
   },
   {
-    path: `/:userId/dashboard/:path`,
-    element: <Dashboard />,
+    path: `${dashboard}/orders`,
+    element: <Orders />,
   },
   {
-    path: `/:userId/dashboard/:path/:isNew`,
-    element: <Dashboard />,
+    path: `${dashboard}/settings`,
+    element: <Settings />,
+  },
+  {
+    path: `${dashboard}/overview`,
+    element: <Overview />,
+  },
+  {
+    path: `${dashboard}/products`,
+    element: <Products />,
+  },
+  {
+    path: `${dashboard}/products/new`,
+    element: <NewProductForm />,
   },
   {
     path: "*",

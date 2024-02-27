@@ -14,8 +14,10 @@ import {
 import { useDebounce } from "use-debounce";
 import { debounce, newAbortSignal } from "@/lib/utils";
 import PageHeader from "@/components/global/PageHeader";
+import { useAdminCheck } from "@/hooks";
 
 export default function Products() {
+  useAdminCheck();
   //Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [filterString, setFilterString] = useState<FilterString>(initialFilterString);
@@ -76,7 +78,7 @@ export default function Products() {
   }, [debouncedFetchProducts, debouncedFilterString]);
 
   return (
-    <div className="flex flex-col gap-16">
+    <div className="flex flex-col gap-16 mt-32 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4 items-center">
         <PageHeader
           title={`Products (${pageData.totalElements > 0 ? pageData.totalElements : 0})`}
