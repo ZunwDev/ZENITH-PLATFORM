@@ -1,9 +1,26 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { applyDiscount, formatDate } from "@/lib/utils";
+import { applyDiscount, formatDate, getThumbnailFromFirebase } from "@/lib/utils";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
 import { Check, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function ProductTable({ data }) {
+  const [thumbnail, setThumbnail] = useState([]);
+
+  useEffect(() => {
+    const fetchThumbnail = async () => {
+      if (data && data.length > 0) {
+        const promises = data.map(async (item) => {
+          const thumbnail = await getThumbnailFromFirebase(item.productId);
+          return thumbnail;
+        });
+        const thumbnails = await Promise.all(promises);
+        setThumbnail(thumbnails);
+      }
+    };
+
+    fetchThumbnail();
+  }, [data]);
   return (
     <Table className="relative xs:w-full xs:justify-center xs:px-4">
       <TableCaption className="text-wrap">
@@ -13,6 +30,7 @@ export default function ProductTable({ data }) {
       </TableCaption>
       <TableHeader>
         <TableRow>
+          <TableHead className="sm:text-start text-end sm:table-cell hidden">Thumbnail</TableHead>
           <TableHead className="sm:text-start text-end">Name</TableHead>
           <TableHead className="text-end hidden sm:table-cell">Category</TableHead>
           <TableHead className="text-end md:table-cell hidden">Description</TableHead>
@@ -48,10 +66,13 @@ export default function ProductTable({ data }) {
         {data &&
           data.map((item, index) => (
             <TableRow key={index} className="cursor-pointer">
+              <TableCell className="xs:w-32 sm:table-cell hidden">
+                <img src={thumbnail[index]} loading="lazy" width={64} height={64} />
+              </TableCell>
               <TableCell className="font-bold text-start sm:w-[216px] xs:w-32">{item.name}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.category.name}</TableCell>
               <TableCell className="text-end md:table-cell hidden">
-                {item.description.length > 40 ? `${item.description.slice(0, 40)}...` : item.description}
+                {item.description.length > 74 ? `${item.description.slice(0, 74)}...` : item.description}
               </TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.rating}</TableCell>
               <TableCell className="font-bold text-end">${item.price}</TableCell>
@@ -62,7 +83,7 @@ export default function ProductTable({ data }) {
               <TableCell className="text-end">{item.quantity}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.brand.name}</TableCell>
               <TableCell className="text-end w-[130px] hidden sm:table-cell">{formatDate(item.createdAt)}</TableCell>
-              <TableCell className="pl-12 hidden sm:table-cell">
+              <TableCell className="pl-16 hidden sm:table-cell">
                 {item.archived ? <Check className="size-5" /> : <X className="size-5" />}
               </TableCell>
             </TableRow>

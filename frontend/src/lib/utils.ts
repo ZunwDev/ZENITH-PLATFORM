@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import Cookies from "js-cookie";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./configs";
 import { v4 as uuidv4 } from "uuid";
@@ -114,6 +114,51 @@ export async function uploadImagesToFirebase(productId: string, images: string[]
     return regularImageUrls; // Return regular image URLs
   } catch (error) {
     console.error("Error uploading images:", error);
+    throw error;
+  }
+}
+
+export async function getImagesFromFirebase(productId: string) {
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  const storageRef = ref(storage, `images/${productId}`);
+
+  try {
+    const items = await listAll(storageRef);
+    const downloadURLs: string[] = [];
+    await Promise.all(
+      items.items.map(async (itemRef) => {
+        const url = await getDownloadURL(itemRef);
+        downloadURLs.push(url);
+      })
+    );
+    return downloadURLs;
+  } catch (error) {
+    console.error("Error retrieving images from Firebase Storage:", error);
+    throw error;
+  }
+}
+
+export async function getThumbnailFromFirebase(productId: string) {
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  const storageRef = ref(storage, `images/${productId}`);
+
+  try {
+    const items = await listAll(storageRef);
+    const thumbnailURLs: string[] = [];
+    const thumbnailItems = items.items.filter((item) => item.name.includes("_thumbnail"));
+
+    await Promise.all(
+      thumbnailItems.map(async (itemRef) => {
+        const url = await getDownloadURL(itemRef);
+        thumbnailURLs.push(url);
+      })
+    );
+
+    return thumbnailURLs;
+  } catch (error) {
+    console.error("Error retrieving thumbnail image from Firebase Storage:", error);
     throw error;
   }
 }

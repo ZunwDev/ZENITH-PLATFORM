@@ -25,8 +25,7 @@ import {
 import axios from "axios";
 import { newAbortSignal, uploadImagesToFirebase } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { useErrorToast } from "@/hooks/useErrorToast";
-import { useSuccessToast } from "@/hooks/useSuccessToast";
+import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
 
 const FormSchema = z.object({
   name: z.string().min(1).max(64),
@@ -43,6 +42,7 @@ const FormSchema = z.object({
 });
 
 export default function NewProductForm() {
+  useAdminCheck();
   const { resolvedTheme, forcedTheme } = useTheme();
 
   //Data
@@ -169,7 +169,7 @@ export default function NewProductForm() {
   };
 
   return (
-    <div className="flex flex-col gap-16 pb-32">
+    <div className="flex flex-col gap-16 pb-32 mt-32 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
         <PageHeader title="New Product" description="Add new product to the store" />
       </div>
@@ -208,7 +208,7 @@ export default function NewProductForm() {
                       form={form}
                       required
                       description="Briefly describe the product and its main features."
-                      placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Bluetooth, Weight 1.78 kg, Windows 11 Pro'></TextareaFormItem>
+                      placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'></TextareaFormItem>
                   </div>
                   <div className="flex flex-col md:w-1/4 w-full gap-4">
                     <InputFormItem
