@@ -43,7 +43,7 @@ export function goto(url: string, timeToProceed: number = 0) {
 export function applyDiscount(price: number, discount: number) {
   let discountedPrice = Math.floor(price * (1 - discount / 100));
   discountedPrice = discountedPrice - (discountedPrice % 1) + 0.99;
-  return discount >= 20 ? discountedPrice : price;
+  return discountedPrice;
 }
 
 export function setStateDelayed(setState: void, time: number) {
