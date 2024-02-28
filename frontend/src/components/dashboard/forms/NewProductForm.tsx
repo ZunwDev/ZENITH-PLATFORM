@@ -29,7 +29,7 @@ import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
 
 const FormSchema = z.object({
   name: z.string().min(1).max(64),
-  description: z.string().min(1).max(255),
+  description: z.string().min(1).max(512),
   price: z.coerce.number().min(1),
   discount: z.coerce.number().min(0).max(90).optional(),
   quantity: z.coerce.number().min(1),

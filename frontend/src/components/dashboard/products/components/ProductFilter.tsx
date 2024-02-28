@@ -17,6 +17,7 @@ import { Filter, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Brand, Category, Checked, FilterString } from "../interfaces";
 import { DebouncedBrandsAndCategories } from "@/lib/api";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ProductFilter {
   setFilterString: React.Dispatch<React.SetStateAction<FilterString>>;
@@ -93,22 +94,24 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
-        <DropdownMenuLabel>Available Filters</DropdownMenuLabel>
+        <DropdownMenuLabel>Available filters</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <span>Brand {getFilterAmountLabel("brands")}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
-            <DropdownMenuSubContent className="h-96 overflow-auto">
-              {brands.map((item, index) => (
-                <DropdownMenuCheckboxItem
-                  key={index}
-                  checked={checkedIncludes("brands", item.brandId)}
-                  onCheckedChange={() => handleFilterChange("brands", item.brandId, "brand")}>
-                  {item.name}
-                </DropdownMenuCheckboxItem>
-              ))}
+            <DropdownMenuSubContent>
+              <ScrollArea className="h-96">
+                {brands.map((item, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={index}
+                    checked={checkedIncludes("brands", item.brandId)}
+                    onCheckedChange={() => handleFilterChange("brands", item.brandId, "brand")}>
+                    {item.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </ScrollArea>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
