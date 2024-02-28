@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { applyDiscount, formatDate, getThumbnailFromFirebase } from "@/lib/utils";
+import { applyDiscount, cn, formatDate, getThumbnailFromFirebase } from "@/lib/utils";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
 import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -67,7 +67,7 @@ export default function ProductTable({ data }) {
           data.map((item, index) => (
             <TableRow key={index} className="cursor-pointer">
               <TableCell className="xs:w-32 sm:table-cell hidden">
-                <img src={thumbnail[index]} loading="lazy" width={64} height={64} />
+                <img src={thumbnail[index]} loading="lazy" width={64} height={64} className="size-20 object-contain" />
               </TableCell>
               <TableCell className="font-bold text-start sm:w-[216px] xs:w-32">{item.name}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.category.name}</TableCell>
@@ -75,16 +75,29 @@ export default function ProductTable({ data }) {
                 {item.description.length > 74 ? `${item.description.slice(0, 74)}...` : item.description}
               </TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.rating}</TableCell>
-              <TableCell className="font-bold text-end">${item.price}</TableCell>
-              <TableCell className="font-bold text-end md:table-cell hidden">
+              <TableCell className={cn("font-bold text-end")}>
+                <span
+                  className={item.discount > 0 ? "font-normal" : ""}
+                  style={{
+                    backgroundImage:
+                      item.discount > 0
+                        ? "linear-gradient(to top right, transparent calc(50% - 1px), red 50%, transparent calc(50% + 1px))"
+                        : "none",
+                  }}>
+                  ${item.price}
+                </span>
+              </TableCell>
+              <TableCell className={cn("font-bold text-end md:table-cell hidden", { "font-normal": item.discount == 0 })}>
                 ${applyDiscount(item.price, item.discount)}
               </TableCell>
               <TableCell className="text-end md:table-cell hidden">{item.discount}%</TableCell>
               <TableCell className="text-end">{item.quantity}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.brand.name}</TableCell>
               <TableCell className="text-end w-[130px] hidden sm:table-cell">{formatDate(item.createdAt)}</TableCell>
-              <TableCell className="pl-16 hidden sm:table-cell">
-                {item.archived ? <Check className="size-5" /> : <X className="size-5" />}
+              <TableCell className="hidden sm:table-cell">
+                <div className="flex justify-center">
+                  {item.archived ? <Check className="size-5" /> : <X className="size-5" />}
+                </div>
               </TableCell>
             </TableRow>
           ))}
