@@ -48,18 +48,6 @@ public class ProductController {
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping("/category")
-    public ResponseEntity<Object> getProductCategories() {
-        return ResponseEntity.ok(productService.getAllProductCategories());
-    }
-
-    @CrossOrigin(origins = "*")
-    @GetMapping("/brand")
-    public ResponseEntity<Object> getProductBrands() {
-        return ResponseEntity.ok(productService.getAllProductBrands());
-    }
-
-    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getProductById(@PathVariable UUID id) {
         Optional<Product> productOptional = productService.getProductById(id);
@@ -86,7 +74,7 @@ public class ProductController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createProduct(@RequestBody CreateProductRequest requestBody ) {
+    public ResponseEntity<Map<String, Object>> createProduct(@RequestBody CreateProductRequest requestBody) {
         Product product = requestBody.getProduct();
         if (productService.productExists(product)) {
             Map<String, Object> errorResponse = new HashMap<>();

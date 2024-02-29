@@ -18,17 +18,21 @@ export async function fetchSessionData(sessionToken) {
 
 export async function DebouncedBrandsAndCategories() {
   try {
-    const [categoriesResponse, brandsResponse] = await Promise.all([
-      axios.get(`${API_URL}/products/category`, {
+    const [categoriesResponse, brandsResponse, brandsNonZeroResponse] = await Promise.all([
+      axios.get(`${API_URL}/categories`, {
         signal: newAbortSignal(5000),
       }),
-      axios.get(`${API_URL}/products/brand`, {
+      axios.get(`${API_URL}/brands`, {
+        signal: newAbortSignal(5000),
+      }),
+      axios.get(`${API_URL}/brands/nonzero`, {
         signal: newAbortSignal(5000),
       }),
     ]);
     const categories = categoriesResponse.data;
     const brands = brandsResponse.data;
-    return [categories, brands];
+    const brandsNonZero = brandsNonZeroResponse.data;
+    return [categories, brands, brandsNonZero];
   } catch (error) {
     console.error("Error fetching categories and brands:", error.response?.data?.message || error.message);
     return [[], []];

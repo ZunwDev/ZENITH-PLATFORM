@@ -21,11 +21,13 @@ interface Product {
 export interface Category {
   name: string;
   categoryId: number;
+  amount: number;
 }
 
 export interface Brand {
   name: string;
   brandId: number;
+  amount: number;
 }
 
 export interface FilterString {
@@ -34,22 +36,16 @@ export interface FilterString {
   archived: string;
 }
 
-export interface Data {
-  brands: Brand[];
-  categories: Category[];
-  products: Product[];
-}
-
 export interface Checked {
-  brands: number[];
-  categories: number[];
+  brand: number[];
+  category: number[];
   archived: number[];
 }
 
 export const initialCheckedState: Checked = {
   archived: [],
-  categories: [],
-  brands: [],
+  category: [],
+  brand: [],
 };
 
 export const initialFilterString: FilterString = {

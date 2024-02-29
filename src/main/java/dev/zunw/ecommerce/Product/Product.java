@@ -1,10 +1,9 @@
 package dev.zunw.ecommerce.Product;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.zunw.ecommerce.ProductBrand.ProductBrand;
-import dev.zunw.ecommerce.ProductCategory.ProductCategory;
+import dev.zunw.ecommerce.Brand.Brand;
+import dev.zunw.ecommerce.Category.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,11 +25,11 @@ public class Product {
 
     @OneToOne
     @JoinColumn(name = "category_id")
-    private ProductCategory category;
+    private Category category;
 
     @OneToOne
     @JoinColumn(name = "brand_id")
-    private ProductBrand brand;
+    private Brand brand;
 
     @Transient
     private transient JsonNode parsedSpecifications;

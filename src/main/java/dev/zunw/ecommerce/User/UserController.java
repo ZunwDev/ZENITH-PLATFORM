@@ -157,6 +157,7 @@ public class UserController {
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @CrossOrigin(origins = "*")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable UUID id) {

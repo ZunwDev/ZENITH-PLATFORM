@@ -1,4 +1,4 @@
-package dev.zunw.ecommerce.ProductBrand;
+package dev.zunw.ecommerce.Brand;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,11 +8,13 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "brand")
-public class ProductBrand {
+public class Brand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "brand_id")
     private Long brandId;
 
     private String name;
+
+    private Integer amount;
 }

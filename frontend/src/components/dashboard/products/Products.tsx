@@ -42,7 +42,7 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState("1" || "1");
 
   // Debounced values
-  const [dbcSearch] = useDebounce(searchQuery, 750);
+  const [dbcSearch] = useDebounce(searchQuery, 500);
   const [dbcFilterString] = useDebounce(filterString, 250);
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function Products() {
     () =>
       debounce(async () => {
         try {
-          const response = await axios.get(`${API_URL}/products?limit=${limit}&${productAPIURL}`, {
+          const response = await axios.get(`${productAPIURL}`, {
             signal: newAbortSignal(5000),
           });
           setPageData(response.data);
@@ -86,6 +86,7 @@ export default function Products() {
           setPageData({} as Page);
         }
       }, 250),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [limit, productAPIURL]
   );
 
@@ -139,6 +140,7 @@ export default function Products() {
               filterAmount={filterAmount}
               checked={checked}
               setChecked={setChecked}
+              data={pageData.content}
             />
             <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
             <ProductSearch setSearchQuery={setSearchQuery} />
@@ -149,29 +151,31 @@ export default function Products() {
           </div>
         </div>
         <ProductTable data={pageData.content} />
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                className={parseInt(currentPage) <= 1 ? "pointer-events-none opacity-50" : undefined}
-                aria-disabled={parseInt(currentPage) === 1}
-                tabIndex={parseInt(currentPage) <= 1 ? -1 : undefined}
-                href={`?page=${Math.max(1, parseInt(currentPage) - 1)}`}
-                onClick={(event) => handlePageChange(Math.max(1, parseInt(currentPage) - 1), event)}
-              />
-            </PaginationItem>
-            {paginationItems}
-            <PaginationItem>
-              <PaginationNext
-                className={parseInt(currentPage) == pageData.totalPages ? "pointer-events-none opacity-50" : undefined}
-                aria-disabled={parseInt(currentPage) === pageData.totalPages}
-                tabIndex={parseInt(currentPage) >= pageData.totalPages ? -1 : undefined}
-                href={`?page=${Math.min(pageData.totalPages, parseInt(currentPage) + 1)}`}
-                onClick={(event) => handlePageChange(Math.min(pageData.totalPages, parseInt(currentPage) + 1), event)}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        {pageData.content && (
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  className={parseInt(currentPage) <= 1 ? "pointer-events-none opacity-50" : undefined}
+                  aria-disabled={parseInt(currentPage) === 1}
+                  tabIndex={parseInt(currentPage) <= 1 ? -1 : undefined}
+                  href={`?page=${Math.max(1, parseInt(currentPage) - 1)}`}
+                  onClick={(event) => handlePageChange(Math.max(1, parseInt(currentPage) - 1), event)}
+                />
+              </PaginationItem>
+              {paginationItems}
+              <PaginationItem>
+                <PaginationNext
+                  className={parseInt(currentPage) == pageData.totalPages ? "pointer-events-none opacity-50" : undefined}
+                  aria-disabled={parseInt(currentPage) === pageData.totalPages}
+                  tabIndex={parseInt(currentPage) >= pageData.totalPages ? -1 : undefined}
+                  href={`?page=${Math.min(pageData.totalPages, parseInt(currentPage) + 1)}`}
+                  onClick={(event) => handlePageChange(Math.min(pageData.totalPages, parseInt(currentPage) + 1), event)}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   );

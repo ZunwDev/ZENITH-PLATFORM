@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Brand, Category, Checked, FilterString } from "../interfaces";
 import { DebouncedBrandsAndCategories } from "@/lib/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,13 +25,73 @@ interface ProductFilter {
   filterAmount: number;
   checked: Checked;
   setChecked: React.Dispatch<React.SetStateAction<Checked>>;
+  data;
 }
 
-export default function ProductFilter({ setFilterString, setFilterAmount, filterAmount, checked, setChecked }: ProductFilter) {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
+const FilterCheckboxItems = ({ data, products, checked, handleFilterChange, filterType }) => {
+  const getFilteredItemCount = useMemo(
+    () => (itemId) => {
+      const filteredCount = products.filter((product) => {
+        const categoryId = product.category.categoryId;
+        const brandId = product.brand.brandId;
+        const isCategoryChecked = !checked.category.length || checked.category.includes(categoryId);
+        const isBrandChecked = !checked.brand.length || checked.brand.includes(brandId);
+        const isFilterTypeMatch = filterType === "brand" ? brandId === itemId : categoryId === itemId;
 
-  const handleFilterChange = useCallback((type: keyof Checked, id: number, s: string) => {
+        return isCategoryChecked && isBrandChecked && isFilterTypeMatch;
+      }).length;
+
+      return filteredCount;
+    },
+    [products, checked, filterType]
+  );
+
+  //Show this if no filter is set
+  if (Object.keys(checked).every((key) => !checked[key].length)) {
+    return data.map((item, index) => {
+      const id = item[`${filterType}Id`];
+      return (
+        <DropdownMenuCheckboxItem
+          key={index}
+          checked={checked[filterType].includes(id)}
+          onCheckedChange={() => handleFilterChange(filterType, id)}>
+          {`${item.name} (${item.amount})`}
+        </DropdownMenuCheckboxItem>
+      );
+    });
+  }
+
+  //Show this if filter is set
+  return data.map((item, index) => {
+    const id = item[`${filterType}Id`];
+    const filteredItemCount = getFilteredItemCount(id);
+    const itemCount = filteredItemCount || item.amount;
+
+    return (
+      <DropdownMenuCheckboxItem
+        key={index}
+        checked={checked[filterType].includes(id)}
+        onCheckedChange={() => handleFilterChange(filterType, id)}>
+        {`${item.name} (${itemCount})`}
+      </DropdownMenuCheckboxItem>
+    );
+  });
+};
+
+export default function ProductFilter({
+  setFilterString,
+  setFilterAmount,
+  filterAmount,
+  checked,
+  setChecked,
+  data,
+}: ProductFilter) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [brandsNonZero, setBrandsNonZero] = useState<Brand[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+  const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
+
+  const handleFilterChange = useCallback((type: keyof Checked, id: number) => {
     setChecked((prevState) => {
       const updated = prevState[type].includes(id) ? prevState[type].filter((item) => item !== id) : [...prevState[type], id];
 
@@ -40,13 +100,56 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
         [type]: updated,
       };
 
-      const updatedFilterStringValues = updatedFilterString[type].map((item) => `${s}=${item}&`).join("");
+      const updatedFilterStringValues = updatedFilterString[type].map((item) => `${type}=${item}&`).join("");
 
-      setFilterString((prev) => ({ ...prev, [s]: updatedFilterStringValues }));
+      setFilterString((prev) => ({ ...prev, [type]: updatedFilterStringValues }));
       return updatedFilterString;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [categoryData, , brandNonZero] = await DebouncedBrandsAndCategories();
+      setCategories(categoryData);
+      setBrandsNonZero(brandNonZero);
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const filterData = () => {
+      if (data) {
+        const filteredCategories =
+          checked.brand.length > 0
+            ? categories.filter((category) =>
+                data.some(
+                  (product) =>
+                    checked.brand.includes(product.brand.brandId) && product.category.categoryId === category.categoryId
+                )
+              )
+            : categories;
+
+        const filteredBrands =
+          checked.category.length > 0
+            ? brandsNonZero.filter((brand) =>
+                data.some(
+                  (product) => checked.category.includes(product.category.categoryId) && product.brand.brandId === brand.brandId
+                )
+              )
+            : brandsNonZero;
+
+        setFilteredCategories(filteredCategories);
+        setFilteredBrands(filteredBrands);
+      }
+    };
+    filterData();
+  }, [data, categories, brandsNonZero, checked]);
+
+  useEffect(() => {
+    setFilterAmount(checked.archived.length + checked.brand.length + checked.category.length);
+  }, [checked, setFilterAmount]);
 
   const getFilterAmountLabel = (type: string) => {
     return checked[type].length > 0 && "(" + checked[type].length + ")";
@@ -55,22 +158,6 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
   const checkedIncludes = (type: string, id: number) => {
     return checked[type].includes(id);
   };
-
-  const fetchData = async () => {
-    const [categoryData, brandData] = await DebouncedBrandsAndCategories();
-    setCategories(categoryData);
-    setBrands(brandData);
-  };
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setFilterAmount(checked.archived.length + checked.brands.length + checked.categories.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked.archived, checked.brands, checked.categories]);
 
   return (
     <DropdownMenu modal={false}>
@@ -98,37 +185,35 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <span>Brand {getFilterAmountLabel("brands")}</span>
+            <span>Brand {getFilterAmountLabel("brand")}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              <ScrollArea className="h-96">
-                {brands.map((item, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={index}
-                    checked={checkedIncludes("brands", item.brandId)}
-                    onCheckedChange={() => handleFilterChange("brands", item.brandId, "brand")}>
-                    {item.name}
-                  </DropdownMenuCheckboxItem>
-                ))}
+              <ScrollArea className={brandsNonZero.length > 12 ? "h-96" : "h-fit"}>
+                <FilterCheckboxItems
+                  data={filteredBrands}
+                  checked={checked}
+                  products={data}
+                  filterType={"brand"}
+                  handleFilterChange={handleFilterChange}
+                />
               </ScrollArea>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <span>Category {getFilterAmountLabel("categories")}</span>
+            <span>Category {getFilterAmountLabel("category")}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              {categories.map((item, index) => (
-                <DropdownMenuCheckboxItem
-                  key={index}
-                  checked={checkedIncludes("categories", item.categoryId)}
-                  onCheckedChange={() => handleFilterChange("categories", item.categoryId, "category")}>
-                  {item.name}
-                </DropdownMenuCheckboxItem>
-              ))}
+              <FilterCheckboxItems
+                data={filteredCategories}
+                checked={checked}
+                products={data}
+                filterType="category"
+                handleFilterChange={handleFilterChange}
+              />
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
@@ -140,12 +225,12 @@ export default function ProductFilter({ setFilterString, setFilterAmount, filter
             <DropdownMenuSubContent>
               <DropdownMenuCheckboxItem
                 checked={checkedIncludes("archived", 0)}
-                onCheckedChange={() => handleFilterChange("archived", 0, "archived")}>
+                onCheckedChange={() => handleFilterChange("archived", 0)}>
                 Show Archived Products
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={checkedIncludes("archived", 1)}
-                onCheckedChange={() => handleFilterChange("archived", 1, "archived")}>
+                onCheckedChange={() => handleFilterChange("archived", 1)}>
                 Show Active Products
               </DropdownMenuCheckboxItem>
             </DropdownMenuSubContent>

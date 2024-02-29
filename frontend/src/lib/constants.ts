@@ -1,5 +1,7 @@
 import { templates } from "./enum/specsTemplates";
 
+export const STORE_NAME = "ZENITH";
+
 export const API_URL = "http://localhost:8080/api";
 export const BASE_URL = "http://localhost:5173";
 export const DEFAULT_LIMIT = "10";

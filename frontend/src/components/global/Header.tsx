@@ -7,6 +7,7 @@ import { fetchSessionData } from "@/lib/api";
 import { SessionData } from "@/lib/interfaces";
 import { Menu } from "lucide-react";
 import { Logo } from "./Logo";
+import { STORE_NAME } from "@/lib/constants";
 
 const sessionToken = Cookies.get("sessionToken");
 
@@ -40,7 +41,9 @@ export default function Header() {
         })}>
         <a className="flex flex-row gap-4 items-center" href="/">
           <Logo />
-          <p className="md:text-2xl sm:text-lg sm:block hidden tracking-widest font-semibold select-none logoClass">ZENITH</p>
+          <p className="md:text-2xl sm:text-lg sm:block hidden tracking-widest font-semibold select-none logoClass">
+            {STORE_NAME}
+          </p>
         </a>
         {!urlContainsDashboard && !urlContainsAuth ? (
           <div className="flex md:gap-2 flex-row-reverse">
