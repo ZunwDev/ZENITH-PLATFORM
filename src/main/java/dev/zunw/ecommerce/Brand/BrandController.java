@@ -25,5 +25,7 @@ public class BrandController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/nonzero")
-    public ResponseEntity<Object> getProductBrandsNonZero() {return ResponseEntity.ok(brandService.getAllProductBrandsWithAmountGreaterThanZero());}
+    public ResponseEntity<Object> getProductBrandsNonZero() {
+        return ResponseEntity.ok(brandService.getAllProductBrandsWithAmountGreaterThanZero());
+    }
 }

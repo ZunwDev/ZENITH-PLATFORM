@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import axios from "axios";
 import { API_URL, DEFAULT_LIMIT } from "@/lib/constants";
-import { Checked, FilterString, Page, initialCheckedState, initialFilterString } from "./interfaces";
+import { AmountData, Checked, FilterString, Page, initialCheckedState, initialFilterString } from "./interfaces";
 import {
   NewProductButton,
   ProductFilter,
@@ -38,11 +38,12 @@ export default function Products() {
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [sortBy, setSortBy] = useState("createdAt_desc");
   const [pageData, setPageData] = useState<Page>({} as Page);
+  const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState("1" || "1");
 
   // Debounced values
-  const [dbcSearch] = useDebounce(searchQuery, 500);
+  const [dbcSearch] = useDebounce(searchQuery, 250);
   const [dbcFilterString] = useDebounce(filterString, 250);
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function Products() {
       searchQuery: dbcSearch || "",
     });
 
-    return `${API_URL}/products?${params.toString()}&${brand}${category}${archived}`;
+    return `${params.toString()}&${brand}${category}${archived}`;
   }, [dbcFilterString, limit, sortBy, dbcSearch, queryParams]);
 
   const handleResetFilters = useCallback(() => {
@@ -77,13 +78,17 @@ export default function Products() {
     () =>
       debounce(async () => {
         try {
-          const response = await axios.get(`${productAPIURL}`, {
+          const response = await axios.get(`${API_URL}/products?${productAPIURL}`, {
             signal: newAbortSignal(5000),
           });
+          const { brand, category, archived } = dbcFilterString;
+          const responseAmount = await axios.get(`${API_URL}/products/amounts?${brand}${category}${archived}`);
           setPageData(response.data);
+          setAmountData(responseAmount.data);
         } catch (error) {
           console.error("Error fetching products:", error.response?.data?.message || error.message);
           setPageData({} as Page);
+          setAmountData({} as AmountData);
         }
       }, 250),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -140,7 +145,7 @@ export default function Products() {
               filterAmount={filterAmount}
               checked={checked}
               setChecked={setChecked}
-              data={pageData.content}
+              amountData={amountData}
             />
             <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
             <ProductSearch setSearchQuery={setSearchQuery} />

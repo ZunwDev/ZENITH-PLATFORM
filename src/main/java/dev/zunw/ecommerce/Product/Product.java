@@ -2,6 +2,7 @@ package dev.zunw.ecommerce.Product;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.zunw.ecommerce.Archived.Archived;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Category.Category;
 import jakarta.persistence.*;
@@ -31,6 +32,10 @@ public class Product {
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
+    @OneToOne
+    @JoinColumn(name = "archived_id")
+    private Archived archived;
+
     @Transient
     private transient JsonNode parsedSpecifications;
     private String description;
@@ -43,14 +48,6 @@ public class Product {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    private Boolean archived;
-
-    public Product() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-        this.archived = false;
-        this.rating = 0.0f;
-    }
 
     @PostLoad
     public void parseSpecifications() {

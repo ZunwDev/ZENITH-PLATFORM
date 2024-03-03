@@ -24,6 +24,12 @@ export interface Category {
   amount: number;
 }
 
+export interface Archived {
+  name: string;
+  archivedyId: number;
+  amount: number;
+}
+
 export interface Brand {
   name: string;
   brandId: number;
@@ -81,4 +87,13 @@ export interface Page {
   sort: Sort;
   totalElements: number;
   totalPages: number;
+}
+
+export interface AmountData {
+  type: {
+    id: {
+      amount: number;
+      name: string;
+    };
+  };
 }

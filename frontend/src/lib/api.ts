@@ -16,9 +16,9 @@ export async function fetchSessionData(sessionToken) {
   }
 }
 
-export async function DebouncedBrandsAndCategories() {
+export async function DebouncedFilterData() {
   try {
-    const [categoriesResponse, brandsResponse, brandsNonZeroResponse] = await Promise.all([
+    const [categoriesResponse, brandsResponse, brandsNonZeroResponse, archivedResponse] = await Promise.all([
       axios.get(`${API_URL}/categories`, {
         signal: newAbortSignal(5000),
       }),
@@ -28,13 +28,15 @@ export async function DebouncedBrandsAndCategories() {
       axios.get(`${API_URL}/brands/nonzero`, {
         signal: newAbortSignal(5000),
       }),
+      axios.get(`${API_URL}/archived`),
     ]);
     const categories = categoriesResponse.data;
     const brands = brandsResponse.data;
     const brandsNonZero = brandsNonZeroResponse.data;
-    return [categories, brands, brandsNonZero];
+    const archived = archivedResponse.data;
+    return [categories, brands, brandsNonZero, archived];
   } catch (error) {
-    console.error("Error fetching categories and brands:", error.response?.data?.message || error.message);
+    console.error("Error fetching filters:", error.response?.data?.message || error.message);
     return [[], []];
   }
 }

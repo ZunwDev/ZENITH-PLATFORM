@@ -17,32 +17,32 @@ const sorts = [
     name: "Rating",
     sortOptions: {
       name: "rating",
-      asc: "Ascending",
-      desc: "Descending",
+      asc: "Lowest",
+      desc: "Highest",
     },
   },
   {
     name: "Original Price",
     sortOptions: {
       name: "price",
-      asc: "Ascending",
-      desc: "Descending",
+      asc: "Lowest",
+      desc: "Highest",
     },
   },
   {
     name: "Quantity",
     sortOptions: {
       name: "quantity",
-      asc: "Ascending",
-      desc: "Descending",
+      asc: "Lowest",
+      desc: "Highest",
     },
   },
   {
     name: "Discount",
     sortOptions: {
       name: "discount",
-      asc: "Ascending",
-      desc: "Descending",
+      asc: "Lowest",
+      desc: "Highest",
     },
   },
   {

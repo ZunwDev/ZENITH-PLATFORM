@@ -80,7 +80,7 @@ export default function ProductTable({ data }) {
               <TableCell className="text-end w-[130px] hidden sm:table-cell">{formatDate(item.createdAt)}</TableCell>
               <TableCell className="hidden sm:table-cell">
                 <div className="flex justify-center">
-                  {item.archived ? <Check className="size-5" /> : <X className="size-5" />}
+                  {item.archived.archivedId == 1 ? <Check className="size-5" /> : <X className="size-5" />}
                 </div>
               </TableCell>
             </TableRow>

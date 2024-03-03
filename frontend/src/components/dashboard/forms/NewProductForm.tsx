@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Brand, Category } from "../products/interfaces";
-import { DebouncedBrandsAndCategories } from "@/lib/api";
+import { DebouncedFilterData } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProductImageManager from "../products/components/ProductImageManager";
 import { InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util/FormItems";
@@ -106,7 +106,7 @@ export default function NewProductForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, brandData] = await DebouncedBrandsAndCategories();
+      const [categoryData, brandData] = await DebouncedFilterData();
       setCategories(categoryData);
       setBrands(brandData);
     };
@@ -143,7 +143,7 @@ export default function NewProductForm() {
           name: values.name,
           description: values.description,
           price: !values.price.toFixed(2).endsWith(".99") ? (values.price + 0.99).toFixed(2) : values.price.toFixed(2),
-          specifications: formattedJSON,
+          specifications: formattedJSON.trim(),
           quantity: values.quantity,
           discount: values.discount,
           brand: brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
