@@ -47,13 +47,8 @@ export default function Header() {
         </a>
         {!urlContainsDashboard && !urlContainsAuth ? (
           <div className="flex md:gap-2 flex-row-reverse">
-            {/* User */}
             <User />
-
-            {/* Cart */}
             <Cart />
-
-            {/* Search bar */}
             <SearchBar />
           </div>
         ) : (
