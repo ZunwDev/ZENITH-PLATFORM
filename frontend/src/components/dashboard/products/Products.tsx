@@ -58,12 +58,13 @@ export default function Products() {
   const productAPIURL = useMemo(() => {
     const { brand, category, archived } = dbcFilterString;
     const pageQueryParam = parseInt(queryParams.get("page")) || 1;
+    const searchQueryParam = queryParams.get("query") || "";
     const params = new URLSearchParams({
       limit: limit,
       page: String(pageQueryParam - 1),
       sortBy: sortBy.slice(0, sortBy.indexOf("_")),
       sortDirection: sortBy.slice(sortBy.indexOf("_") + 1, sortBy.length),
-      searchQuery: dbcSearch || "",
+      searchQuery: searchQueryParam || dbcSearch || "",
     });
 
     return `${params.toString()}&${brand}${category}${archived}`;
@@ -74,26 +75,31 @@ export default function Products() {
     setChecked(initialCheckedState);
   }, []);
 
-  const debouncedFetchProducts = useMemo(
-    () =>
-      debounce(async () => {
-        try {
-          const response = await axios.get(`${API_URL}/products?${productAPIURL}`, {
-            signal: newAbortSignal(5000),
-          });
-          const { brand, category, archived } = dbcFilterString;
-          const responseAmount = await axios.get(`${API_URL}/products/amounts?${brand}${category}${archived}`);
-          setPageData(response.data);
-          setAmountData(responseAmount.data);
-        } catch (error) {
-          console.error("Error fetching products:", error.response?.data?.message || error.message);
-          setPageData({} as Page);
-          setAmountData({} as AmountData);
-        }
-      }, 250),
+  const debouncedFetchProducts = useMemo(() => {
+    const fetchProductsDebounced = debounce(async () => {
+      try {
+        // Fetch products data
+        const productsResponse = await axios.get(`${API_URL}/products?${productAPIURL}`, {
+          signal: newAbortSignal(5000),
+        });
+
+        // Fetch amounts data
+        const { brand, category, archived } = dbcFilterString;
+        const amountsResponse = await axios.get(`${API_URL}/products/amounts?${brand}${category}${archived}`);
+
+        // Update page data and amount data with fetched data
+        setPageData(productsResponse.data);
+        setAmountData(amountsResponse.data);
+      } catch (error) {
+        console.error("Error fetching products:", error.response?.data?.message || error.message);
+        setPageData({} as Page);
+        setAmountData({} as AmountData);
+      }
+    }, 250);
+
+    return fetchProductsDebounced;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, productAPIURL]
-  );
+  }, [limit, productAPIURL, dbcFilterString]);
 
   useEffect(() => {
     const debouncedFilterString = debounce(filterString, 250);
