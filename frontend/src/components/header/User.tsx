@@ -51,7 +51,7 @@ export default function User() {
 
   const logOut = async () => {
     try {
-      await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`, { signal: newAbortSignal(5000) });
+      await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`, { signal: newAbortSignal() });
       removeAllCookies();
     } catch (error) {
       removeAllCookies();

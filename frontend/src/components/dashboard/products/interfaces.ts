@@ -1,21 +1,17 @@
-interface Product {
+export interface Product {
   productId: string;
   name: string;
-  category: {
-    name: string;
-  };
+  category: Category;
+  archived: Archived;
   description: string;
   rating: number;
   price: number;
   parsedSpecifications: string;
   quantity: number;
   discount: number;
-  brand: {
-    name: string;
-  };
+  brand: Brand;
   createdAt: string;
   updatedAt: string;
-  archived: boolean;
 }
 
 export interface Category {
@@ -26,7 +22,7 @@ export interface Category {
 
 export interface Archived {
   name: string;
-  archivedyId: number;
+  archivedId: number;
   amount: number;
 }
 

@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Archived, Brand, Category, Checked, FilterString } from "../interfaces";
-import { DebouncedFilterData } from "@/lib/api";
+import { fetchFilterData } from "@/lib/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from "react";
 
@@ -91,7 +91,7 @@ export default function ProductFilter({
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, , brandNonZero, archivedData] = await DebouncedFilterData();
+      const [categoryData, , brandNonZero, archivedData] = await fetchFilterData();
       setData({ category: categoryData, brandsNonZero: brandNonZero, archived: archivedData });
     };
 

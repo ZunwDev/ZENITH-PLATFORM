@@ -62,8 +62,8 @@ export default function ProductSort({ sortBy, setSortBy }) {
         <React.Fragment key={index}>
           <DropdownMenuLabel>{item.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuRadioItem value={`${item.sortOptions.name}_asc`}>{item.sortOptions.asc}</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value={`${item.sortOptions.name}_desc`}>{item.sortOptions.desc}</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value={`${item.sortOptions.name}_asc`}>{item.sortOptions.asc}</DropdownMenuRadioItem>
           {index !== sorts.length - 1 && <DropdownMenuSeparator key={`separator-${index}`} />}
         </React.Fragment>
       )),

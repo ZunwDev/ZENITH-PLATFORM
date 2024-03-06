@@ -17,9 +17,9 @@ export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
     setSearchQuery(value);
 
     if (value === "") {
-      queryParams.delete("query");
+      queryParams.delete("q");
     } else {
-      queryParams.set("query", value);
+      queryParams.set("q", value);
     }
 
     navigate(`${location.pathname}?${queryParams.toString()}`);
@@ -34,7 +34,7 @@ export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
           placeholder="Search products..."
           className=" rounded-none rounded-tr-md rounded-br-md"
           onChange={(e) => handleSearch(e.target.value, e)}
-          value={queryParams.get("query") || ""}
+          value={queryParams.get("q") || ""}
         />
       </div>
     </>

@@ -39,7 +39,7 @@ export default function VerifyForm({ verifyCode, userId, setVerifyState, verifyS
   async function handleVerifyClick(values: z.infer<typeof VerifyCodeSchema>) {
     try {
       VerifyCodeSchema.parse(values);
-      await axios.put(`${API_URL}/users/verify/${userId}`, { signal: newAbortSignal(5000) });
+      await axios.put(`${API_URL}/users/verify/${userId}`, { signal: newAbortSignal() });
       setVerifyState(true);
       setButtonText("REDIRECTING...");
       goto("/auth/signin", 1000);

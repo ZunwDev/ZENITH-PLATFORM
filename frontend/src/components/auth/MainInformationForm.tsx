@@ -60,7 +60,7 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
   const createUser = async ({ values, hashedPassword }: CreateUserParams) => {
     try {
       const response = await axios.post(`${API_URL}/users/create`, {
-        signal: newAbortSignal(5000),
+        signal: newAbortSignal(),
         user: {
           firstName: values.firstName,
           lastName: values.lastName,

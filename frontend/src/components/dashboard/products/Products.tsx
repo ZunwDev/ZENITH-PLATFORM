@@ -47,8 +47,8 @@ export default function Products() {
   const [dbcFilterString] = useDebounce(filterString, 250);
 
   useEffect(() => {
-    if (!queryParams.has("page")) {
-      queryParams.set("page", "1");
+    if (!queryParams.has("p")) {
+      queryParams.set("p", "1");
       setCurrentPage("1");
       navigate(`${location.pathname}?${queryParams.toString()}`);
     }
@@ -57,8 +57,8 @@ export default function Products() {
 
   const productAPIURL = useMemo(() => {
     const { brand, category, archived } = dbcFilterString;
-    const pageQueryParam = parseInt(queryParams.get("page")) || 1;
-    const searchQueryParam = queryParams.get("query") || "";
+    const pageQueryParam = parseInt(queryParams.get("p")) || 1;
+    const searchQueryParam = queryParams.get("q") || "";
     const params = new URLSearchParams({
       limit: limit,
       page: String(pageQueryParam - 1),
@@ -80,7 +80,7 @@ export default function Products() {
       try {
         // Fetch products data
         const productsResponse = await axios.get(`${API_URL}/products?${productAPIURL}`, {
-          signal: newAbortSignal(5000),
+          signal: newAbortSignal(),
         });
 
         // Fetch amounts data
@@ -114,7 +114,7 @@ export default function Products() {
 
   const handlePageChange = (page, event) => {
     event.preventDefault();
-    queryParams.set("page", page);
+    queryParams.set("p", page);
     setCurrentPage(page);
     navigate(`${location.pathname}?${queryParams.toString()}`);
   };
@@ -124,7 +124,7 @@ export default function Products() {
     paginationItems.push(
       <PaginationItem key={i} className="cursor-pointer">
         <PaginationLink
-          href={`?page=${i}`}
+          href={`?p=${i}`}
           isActive={i === (pageData.number + 1 || 1)}
           onClick={(event) => handlePageChange(i, event)}>
           {i}
@@ -170,7 +170,7 @@ export default function Products() {
                   className={parseInt(currentPage) <= 1 ? "pointer-events-none opacity-50" : undefined}
                   aria-disabled={parseInt(currentPage) === 1}
                   tabIndex={parseInt(currentPage) <= 1 ? -1 : undefined}
-                  href={`?page=${Math.max(1, parseInt(currentPage) - 1)}`}
+                  href={`?p=${Math.max(1, parseInt(currentPage) - 1)}`}
                   onClick={(event) => handlePageChange(Math.max(1, parseInt(currentPage) - 1), event)}
                 />
               </PaginationItem>
@@ -180,7 +180,7 @@ export default function Products() {
                   className={parseInt(currentPage) == pageData.totalPages ? "pointer-events-none opacity-50" : undefined}
                   aria-disabled={parseInt(currentPage) === pageData.totalPages}
                   tabIndex={parseInt(currentPage) >= pageData.totalPages ? -1 : undefined}
-                  href={`?page=${Math.min(pageData.totalPages, parseInt(currentPage) + 1)}`}
+                  href={`?p=${Math.min(pageData.totalPages, parseInt(currentPage) + 1)}`}
                   onClick={(event) => handlePageChange(Math.min(pageData.totalPages, parseInt(currentPage) + 1), event)}
                 />
               </PaginationItem>

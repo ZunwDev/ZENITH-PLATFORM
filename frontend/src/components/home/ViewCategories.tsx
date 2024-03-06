@@ -7,8 +7,8 @@ import axios from "axios";
 import { newAbortSignal } from "@/lib/utils";
 
 const getCategories = async () => {
-  const response = await axios.get(`${API_URL}/products/category`, {
-    signal: newAbortSignal(5000),
+  const response = await axios.get(`${API_URL}/categories`, {
+    signal: newAbortSignal(),
   });
   type IconMapping = {
     [key: string]: JSX.Element;

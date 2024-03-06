@@ -43,7 +43,7 @@ export default function LoginForm() {
         email: values.email,
         password: btoa(values.password),
         isChecked: String(isChecked),
-        signal: newAbortSignal(5000),
+        signal: newAbortSignal(),
       });
 
       if (response.status === 200) {
