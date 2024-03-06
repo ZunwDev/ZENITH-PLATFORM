@@ -6,7 +6,6 @@ import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Brand.BrandRepository;
 import dev.zunw.ecommerce.Category.Category;
 import dev.zunw.ecommerce.Category.CategoryRepository;
-import dev.zunw.ecommerce.dto.FilterInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

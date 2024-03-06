@@ -6,27 +6,27 @@ export async function fetchSessionData(sessionToken) {
   try {
     if (sessionToken) {
       const response = await axios.get(`${API_URL}/users/session/${sessionToken}`, {
-        signal: newAbortSignal(5000),
+        signal: newAbortSignal(),
       });
       return response.data;
     }
   } catch (error) {
-    console.error("Error fetching session data:", error);
+    console.error("Error fetching session data:", error.response?.data?.message || error.message);
     return [];
   }
 }
 
-export async function DebouncedFilterData() {
+export async function fetchFilterData() {
   try {
     const [categoriesResponse, brandsResponse, brandsNonZeroResponse, archivedResponse] = await Promise.all([
       axios.get(`${API_URL}/categories`, {
-        signal: newAbortSignal(5000),
+        signal: newAbortSignal(),
       }),
       axios.get(`${API_URL}/brands`, {
-        signal: newAbortSignal(5000),
+        signal: newAbortSignal(),
       }),
       axios.get(`${API_URL}/brands/nonzero`, {
-        signal: newAbortSignal(5000),
+        signal: newAbortSignal(),
       }),
       axios.get(`${API_URL}/archived`),
     ]);
@@ -38,5 +38,14 @@ export async function DebouncedFilterData() {
   } catch (error) {
     console.error("Error fetching filters:", error.response?.data?.message || error.message);
     return [[], []];
+  }
+}
+
+export async function fetchProductDataById(id: string) {
+  try {
+    const response = await axios.get(`${API_URL}/products/${id}`, { signal: newAbortSignal() });
+    return response;
+  } catch (error) {
+    console.error(`Error fetching product data with id ${id}`, error.response?.data?.message || error.message);
   }
 }

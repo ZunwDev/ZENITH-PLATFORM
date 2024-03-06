@@ -10,8 +10,9 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "./components/ui/toaster.tsx";
 import { Orders, Overview, Products, Settings } from "./components/dashboard/index.ts";
 import NewProductForm from "./components/dashboard/forms/NewProductForm.tsx";
-const dashboard = "/:userId/dashboard";
+import EditProductForm from "./components/dashboard/forms/EditProductForm.tsx";
 
+const dashboard = "/:userId/dashboard";
 const router = createBrowserRouter([
   {
     path: "/auth/access",
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: `${dashboard}/products/new`,
     element: <NewProductForm />,
+  },
+  {
+    path: `${dashboard}/products/edit/:productId`,
+    element: <EditProductForm />,
   },
   {
     path: "*",

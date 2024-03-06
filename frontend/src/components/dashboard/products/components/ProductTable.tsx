@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { applyDiscount, cn, formatDate, getThumbnailFromFirebase } from "@/lib/utils";
+import { getThumbnailFromFirebase } from "@/lib/firebase";
+import { applyDiscount, cn, formatDate, goto } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -11,7 +12,7 @@ export default function ProductTable({ data }) {
       if (data && data.length > 0) {
         const promises = data.map(async (item) => {
           const thumbnail = await getThumbnailFromFirebase(item.productId);
-          return thumbnail;
+          return thumbnail.url;
         });
         const thumbnails = await Promise.all(promises);
         setThumbnail(thumbnails);
@@ -46,7 +47,7 @@ export default function ProductTable({ data }) {
       <TableBody>
         {data &&
           data.map((item, index) => (
-            <TableRow key={index} className="cursor-pointer">
+            <TableRow key={index} className="cursor-pointer" onClick={() => goto(`products/edit/${item.productId}`)}>
               <TableCell className="xs:w-32 sm:table-cell hidden">
                 <img src={thumbnail[index]} loading="lazy" width={64} height={64} className="size-20 object-contain" />
               </TableCell>

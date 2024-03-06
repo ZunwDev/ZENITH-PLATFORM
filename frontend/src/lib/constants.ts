@@ -16,6 +16,7 @@ export const ACCOUNT_CREATE_SERVER_ERROR_MESSAGE = "Oops! It seems there's a pro
 export const NO_IMAGE_PROVIDED_MESSAGE = "Please ensure that you include at least one image to represent the product.";
 export const IS_PARSE_ERROR_MESSAGE = "There is a parse error in the product specifications. Please correct it.";
 export const NO_SPECS_PROVIDED_MESSAGE = "No product specifications were provided. Please add them.";
+export const NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE = "Please select one image to be a thumbnail.";
 
 export const CATEGORY_TEMPLATE_MAPPING = {
   "computers & laptops": templates.ComputersAndLaptops,

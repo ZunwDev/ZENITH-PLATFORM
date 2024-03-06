@@ -27,7 +27,15 @@ export default function ProductImageManager({
   setSelectedImages,
 }: ImageManagerProps) {
   const deleteSelectedImages = useCallback(() => {
-    setImages((prev) => prev.filter((item) => !selectedImages.includes(item)));
+    setImages((prev) => {
+      const updatedImages = prev.map((item) => {
+        if (selectedImages.includes(imageThumbnail)) {
+          setImageThumbnail("");
+        }
+        return item;
+      });
+      return updatedImages.filter((item) => !selectedImages.includes(item));
+    });
     setSelectedImages([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedImages]);
@@ -64,9 +72,7 @@ export default function ProductImageManager({
                       title="Click to set as thumbnail"
                       src={item}
                       loading="lazy"
-                      width={96}
-                      height={96}
-                      className={cn("rounded-md object-cover cursor-pointer ring-2 ring-accent", {
+                      className={cn("rounded-md object-contain size-20 cursor-pointer ring-2 ring-accent", {
                         "ring-2 ring-primary": item === imageThumbnail,
                         "group-hover:ring-primary/30": item !== imageThumbnail,
                       })}

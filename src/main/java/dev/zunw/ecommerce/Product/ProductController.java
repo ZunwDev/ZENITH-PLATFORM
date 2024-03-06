@@ -1,7 +1,7 @@
 package dev.zunw.ecommerce.Product;
 
 import dev.zunw.ecommerce.dto.CreateProductRequest;
-import dev.zunw.ecommerce.dto.FilterInfo;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -95,6 +95,49 @@ public class ProductController {
             errorResponse.put("message", "Failed to create product");
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @CrossOrigin(origins = "*")
+    @PutMapping("/{productId}")
+    public ResponseEntity<Map<String, Object>> updateProduct(@PathVariable UUID productId, @RequestBody CreateProductRequest updatedProductData) {
+        try {
+            Optional<Product> existingProductOptional = productService.getProductById(productId);
+            if (existingProductOptional.isPresent()) {
+                Product existingProduct = getExistingProduct(updatedProductData.getProduct(), existingProductOptional);
+                Product updatedProduct = productService.updateProduct(existingProduct);
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("product", updatedProduct);
+                response.put("message", "Product updated successfully");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Product not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Failed to update product");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @NotNull
+    private static Product getExistingProduct(Product updatedProductData, Optional<Product> existingProductOptional) {
+        if (existingProductOptional.isPresent()) {
+            Product existingProduct = existingProductOptional.get();
+            existingProduct.setName(updatedProductData.getName());
+            existingProduct.setDescription(updatedProductData.getDescription());
+            existingProduct.setPrice(updatedProductData.getPrice());
+            existingProduct.setSpecifications(updatedProductData.getSpecifications());
+            existingProduct.setQuantity(updatedProductData.getQuantity());
+            existingProduct.setDiscount(updatedProductData.getDiscount());
+            existingProduct.setBrand(updatedProductData.getBrand());
+            existingProduct.setCategory(updatedProductData.getCategory());
+            existingProduct.setArchived(updatedProductData.getArchived());
+            return existingProduct;
+        }
+        return null;
     }
 }
 

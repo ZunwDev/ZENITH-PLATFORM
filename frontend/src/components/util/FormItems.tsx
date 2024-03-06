@@ -7,6 +7,8 @@ import { CommandInput, CommandEmpty, CommandGroup, CommandItem, Command } from "
 import { ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
+import { Checkbox } from "../ui/checkbox";
+import { useState } from "react";
 
 export function InputFormItem({
   id,
@@ -56,6 +58,36 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
       <Textarea id={id} name={id} placeholder={placeholder} {...form.register(id)} className="h-44" {...rest} />
       {description && <FormDescription>{description}</FormDescription>}
       <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
+    </FormItem>
+  );
+}
+
+export function CheckboxFormItem({ id, label, description, form, data, ...rest }) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const initialValue = data.archived.archivedId === 1;
+  const [isChecked, setIsChecked] = useState(initialValue);
+
+  const handleCheckboxChange = () => {
+    const newValue = !isChecked;
+    setIsChecked(newValue);
+    form.setValue(id, newValue ? true : false);
+  };
+
+  return (
+    <FormItem>
+      <div className="flex flex-row gap-1">
+        <Checkbox
+          id={id}
+          name={id}
+          {...form.register(id)}
+          {...rest}
+          checked={isChecked}
+          onCheckedChange={handleCheckboxChange}
+        />
+        <FormLabel htmlFor={id}>{label}</FormLabel>
+      </div>
+      {description && <FormDescription>{description}</FormDescription>}
     </FormItem>
   );
 }
