@@ -2,15 +2,16 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { getThumbnailFromFirebase } from "@/lib/firebase";
 import { applyDiscount, cn, formatDate, goto } from "@/lib/utils";
 import { Check, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 export default function ProductTable({ data }) {
   const [thumbnail, setThumbnail] = useState([]);
+  const [showingRange, setShowingRange] = useState<ReactNode>();
 
   useEffect(() => {
     const fetchThumbnail = async () => {
-      if (data && data.length > 0) {
-        const promises = data.map(async (item) => {
+      if (data.content && data.content.length > 0) {
+        const promises = data.content.map(async (item) => {
           const thumbnail = await getThumbnailFromFirebase(item.productId);
           return thumbnail.url;
         });
@@ -21,12 +22,33 @@ export default function ProductTable({ data }) {
 
     fetchThumbnail();
   }, [data]);
+
+  useEffect(() => {
+    if (Object.keys(data).length === 0) return;
+
+    const currentPage = data.number + 1;
+    const pageSize = data.pageable.pageSize;
+
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(currentPage * pageSize, data.totalElements);
+
+    setShowingRange(
+      <span>
+        <strong>{startItem}</strong>-<strong>{endItem}</strong>
+      </span>
+    );
+  }, [data]);
+
   return (
     <Table className="relative xs:w-full xs:justify-center xs:px-4">
       <TableCaption className="text-wrap">
-        {data && data.length > 0
-          ? `A list of existing products - viewing ${data.length} products.`
-          : "No products found. Try changing/removing filters."}
+        {data.content && data.content.length > 0 ? (
+          <span>
+            Showing {showingRange} of <strong>{data.totalElements}</strong> products
+          </span>
+        ) : (
+          "No products found. Try changing/removing filters."
+        )}
       </TableCaption>
       <TableHeader>
         <TableRow>
@@ -45,8 +67,8 @@ export default function ProductTable({ data }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data &&
-          data.map((item, index) => (
+        {data.content &&
+          data.content.map((item, index) => (
             <TableRow key={index} className="cursor-pointer" onClick={() => goto(`products/edit/${item.productId}`)}>
               <TableCell className="xs:w-32 sm:table-cell hidden">
                 <img src={thumbnail[index]} loading="lazy" width={64} height={64} className="size-20 object-contain" />

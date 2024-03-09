@@ -15,13 +15,7 @@ export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
   const handleSearch = (value: string, event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     setSearchQuery(value);
-
-    if (value === "") {
-      queryParams.delete("q");
-    } else {
-      queryParams.set("q", value);
-    }
-
+    value === "" ? queryParams.delete("q") : queryParams.set("q", value);
     navigate(`${location.pathname}?${queryParams.toString()}`);
   };
 

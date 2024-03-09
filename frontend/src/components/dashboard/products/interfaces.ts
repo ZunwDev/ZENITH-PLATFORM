@@ -32,12 +32,6 @@ export interface Brand {
   amount: number;
 }
 
-export interface FilterString {
-  brand: string;
-  category: string;
-  archived: string;
-}
-
 export interface Checked {
   brand: number[];
   category: number[];
@@ -48,12 +42,6 @@ export const initialCheckedState: Checked = {
   archived: [],
   category: [],
   brand: [],
-};
-
-export const initialFilterString: FilterString = {
-  brand: "",
-  category: "",
-  archived: "",
 };
 
 interface Sort {

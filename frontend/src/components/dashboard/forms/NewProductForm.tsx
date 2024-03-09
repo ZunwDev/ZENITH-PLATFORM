@@ -153,6 +153,9 @@ export default function NewProductForm() {
           discount: values.discount,
           brand: brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
           category: categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
+          archived: {
+            archivedId: values.archived ? 1 : 2,
+          },
         },
       });
 

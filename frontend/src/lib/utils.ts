@@ -67,10 +67,36 @@ export function debounce(fn, delay) {
   };
 }
 
-Object.defineProperty(String.prototype, "capitalize", {
-  value: function () {
-    return this.charAt(0).toUpperCase() + this.slice(1);
-  },
-  enumerable: false,
-  configurable: true,
-});
+declare global {
+  interface String {
+    capitalize(): string;
+  }
+}
+
+String.prototype.capitalize = function () {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+type ParamsObject = {
+  [key: string | number]: string | string[] | number | number[];
+};
+
+export function buildQueryParams(paramsObj: ParamsObject) {
+  const queryParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(paramsObj)) {
+    switch (typeof value) {
+      case "number":
+        queryParams.append(key, value.toString());
+        break;
+      case "string":
+        queryParams.append(key, value);
+        break;
+      case "object":
+        if (Array.isArray(value)) {
+          value.forEach((item) => queryParams.append(key, item.toString()));
+        }
+        break;
+    }
+  }
+  return queryParams.toString();
+}

@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import axios from "axios";
 import { API_URL, DEFAULT_LIMIT } from "@/lib/constants";
-import { AmountData, Checked, FilterString, Page, initialCheckedState, initialFilterString } from "./interfaces";
+import { AmountData, Archived, Brand, Category, Checked, Page, initialCheckedState } from "./interfaces";
 import {
   NewProductButton,
   ProductFilter,
@@ -12,7 +12,7 @@ import {
   ResetFilter,
 } from "./components";
 import { useDebounce } from "use-debounce";
-import { debounce, newAbortSignal } from "@/lib/utils";
+import { buildQueryParams, debounce, newAbortSignal } from "@/lib/utils";
 import PageHeader from "@/components/global/PageHeader";
 import { useAdminCheck } from "@/hooks";
 import {
@@ -24,16 +24,18 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { fetchFilterData } from "@/lib/api";
 
 export default function Products() {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   useAdminCheck();
+
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [filterString, setFilterString] = useState<FilterString>(initialFilterString);
-  const [debouncedFilterString, setDebouncedFilterString] = useState<FilterString>(initialFilterString);
   const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [sortBy, setSortBy] = useState("createdAt_desc");
@@ -41,10 +43,14 @@ export default function Products() {
   const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState("1" || "1");
+  const [filterData, setFilterData] = useState({
+    category: [] as Category[],
+    brand: [] as Brand[],
+    archived: [] as Archived[],
+  });
 
   // Debounced values
   const [dbcSearch] = useDebounce(searchQuery, 250);
-  const [dbcFilterString] = useDebounce(filterString, 250);
 
   useEffect(() => {
     if (!queryParams.has("p")) {
@@ -56,22 +62,24 @@ export default function Products() {
   }, []);
 
   const productAPIURL = useMemo(() => {
-    const { brand, category, archived } = dbcFilterString;
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
     const searchQueryParam = queryParams.get("q") || "";
-    const params = new URLSearchParams({
-      limit: limit,
-      page: String(pageQueryParam - 1),
+    const paramsObj = {
+      limit,
+      page: pageQueryParam - 1,
       sortBy: sortBy.slice(0, sortBy.indexOf("_")),
       sortDirection: sortBy.slice(sortBy.indexOf("_") + 1, sortBy.length),
       searchQuery: searchQueryParam || dbcSearch || "",
-    });
+      brand: checked.brand,
+      category: checked.category,
+      archived: checked.archived,
+    };
 
-    return `${params.toString()}&${brand}${category}${archived}`;
-  }, [dbcFilterString, limit, sortBy, dbcSearch, queryParams]);
+    const queryString = buildQueryParams(paramsObj);
+    return queryString;
+  }, [checked, limit, sortBy, dbcSearch, queryParams]);
 
   const handleResetFilters = useCallback(() => {
-    setFilterString(initialFilterString);
     setChecked(initialCheckedState);
   }, []);
 
@@ -84,8 +92,7 @@ export default function Products() {
         });
 
         // Fetch amounts data
-        const { brand, category, archived } = dbcFilterString;
-        const amountsResponse = await axios.get(`${API_URL}/products/amounts?${brand}${category}${archived}`);
+        const amountsResponse = await axios.get(`${API_URL}/products/amounts?${productAPIURL}`);
 
         // Update page data and amount data with fetched data
         setPageData(productsResponse.data);
@@ -99,25 +106,30 @@ export default function Products() {
 
     return fetchProductsDebounced;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [limit, productAPIURL, dbcFilterString]);
+  }, [limit, productAPIURL]);
 
   useEffect(() => {
-    const debouncedFilterString = debounce(filterString, 250);
-    if (typeof debouncedFilterString === "object" && debouncedFilterString !== null) {
-      setDebouncedFilterString(debouncedFilterString);
-    }
-  }, [filterString]);
+    const fetchData = async () => {
+      const [categoryData, brandData, , archivedData] = await fetchFilterData();
+      setFilterData({ category: categoryData, brand: brandData, archived: archivedData });
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    debouncedFetchProducts(debouncedFilterString);
-  }, [debouncedFetchProducts, debouncedFilterString]);
+    debouncedFetchProducts();
+  }, [debouncedFetchProducts]);
 
-  const handlePageChange = (page, event) => {
-    event.preventDefault();
-    queryParams.set("p", page);
-    setCurrentPage(page);
-    navigate(`${location.pathname}?${queryParams.toString()}`);
-  };
+  const handlePageChange = useCallback(
+    (page, event) => {
+      event.preventDefault();
+      queryParams.set("p", page);
+      setCurrentPage(page);
+      navigate(`${location.pathname}?${queryParams.toString()}`);
+    },
+    [queryParams, navigate, location.pathname]
+  );
 
   const paginationItems = [];
   for (let i = 1; i <= Math.min(pageData.totalPages || 0, 3); i++) {
@@ -133,6 +145,18 @@ export default function Products() {
     );
   }
 
+  const handleChipRemove = useCallback(
+    (key, idToRemove) => {
+      // Update the checked state
+      setChecked((prevChecked) => {
+        const updatedChecked = { ...prevChecked };
+        updatedChecked[key] = updatedChecked[key].filter((id) => id !== idToRemove);
+        return updatedChecked;
+      });
+    },
+    [setChecked]
+  );
+
   return (
     <div className="flex flex-col gap-16 mt-32 px-8 pb-64 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4 items-center">
@@ -146,7 +170,6 @@ export default function Products() {
         <div className="w-full flex flex-row justify-between gap-1 flex-wrap xs:px-4 sm:px-0">
           <div className="flex flex-row gap-1.5">
             <ProductFilter
-              setFilterString={setFilterString}
               setFilterAmount={setFilterAmount}
               filterAmount={filterAmount}
               checked={checked}
@@ -156,14 +179,40 @@ export default function Products() {
             <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
             <ProductSearch setSearchQuery={setSearchQuery} />
           </div>
-          <div className="flex flex-row gap-1.5 flex-wrap">
-            <ResetFilter onReset={handleResetFilters} filterAmount={filterAmount} />
-            <ProductLimit setLimit={setLimit} limit={limit} />
-          </div>
+          <ProductLimit setLimit={setLimit} limit={limit} />
         </div>
-        <ProductTable data={pageData.content} />
+        {filterAmount > 0 && (
+          <ScrollArea className="w-[1600px] overflow-y-hidden whitespace-nowrap pb-4">
+            {Object.entries(checked)
+              .reverse()
+              .map(([key, value], index) => {
+                if (value.length > 0) {
+                  return (
+                    <ChipGroup key={index}>
+                      <ChipGroupTitle>{key.capitalize()}:</ChipGroupTitle>
+                      <ChipGroupContent>
+                        {value.map((item, index) => (
+                          <Chip key={index} onRemove={() => handleChipRemove(key, item)}>
+                            {filterData &&
+                              filterData[key]
+                                .filter((filtered) => filtered[key + "Id"] === item)
+                                .map((filteredItem) => filteredItem.name)}
+                          </Chip>
+                        ))}
+                      </ChipGroupContent>
+                    </ChipGroup>
+                  );
+                }
+                return null;
+              })}
+            <ResetFilter onReset={handleResetFilters} filterAmount={filterAmount} />
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        )}
+
+        <ProductTable data={pageData} />
         {pageData.content && (
-          <Pagination>
+          <Pagination className="mt-[-2.5rem] z-50">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious

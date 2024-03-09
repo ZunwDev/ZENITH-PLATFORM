@@ -15,13 +15,12 @@ import {
 import { cn } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Archived, Brand, Category, Checked, FilterString } from "../interfaces";
+import { Archived, Brand, Category, Checked } from "../interfaces";
 import { fetchFilterData } from "@/lib/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from "react";
 
 interface ProductFilter {
-  setFilterString: React.Dispatch<React.SetStateAction<FilterString>>;
   setFilterAmount: React.Dispatch<React.SetStateAction<number>>;
   filterAmount: number;
   checked: Checked;
@@ -38,15 +37,15 @@ interface CheckboxItems {
 
 const FilterCheckboxItems = React.memo(({ data, checked, handleFilterChange, filterType }: CheckboxItems) => {
   const renderCheckboxItem = (amount: number, name: string, id: number) => {
-    return (
-      amount > 0 && (
-        <DropdownMenuCheckboxItem
-          key={name}
-          checked={checked[filterType].includes(id)}
-          onCheckedChange={() => handleFilterChange(filterType, id)}>
-          {`${name} (${amount})`}
-        </DropdownMenuCheckboxItem>
-      )
+    return amount > 0 && data !== "No data found" ? (
+      <DropdownMenuCheckboxItem
+        key={name}
+        checked={checked[filterType].includes(id)}
+        onCheckedChange={() => handleFilterChange(filterType, id)}>
+        {`${name} (${amount})`}
+      </DropdownMenuCheckboxItem>
+    ) : (
+      <DropdownMenuCheckboxItem key={name + id}>No data found</DropdownMenuCheckboxItem>
     );
   };
 
@@ -56,14 +55,7 @@ const FilterCheckboxItems = React.memo(({ data, checked, handleFilterChange, fil
   });
 });
 
-export default function ProductFilter({
-  setFilterString,
-  setFilterAmount,
-  filterAmount,
-  checked,
-  setChecked,
-  amountData,
-}: ProductFilter) {
+export default function ProductFilter({ setFilterAmount, filterAmount, checked, setChecked, amountData }: ProductFilter) {
   const [data, setData] = useState({
     category: [] as Category[],
     brandsNonZero: [] as Brand[],
@@ -75,19 +67,15 @@ export default function ProductFilter({
     archived: [] as Archived[],
   });
 
-  const handleFilterChange = useCallback((type: keyof Checked, id: number) => {
-    setChecked((prevState) => {
-      const updatedFilterString = {
+  const handleFilterChange = useCallback(
+    (type: keyof Checked, id: number) => {
+      setChecked((prevState) => ({
         ...prevState,
         [type]: prevState[type].includes(id) ? prevState[type].filter((item) => item !== id) : [...prevState[type], id],
-      };
-
-      const updatedFilterStringValues = updatedFilterString[type].map((item) => `${type}=${item}&`).join("");
-      setFilterString((prev) => ({ ...prev, [type]: updatedFilterStringValues }));
-      return updatedFilterString;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      }));
+    },
+    [setChecked]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,7 +113,7 @@ export default function ProductFilter({
           Filter By
           {filterAmount > 0 && (
             <div
-              className={cn("bg-primary size-4 rounded-full flex items-center justify-center text-accent", {
+              className={cn("bg-primary size-4 rounded-full text-xs flex items-center justify-center text-accent", {
                 "px-4": filterAmount > 9,
               })}>
               {filterAmount > 99 ? "99+" : filterAmount}
@@ -179,7 +167,7 @@ function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, 
           {filterType === "brand" && (
             <ScrollArea className={data.brandsNonZero.length > 12 ? "h-96" : "h-fit"}>
               <FilterCheckboxItems
-                data={filteredData[filterType]}
+                data={filteredData[filterType] || ["No data found"]}
                 checked={checked}
                 filterType={filterType}
                 handleFilterChange={handleFilterChange}
@@ -188,7 +176,7 @@ function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, 
           )}
           {filterType !== "brand" && (
             <FilterCheckboxItems
-              data={filteredData[filterType]}
+              data={filteredData[filterType] || ["No data found"]}
               checked={checked}
               filterType={filterType}
               handleFilterChange={handleFilterChange}

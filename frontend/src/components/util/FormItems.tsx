@@ -65,7 +65,7 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
 export function CheckboxFormItem({ id, label, description, form, data, ...rest }) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
-  const initialValue = data.archived.archivedId === 1;
+  const initialValue = data && data.archived.archivedId === 1;
   const [isChecked, setIsChecked] = useState(initialValue);
 
   const handleCheckboxChange = () => {
