@@ -1,8 +1,10 @@
 # ZENITH ECOMMERCE PLATFORM
 
+## Currently working on: Better product creation, specs generation with an form. Preps for banner manager and category logic improvement
+
 Fully functional ecom platform, with all features, will be added later on in this readme.
 
-## Images/Preview (WIP)
+## Images/Preview (WIP) OUTDATED
 
 ![Image 1](/frontend/src/assets/image1.png)
 ![Image 2](/frontend/src/assets/image2.png)
