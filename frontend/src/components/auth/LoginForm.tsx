@@ -1,16 +1,17 @@
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { API_URL } from "@/lib/api";
+import { LOGIN_ERROR_MESSAGE, LOGIN_INVALID_CREDENTIALS_MESSAGE, LOGIN_SERVER_ERROR_MESSAGE } from "@/lib/constants";
+import { cn, goto, newAbortSignal } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { cn, goto, newAbortSignal } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { API_URL, LOGIN_ERROR_MESSAGE, LOGIN_INVALID_CREDENTIALS_MESSAGE, LOGIN_SERVER_ERROR_MESSAGE } from "@/lib/constants";
-import axios from "axios";
-import Cookies from "js-cookie";
 
 const FormSchema = z.object({
   email: z.string().email("Invalid email format.").min(2, "Please enter an email address"),

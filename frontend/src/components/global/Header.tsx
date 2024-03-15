@@ -1,13 +1,13 @@
-import { Button } from "../ui/button";
-import Cookies from "js-cookie";
-import { cn } from "@/lib/utils";
-import { Cart, SearchBar, User } from "../header";
-import { useEffect, useState } from "react";
 import { fetchSessionData } from "@/lib/api";
-import { SessionData } from "@/lib/interfaces";
-import { Menu } from "lucide-react";
-import { Logo } from "./Logo";
 import { STORE_NAME } from "@/lib/constants";
+import { SessionData } from "@/lib/interfaces";
+import { cn } from "@/lib/utils";
+import Cookies from "js-cookie";
+import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Logo } from ".";
+import { Cart, SearchBar, User } from "../header";
+import { Button } from "../ui/button";
 
 const sessionToken = Cookies.get("sessionToken");
 
@@ -15,6 +15,7 @@ const adminButtons: { name: string; goto: string }[] = [
   { name: "Dashboard", goto: "/overview" },
   { name: "Orders", goto: "/orders" },
   { name: "Products", goto: "/products" },
+  { name: "Banner Manager", goto: "/banner" },
   { name: "Settings", goto: "/settings" },
 ];
 

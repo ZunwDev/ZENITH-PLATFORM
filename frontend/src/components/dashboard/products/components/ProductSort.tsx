@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 
 const sorts = [
   {

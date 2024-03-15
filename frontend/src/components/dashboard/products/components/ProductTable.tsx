@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getThumbnailFromFirebase } from "@/lib/firebase";
-import { applyDiscount, cn, formatDate, goto } from "@/lib/utils";
+import { applyDiscount, cn, formatDate, goto, shortenText } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 
@@ -71,13 +71,11 @@ export default function ProductTable({ data }) {
           data.content.map((item, index) => (
             <TableRow key={index} className="cursor-pointer" onClick={() => goto(`products/edit/${item.productId}`)}>
               <TableCell className="xs:w-32 sm:table-cell hidden">
-                <img src={thumbnail[index]} loading="lazy" width={64} height={64} className="size-20 object-contain" />
+                <img src={thumbnail[index]} loading="lazy" width={80} height={80} className="size-20 object-contain" alt="" />
               </TableCell>
               <TableCell className="font-bold text-start sm:w-[216px] xs:w-32">{item.name}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.category.name}</TableCell>
-              <TableCell className="text-end md:table-cell hidden">
-                {item.description.length > 80 ? `${item.description.slice(0, 80)}...` : item.description}
-              </TableCell>
+              <TableCell className="text-end md:table-cell hidden">{shortenText(item.description)}</TableCell>
               <TableCell className="text-end hidden sm:table-cell">{item.rating}</TableCell>
               <TableCell className={cn("font-bold text-end")}>
                 <span

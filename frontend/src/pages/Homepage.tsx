@@ -1,12 +1,12 @@
-import { Benefits, AdBanner, FeaturedProductsInEachCategory, ViewCategories } from "@/components/home";
+import { Banner, Benefits, CategoryList, FeaturedProductsInEachCategory } from "@/components/home";
 
 export default function Homepage() {
   return (
-    <section className="mt-32 flex flex-col gap-12 px-8 md:min-w-[1200px] max-w-[1200px] min-w-[360px]">
+    <section className="mt-32 flex flex-col gap-12 px-8 md:min-w-[1600px] max-w-[1600px] min-w-[360px]">
       <Benefits />
-      <AdBanner />
+      <Banner />
       <FeaturedProductsInEachCategory />
-      <ViewCategories />
+      <CategoryList />
     </section>
   );
 }

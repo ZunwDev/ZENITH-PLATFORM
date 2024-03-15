@@ -1,9 +1,9 @@
+import { LoginForm } from "@/components/auth";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { goto } from "@/lib/utils";
+import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
-import { LoginForm } from "@/components/auth";
-import { goto } from "@/lib/utils";
 
 export default function Login() {
   useEffect(() => {

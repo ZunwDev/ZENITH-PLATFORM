@@ -1,7 +1,22 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { PageHeader } from "@/components/global";
+import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useAdminCheck } from "@/hooks";
+import { API_URL, fetchFilterData } from "@/lib/api";
+import { DEFAULT_LIMIT } from "@/lib/constants";
+import { buildQueryParams, debounce, newAbortSignal } from "@/lib/utils";
 import axios from "axios";
-import { API_URL, DEFAULT_LIMIT } from "@/lib/constants";
-import { AmountData, Archived, Brand, Category, Checked, Page, initialCheckedState } from "./interfaces";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDebounce } from "use-debounce";
 import {
   NewProductButton,
   ProductFilter,
@@ -11,22 +26,7 @@ import {
   ProductTable,
   ResetFilter,
 } from "./components";
-import { useDebounce } from "use-debounce";
-import { buildQueryParams, debounce, newAbortSignal } from "@/lib/utils";
-import PageHeader from "@/components/global/PageHeader";
-import { useAdminCheck } from "@/hooks";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { fetchFilterData } from "@/lib/api";
+import { AmountData, Archived, Brand, Category, Checked, Page, initialCheckedState } from "./interfaces";
 
 export default function Products() {
   const location = useLocation();
@@ -42,7 +42,7 @@ export default function Products() {
   const [pageData, setPageData] = useState<Page>({} as Page);
   const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState("1" || "1");
+  const [currentPage, setCurrentPage] = useState("1");
   const [filterData, setFilterData] = useState({
     category: [] as Category[],
     brand: [] as Brand[],

@@ -1,3 +1,9 @@
+import { API_URL, fetchSessionData } from "@/lib/api";
+import { BASE_URL } from "@/lib/constants";
+import { SessionData } from "@/lib/interfaces";
+import { newAbortSignal, removeAllCookies } from "@/lib/utils";
+import axios from "axios";
+import Cookies from "js-cookie";
 import {
   ChevronDown,
   DoorClosed,
@@ -10,6 +16,7 @@ import {
   UserRound,
   UserRoundCog,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,22 +25,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import Cookies from "js-cookie";
-import { newAbortSignal, removeAllCookies } from "@/lib/utils";
-import { API_URL, BASE_URL } from "@/lib/constants";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { fetchSessionData } from "@/lib/api";
-import { SessionData } from "@/lib/interfaces";
 
 const sessionToken = Cookies.get("sessionToken");
 
 const items: { name: string; icon: JSX.Element; redirect: boolean; goto: string }[] = [
-  { name: "Favorites", icon: <Heart className="mr-2 size-4" />, redirect: false, goto: "/account/favorites" },
-  { name: "Orders", icon: <Receipt className="mr-2 size-4" />, redirect: true, goto: "/account/orders" },
-  { name: "Returns", icon: <Undo2 className="mr-2 size-4" />, redirect: true, goto: "/account/returns" },
-  { name: "Recent Products", icon: <List className="mr-2 size-4" />, redirect: false, goto: "/account/recent" },
-  { name: "Settings", icon: <Settings className="mr-2 size-4" />, redirect: true, goto: "/account/settings" },
+  { name: "Favorites", icon: <Heart className="size-4" />, redirect: false, goto: "/account/favorites" },
+  { name: "Orders", icon: <Receipt className="size-4" />, redirect: true, goto: "/account/orders" },
+  { name: "Returns", icon: <Undo2 className="size-4" />, redirect: true, goto: "/account/returns" },
+  { name: "Recent Products", icon: <List className="size-4" />, redirect: false, goto: "/account/recent" },
+  { name: "Settings", icon: <Settings className="size-4" />, redirect: true, goto: "/account/settings" },
 ];
 
 export default function User() {
@@ -70,10 +70,9 @@ export default function User() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()}>
         <DropdownMenuLabel>My account</DropdownMenuLabel>
-        <DropdownMenuSeparator className="" />
         {items.map((item, index) => (
           <DropdownMenuItem key={index} asChild>
-            <a className="flex flex-row items-center" href={BASE_URL + item.goto}>
+            <a className="flex flex-row items-center gap-2" href={BASE_URL + item.goto}>
               {item.icon}
               {item.name}
             </a>
@@ -81,7 +80,6 @@ export default function User() {
         ))}
         {sessionToken && data.isAdmin && (
           <>
-            <DropdownMenuSeparator />
             <DropdownMenuLabel>Administrator</DropdownMenuLabel>
             <DropdownMenuItem asChild>
               <a href={`/${data.userId}/dashboard/overview`} className="flex flex-row items-center">

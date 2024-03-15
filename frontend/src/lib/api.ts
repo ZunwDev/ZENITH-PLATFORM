@@ -1,6 +1,7 @@
-import { API_URL } from "./constants";
 import axios from "axios";
 import { newAbortSignal } from "./utils";
+
+export const API_URL = "http://localhost:8080/api";
 
 export async function fetchSessionData(sessionToken) {
   try {
@@ -47,5 +48,28 @@ export async function fetchProductDataById(id: string) {
     return response;
   } catch (error) {
     console.error(`Error fetching product data with id ${id}`, error.response?.data?.message || error.message);
+  }
+}
+
+export async function fetchAttributeData(attributeTypeId: number) {
+  try {
+    const response = await axios.get(`${API_URL}/attribute/${attributeTypeId}`, { signal: newAbortSignal() });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error fetching attribute data with attribute type id ${attributeTypeId}`,
+      error.response?.data?.message || error.message
+    );
+  }
+}
+export async function fetchAttributeDataWithCategoryId(categoryId: number, attributeTypeId: number) {
+  try {
+    const response = await axios.get(`${API_URL}/attribute/${attributeTypeId}/${categoryId}`, { signal: newAbortSignal() });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error fetching attribute data with category id ${categoryId} and attribute type id ${attributeTypeId}`,
+      error.response?.data?.message || error.message
+    );
   }
 }

@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ImageUploader from "@/components/util/ImageUploader";
 import { cn } from "@/lib/utils";
-import { BoxSelect, Trash, InfoIcon } from "lucide-react";
+import { BoxSelect, InfoIcon, Trash } from "lucide-react";
 import { useCallback } from "react";
 
 interface ImageManagerProps {
@@ -56,7 +56,7 @@ export default function ProductImageManager({
   }, []);
 
   return (
-    <Card className="md:w-80 w-full h-fit border rounded-md flex flex-col flex-shrink-0">
+    <Card className="w-full h-fit border rounded-md flex flex-col flex-shrink-0">
       <CardHeader>
         <CardTitle>Product Images</CardTitle>
         <CardDescription>Upload images that will represent the product.</CardDescription>
@@ -91,7 +91,10 @@ export default function ProductImageManager({
               </div>
             </ScrollArea>
           ) : (
-            <div className="flex justify-center w-full items-center h-96">No images yet...</div>
+            <div className="flex flex-col justify-center items-center w-full h-96">
+              <p className="text-lg mb-2 text-center">No images uploaded yet.</p>
+              <p className="text-sm text-accent-foreground/50 text-center">Once you upload images, they will appear here.</p>
+            </div>
           )}
         </>
       </CardContent>

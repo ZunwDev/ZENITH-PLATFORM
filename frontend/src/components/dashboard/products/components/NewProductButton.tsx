@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { fetchSessionData } from "@/lib/api";
 import { SessionData } from "@/lib/interfaces";
-import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
 const sessionToken = Cookies.get("sessionToken");
 

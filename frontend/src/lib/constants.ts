@@ -1,8 +1,8 @@
-import { templates } from "./enum/specsTemplates";
+import { FormFields } from "./enum/schemas";
+import { Templates } from "./enum/specsTemplates";
 
 export const STORE_NAME = "ZENITH";
 
-export const API_URL = "http://localhost:8080/api";
 export const BASE_URL = "http://localhost:5173";
 export const DEFAULT_LIMIT = "10";
 
@@ -19,13 +19,17 @@ export const NO_SPECS_PROVIDED_MESSAGE = "No product specifications were provide
 export const NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE = "Please select one image to be a thumbnail.";
 
 export const CATEGORY_TEMPLATE_MAPPING = {
-  "computers & laptops": templates.ComputersAndLaptops,
-  "audio & headphones": templates.AudioAndHeadphones,
-  "cameras & photography": templates.CamerasAndPhotography,
-  "wearable technology": templates.WearableTechnology,
-  "home electronics": templates.HomeElectronics,
-  "gaming & consoles": templates.GamingAndConsoles,
-  "cables & adapters": templates.CablesAndAdapters,
-  "power banks & chargers": templates.PowerBanksAndChargers,
-  "smartphones & accessories": templates.SmartphonesAndAccessories,
+  "computers & tablets": Templates.ComputersAndTablets,
+  "audio & headphones": Templates.AudioAndHeadphones,
+  "cameras & photography": Templates.CamerasAndPhotography,
+  "wearable technology": Templates.WearableTechnology,
+  "home electronics": Templates.HomeElectronics,
+  "gaming & consoles": Templates.GamingAndConsoles,
+  "cables & adapters": Templates.CablesAndAdapters,
+  "power banks & chargers": Templates.PowerBanksAndChargers,
+  "smartphones & accessories": Templates.SmartphonesAndAccessories,
+};
+
+export const TYPE_MAPPING = {
+  laptops: FormFields.Laptops,
 };

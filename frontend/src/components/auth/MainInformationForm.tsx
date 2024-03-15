@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { API_URL } from "@/lib/api";
+import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS_MESSAGE } from "@/lib/constants";
+import { generateOTP, newAbortSignal, setStateDelayed } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import bcrypt from "bcryptjs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
-import { generateOTP, newAbortSignal, setStateDelayed } from "@/lib/utils";
-import { ACCOUNT_CREATE_SERVER_ERROR_MESSAGE, ACCOUNT_CREATE_USER_EXISTS_MESSAGE, API_URL } from "@/lib/constants";
-import axios from "axios";
 
 interface MainInfoFormProps {
   setFirstPhase: React.Dispatch<React.SetStateAction<boolean>>;

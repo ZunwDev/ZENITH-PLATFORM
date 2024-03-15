@@ -12,7 +12,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { Filter, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Archived, Brand, Category, Checked } from "../interfaces";
@@ -94,7 +94,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
       brand: checked.category.length > 0 ? amountData.brand : data.brandsNonZero,
       archived: checked.category.length > 0 || checked.brand.length > 0 ? amountData.archived : data.archived,
     });
-    setFilterAmount(checked.archived.length + checked.brand.length + checked.category.length);
+    setFilterAmount(getAmountOfValuesInObjectOfObjects(checked));
   }, [checked, data, setFilterAmount, amountData]);
 
   const getFilterAmountLabel = (type: string) => {

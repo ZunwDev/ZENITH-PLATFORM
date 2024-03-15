@@ -5,12 +5,12 @@ import "./index.css";
 import Signup from "./pages/auth/access/Signup.tsx";
 import Login from "./pages/auth/signin/Signin.tsx";
 import Homepage from "./pages/Homepage.tsx";
-import Header from "./components/global/Header.tsx";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "./components/ui/toaster.tsx";
 import { Orders, Overview, Products, Settings } from "./components/dashboard/index.ts";
 import NewProductForm from "./components/dashboard/forms/NewProductForm.tsx";
 import EditProductForm from "./components/dashboard/forms/EditProductForm.tsx";
+import Header from "./components/global/Header.tsx";
 
 const dashboard = "/:userId/dashboard";
 const router = createBrowserRouter([

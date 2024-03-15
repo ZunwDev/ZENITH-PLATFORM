@@ -63,4 +63,9 @@
   .logoClass {
     font-family: "Bruno Ace SC", sans-serif;
   }
+
+  .PopoverContent {
+    width: var(--radix-popover-trigger-width);
+    max-height: var(--radix-popover-content-available-height);
+  }
 }

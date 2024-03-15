@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FileDigit, ChevronDown } from "lucide-react";
+import { ChevronDown, FileDigit } from "lucide-react";
 
 interface ProductLimitProps {
   limit: string;

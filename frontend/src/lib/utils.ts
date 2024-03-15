@@ -23,6 +23,13 @@ export function formatDate(dateString: string): string {
   return date.toLocaleDateString("en-US", options);
 }
 
+export const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
 export function removeAllCookies() {
   Object.keys(Cookies.get()).forEach(function (cookieName) {
     Cookies.remove(cookieName);
@@ -99,4 +106,23 @@ export function buildQueryParams(paramsObj: ParamsObject) {
     }
   }
   return queryParams.toString();
+}
+
+export function getAmountOfValuesInObjectOfObjects(obj: object) {
+  return Object.values(obj).reduce((acc, obj) => acc + Object.keys(obj).length, 0);
+}
+
+export function shortenText(str: string) {
+  return str.length > 80 ? `${str.slice(0, 80)}...` : str;
+}
+
+export function includesAny(value, arr) {
+  return arr.some((category) => value == category);
+}
+
+export function makeEndBy99(num: number) {
+  console.log(num);
+  if (num) {
+    return !num?.toFixed(2).endsWith(".99") ? (num + 0.99).toFixed(2) : num?.toFixed(2);
+  }
 }
