@@ -7,6 +7,7 @@ import { generateOTP, newAbortSignal, setStateDelayed } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import bcrypt from "bcryptjs";
+import { ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -133,8 +134,9 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
             <FormMessage>{form.formState.errors[field.name]?.message}</FormMessage>
           </FormItem>
         ))}
-        <Button className="w-full" type="submit" onClick={form.handleSubmit(handleEmailClick)}>
-          CREATE ACCOUNT & CONTINUE
+        <Button className="w-full flex-row flex gap-1" type="submit" onClick={form.handleSubmit(handleEmailClick)}>
+          Next
+          <ArrowRight className="size-4" />
         </Button>
       </form>
     </Form>

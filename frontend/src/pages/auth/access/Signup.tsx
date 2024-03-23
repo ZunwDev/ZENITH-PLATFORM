@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import { MainInformationForm, VerifyForm } from "@/components/auth";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { InformationDescription } from "@/components/util";
 import { goto } from "@/lib/utils";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   const [firstPhase, setFirstPhase] = useState(false);
@@ -43,7 +44,16 @@ export default function Signup() {
   // Verify code, that was meant to be sent to email
   return (
     <div className="flex items-center justify-center h-screen">
-      <Card className="w-[450px]">
+      <Card className="w-[360px]">
+        <CardHeader>
+          <CardTitle>User Verification</CardTitle>
+          <CardDescription>
+            A verification code has been sent to your email. Please enter your code below. <br />
+            <InformationDescription>
+              Your code: <strong>{verifyCode}</strong>
+            </InformationDescription>
+          </CardDescription>
+        </CardHeader>
         <CardContent>
           <VerifyForm verifyCode={verifyCode} userId={userId} setVerifyState={setVerifyState} verifyState={verifyState} />
         </CardContent>

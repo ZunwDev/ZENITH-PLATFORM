@@ -4,9 +4,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import ImageUploader from "@/components/util/ImageUploader";
+import { ImageUploader, InformationDescription } from "@/components/util";
 import { cn } from "@/lib/utils";
-import { BoxSelect, InfoIcon, Trash } from "lucide-react";
+import { BoxSelect, Trash } from "lucide-react";
 import { useCallback } from "react";
 
 interface ImageManagerProps {
@@ -145,8 +145,7 @@ export default function ProductImageManager({
         </div>
         <ImageUploader setImages={setImages} />
         <div className="flex flex-row items-center pb-1">
-          <InfoIcon className="inline-block text-primary size-4" />
-          <span className="ml-1 text-primary">Blue border = thumbnail</span>
+          <InformationDescription>Blue border = thumbnail</InformationDescription>
         </div>
       </CardFooter>
     </Card>
