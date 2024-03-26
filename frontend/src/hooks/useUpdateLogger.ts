@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-export const useUpdateLogger = (value) => {
+export const useUpdateLogger = (state, name: string) => {
   useEffect(() => {
-    console.log(value && value);
-  }, [value]);
+    console.log(`${name} updated:`, state);
+  }, [state, name]);
 };

@@ -28,40 +28,39 @@ export default function ProductImageManager({
 }: ImageManagerProps) {
   const deleteSelectedImages = useCallback(() => {
     setImages((prev) => {
-      const updatedImages = prev.map((item) => {
-        if (selectedImages.includes(imageThumbnail)) {
-          setImageThumbnail("");
-        }
-        return item;
-      });
-      return updatedImages.filter((item) => !selectedImages.includes(item));
+      const updatedImages = prev.filter((item) => !selectedImages.includes(item));
+      setSelectedImages([]);
+      return updatedImages;
     });
-    setSelectedImages([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setImageThumbnail(""); // This should be outside the setImages function to ensure it's executed once
   }, [selectedImages]);
 
   const selectAllImages = useCallback(() => {
     setSelectedImages((prev) => (prev.length === images.length ? [] : images));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
   const setImageAsThumbnail = useCallback((image: string) => {
     setImageThumbnail(image);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleImageSelect = useCallback((image: string) => {
     setSelectedImages((prev) => (prev.includes(image) ? prev.filter((item) => item !== image) : [...prev, image]));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <Card className="w-full h-fit border rounded-md flex flex-col flex-shrink-0">
+    <Card className="w-full border rounded-md flex flex-col flex-shrink-0">
       <CardHeader>
         <CardTitle>Product Images</CardTitle>
-        <CardDescription>Upload images that will represent the product.</CardDescription>
+        <CardDescription>
+          Upload images that will represent the product.
+          {images.length > 0 && (
+            <InformationDescription>
+              Images with a blue border represent thumbnail. Click any image to change the thumbnail.
+            </InformationDescription>
+          )}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="h-fit">
+      <CardContent>
         <>
           {images.length > 0 ? (
             <ScrollArea className="h-96">
@@ -78,21 +77,24 @@ export default function ProductImageManager({
                       })}
                       onClick={() => setImageAsThumbnail(item)}
                     />
-                    <Checkbox
-                      checked={selectedImages.includes(item)}
-                      className={cn(
-                        "absolute top-1 right-1 bg-background",
-                        { "group-hover:flex hidden": selectedImages.length == 0 },
-                        { flex: selectedImages.length > 0 }
-                      )}
-                      onClick={() => handleImageSelect(item)}></Checkbox>
+                    <div className="absolute top-1 right-6">
+                      <Checkbox
+                        checked={selectedImages.includes(item)}
+                        className={cn(
+                          "bg-background",
+                          { "group-hover:flex hidden": selectedImages.length == 0 },
+                          { flex: selectedImages.length > 0 }
+                        )}
+                        onClick={() => handleImageSelect(item)}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </ScrollArea>
           ) : (
             <div className="flex flex-col justify-center items-center w-full h-96">
-              <p className="text-lg mb-2 text-center">No images uploaded yet.</p>
+              <p className="text-lg text-center">No images uploaded yet.</p>
               <p className="text-sm text-accent-foreground/50 text-center">Once you upload images, they will appear here.</p>
             </div>
           )}
@@ -144,9 +146,6 @@ export default function ProductImageManager({
           {images.length > 0 && <span className="text-text">{`Selected ${selectedImages.length} of ${images.length}`}</span>}
         </div>
         <ImageUploader setImages={setImages} />
-        <div className="flex flex-row items-center pb-1">
-          <InformationDescription>Blue border = thumbnail</InformationDescription>
-        </div>
       </CardFooter>
     </Card>
   );
