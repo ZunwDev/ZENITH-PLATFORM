@@ -34,7 +34,19 @@ const SpecsGeneratorForm = ({ addFormSchemaData, setJsonData, typesSelectedValue
       return;
     }
 
-    let updatedValue = suffix === "+h" ? fieldValue + "+ hr(s)" : fieldValue + editedSuffix;
+    let updatedValue;
+
+    switch (suffix) {
+      case "+h":
+        updatedValue = `${fieldValue}+ hr(s)`;
+        break;
+      case "pcs":
+        updatedValue = `${fieldValue} piece(s)`;
+        break;
+      default:
+        updatedValue = `${fieldValue}${editedSuffix}`;
+    }
+
     const updateFormData = (prevData, sectionKey) => ({
       ...prevData,
       [sectionKey]: {

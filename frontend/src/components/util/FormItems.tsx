@@ -32,7 +32,14 @@ export function InputFormItem({
         {label}
       </FormLabel>
       <div className="flex flex-row items-center">
-        {prefix && <div className="bg-accent p-1.5 border rounded-tl-md rounded-bl-md">{prefix}</div>}
+        {prefix && (
+          <div
+            className={cn(
+              "bg-accent h-[38px] w-8 flex mb-[0.5px] justify-center items-center border rounded-tl-md rounded-bl-md"
+            )}>
+            <span className="text-sm">{prefix}</span>
+          </div>
+        )}
         <Input
           id={id}
           name={id}
@@ -46,7 +53,14 @@ export function InputFormItem({
           })}
           {...rest}
         />
-        {suffix && <div className="bg-accent p-1.5 border rounded-tr-md rounded-br-md">{suffix}</div>}
+        {suffix && (
+          <div
+            className={cn(
+              "bg-accent h-[38px] w-16 flex mb-[0.5px] justify-center items-center border rounded-tr-md rounded-br-md"
+            )}>
+            <span className="text-sm">{suffix}</span>
+          </div>
+        )}
       </div>
       {description && <FormDescription>{description}</FormDescription>}
       <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
@@ -191,7 +205,15 @@ export function NoValidationInputFormItem({
           {...rest}
         />
         {suffix && (
-          <div className={cn("bg-accent p-1.5 border rounded-tr-md rounded-br-md", { "opacity-50": disabled })}>{suffix}</div>
+          <div
+            className={cn(
+              "bg-accent h-[38px] w-16 flex mb-[0.5px] justify-center items-center border rounded-tr-md rounded-br-md",
+              {
+                "opacity-50": disabled,
+              }
+            )}>
+            <span className="text-sm">{suffix}</span>
+          </div>
         )}
       </div>
       {description && <p>{description}</p>}

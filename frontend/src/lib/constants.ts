@@ -1,5 +1,3 @@
-import { FormFields } from "./enum/schemas";
-
 export const STORE_NAME = "ZENITH";
 
 export const BASE_URL = "http://localhost:5173";
@@ -16,7 +14,3 @@ export const NO_IMAGE_PROVIDED_MESSAGE = "Please ensure that you include at leas
 export const IS_PARSE_ERROR_MESSAGE = "There is a parse error in the product specifications. Please correct it.";
 export const NO_SPECS_PROVIDED_MESSAGE = "No product specifications were provided. Please add them.";
 export const NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE = "Please select one image to be a thumbnail.";
-
-export const TYPE_MAPPING = {
-  laptop: FormFields.Laptop,
-};

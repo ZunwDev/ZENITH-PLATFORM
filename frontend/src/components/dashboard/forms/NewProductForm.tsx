@@ -19,8 +19,8 @@ import {
   NO_IMAGE_PROVIDED_MESSAGE,
   NO_SPECS_PROVIDED_MESSAGE,
   NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE,
-  TYPE_MAPPING,
 } from "@/lib/constants";
+import { FormFields } from "@/lib/enum/schemas";
 import { uploadImagesToFirebase } from "@/lib/firebase";
 import { cn, includesAny, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -100,7 +100,7 @@ export default function NewProductForm() {
   }, [images]);
 
   useEffect(() => {
-    setAddFormSchemaData(typesSelectedValue in TYPE_MAPPING ? TYPE_MAPPING[typesSelectedValue] : []);
+    setAddFormSchemaData(FormFields[typesSelectedValue] || []);
   }, [typesSelectedValue]);
 
   const handleFormSubmit = async (values: z.infer<typeof FormSchema>) => {
