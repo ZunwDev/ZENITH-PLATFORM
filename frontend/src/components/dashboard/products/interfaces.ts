@@ -81,3 +81,9 @@ export interface AmountData {
     };
   };
 }
+
+export interface FilterData {
+  categories: Category[];
+  brands: Brand[];
+  productTypes: string[];
+}

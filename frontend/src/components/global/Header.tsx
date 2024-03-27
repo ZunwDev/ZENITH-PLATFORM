@@ -16,6 +16,7 @@ const adminButtons: { name: string; goto: string }[] = [
   { name: "Orders", goto: "/orders" },
   { name: "Products", goto: "/products" },
   { name: "Banner Manager", goto: "/banner" },
+  { name: "Attribute Manager", goto: "/attribute" },
   { name: "Settings", goto: "/settings" },
 ];
 
@@ -35,7 +36,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-16 border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] bg-background">
+    <header className="h-16 border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] bg-primary text-accent">
       <nav
         className={cn("flex items-center h-full flex-row", {
           "justify-between": !urlContainsDashboard && !urlContainsAuth,

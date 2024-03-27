@@ -1,69 +1,47 @@
-import { Form } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Brand, Category, Product } from "../products/interfaces";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import ProductImageManager from "../products/components/ProductImageManager";
-import { CheckboxFormItem, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util/FormItems";
-import PageHeader from "@/components/global/PageHeader";
+import { PageHeader } from "@/components/global";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
-import { json } from "@codemirror/lang-json";
-import CodeMirror from "@uiw/react-codemirror";
-import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
+import { CheckboxFormItem, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
+import ProductListing from "@/components/view/ProductListing";
+import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
+import { API_URL, fetchFilterData, fetchProductDataById } from "@/lib/api";
 import {
-  API_URL,
-  CATEGORY_TEMPLATE_MAPPING,
   IS_PARSE_ERROR_MESSAGE,
   NO_IMAGE_PROVIDED_MESSAGE,
   NO_SPECS_PROVIDED_MESSAGE,
   NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE,
 } from "@/lib/constants";
-import axios from "axios";
-import { newAbortSignal } from "@/lib/utils";
-import { useTheme } from "next-themes";
-import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
-import { useParams } from "react-router-dom";
-import { fetchFilterData, fetchProductDataById } from "@/lib/api";
 import { getImagesFromFirebase, getThumbnailFromFirebase, updateProductImages } from "@/lib/firebase";
-
-const FormSchema = z.object({
-  name: z.string().min(1).max(64),
-  description: z.string().min(1).max(512),
-  price: z.coerce.number().min(1),
-  discount: z.coerce.number().min(0).max(90).optional(),
-  quantity: z.coerce.number().min(1),
-  category: z.string().min(1, {
-    message: "You must specify the category of product.",
-  }),
-  brand: z.string().min(1, {
-    message: "You must specify the brand of product.",
-  }),
-  archived: z.boolean(),
-});
+import { newAbortSignal } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { z } from "zod";
+import { FormSchema } from ".";
+import { CodeEditor, ProductImageManager } from "../products/components";
+import { FilterData, Product } from "../products/interfaces";
 
 export default function EditProductForm() {
-  const { productId } = useParams();
   useAdminCheck();
-  const { resolvedTheme, forcedTheme } = useTheme();
+  const { productId } = useParams();
+  const showErrorToast = useErrorToast();
+  const showSuccessToast = useSuccessToast();
 
   //Data
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const [filterData, setFilterData] = useState<FilterData>({ categories: [], brands: [], productTypes: [] });
   const [productData, setProductData] = useState<Product>();
 
   //Select stuff
-  const [openCategory, setOpenCategory] = useState(false);
-  const [openBrands, setOpenBrands] = useState(false);
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
 
   //Images
   const [images, setImages] = useState([]);
-  const [selectedImages, setSelectedImages] = useState([]);
   const [imageThumbnail, setImageThumbnail] = useState("");
 
   //Specs
@@ -75,17 +53,10 @@ export default function EditProductForm() {
   const [isProductUpdated, setIsProductUpdated] = useState(false);
   const [productStage, setProductStage] = useState("Save changes");
 
-  const showErrorToast = useErrorToast();
-  const showSuccessToast = useSuccessToast();
-
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
     resolver: zodResolver(FormSchema),
   });
-
-  const onChange = useCallback((val) => {
-    setJsonData(val);
-  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -107,8 +78,7 @@ export default function EditProductForm() {
       const productData = await fetchProductDataById(productId);
       const imagesFromFB = await getImagesFromFirebase(productId);
       setImages(imagesFromFB);
-      setCategories(categoryData);
-      setBrands(brandData);
+      setFilterData({ categories: categoryData, brands: brandData, productTypes: [] });
       setProductData(productData.data);
 
       setCategoriesSelectedValue(productData.data.category.name);
@@ -132,15 +102,6 @@ export default function EditProductForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //if category changed, set corresponding jsonData template
-  useEffect(() => {
-    if (categoriesSelectedValue && categoriesSelectedValue in CATEGORY_TEMPLATE_MAPPING) {
-      setJsonData(CATEGORY_TEMPLATE_MAPPING[categoriesSelectedValue]);
-    } else {
-      setJsonData("");
-    }
-  }, [categoriesSelectedValue]);
-
   const handleFormSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       await FormSchema.parseAsync(values);
@@ -161,8 +122,8 @@ export default function EditProductForm() {
           specifications: formattedJSON,
           quantity: values.quantity,
           discount: values.discount,
-          brand: brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
-          category: categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
+          brand: filterData.brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
+          category: filterData.categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
           archived: {
             archivedId: values.archived ? 1 : 2,
           },
@@ -172,9 +133,9 @@ export default function EditProductForm() {
       setProductStage("Uploading images...");
       await updateProductImages(response.data.product.productId, images, imageThumbnail);
       showSuccessToast("Product Update", `Product "${values.name}" successfully updated.`);
-      /*setTimeout(() => {
+      setTimeout(() => {
         window.location.reload();
-      }, 2000);*/
+      }, 2000);
     } catch (error) {
       setProductStage("Save changes");
       setIsProductUpdated(false);
@@ -186,21 +147,44 @@ export default function EditProductForm() {
     }
   };
 
+  useEffect(() => {}, [form.watch()]);
+
   return (
     <div className="flex flex-col gap-16 pb-32 mt-32 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
       <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
         <PageHeader title="Edit Product" description="Update and manage product details that are viewed for user" />
       </div>
       <div className="flex md:flex-row md:gap-8 gap-32 flex-col">
-        <div className="flex flex-col md:w-80 w-full h-full">
+        <div className="flex flex-col md:w-96 w-full h-full gap-8">
           <ProductImageManager
             images={images}
             imageThumbnail={imageThumbnail}
-            selectedImages={selectedImages}
             setImageThumbnail={setImageThumbnail}
             setImages={setImages}
-            setSelectedImages={setSelectedImages}
           />
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Preview</CardTitle>
+              <CardDescription>
+                The preview may not fully act or display all details available on the real product listing.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ProductListing
+                previewData={{
+                  imageThumbnail: imageThumbnail,
+                  description: form.getValues("description"),
+                  price: form.getValues("price"),
+                  discount: form.getValues("discount"),
+                  quantity: form.getValues("quantity"),
+                  name: form.getValues("name"),
+                }}
+              />
+            </CardContent>
+          </Card>
+          <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isProductUpdated}>
+            {productStage}
+          </Button>
         </div>
 
         <div className="flex flex-col gap-8">
@@ -264,9 +248,7 @@ export default function EditProductForm() {
                         description="Select corresponding category to the product."
                         required
                         form={form}
-                        data={categories}
-                        open={openCategory}
-                        setOpen={setOpenCategory}
+                        data={filterData.categories}
                         selectedValue={categoriesSelectedValue}
                         setSelectedValue={setCategoriesSelectedValue}></SelectFormItem>
                       <SelectFormItem
@@ -276,9 +258,7 @@ export default function EditProductForm() {
                         description="Select corresponding brand to the product."
                         required
                         form={form}
-                        data={brands}
-                        open={openBrands}
-                        setOpen={setOpenBrands}
+                        data={filterData.brands}
                         selectedValue={brandsSelectedValue}
                         setSelectedValue={setBrandsSelectedValue}></SelectFormItem>
                       <CheckboxFormItem
@@ -309,21 +289,9 @@ export default function EditProductForm() {
                   <AlertDescription>{parseError}</AlertDescription>
                 </Alert>
               )}
-              <CodeMirror
-                value={formattedJSON}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                //@ts-ignore
-                theme={forcedTheme ?? (resolvedTheme === "dark" ? githubDark : githubLight)}
-                placeholder="Select any category, to get an editable template."
-                height="252px"
-                extensions={[json()]}
-                onChange={onChange}
-              />
+              <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
             </CardContent>
           </Card>
-          <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="ml-auto" disabled={isProductUpdated}>
-            {productStage}
-          </Button>
         </div>
       </div>
     </div>

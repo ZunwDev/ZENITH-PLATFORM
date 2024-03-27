@@ -7,32 +7,25 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { ImageUploader, InformationDescription } from "@/components/util";
 import { cn } from "@/lib/utils";
 import { BoxSelect, Trash } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 interface ImageManagerProps {
   images: string[];
   imageThumbnail: string;
-  selectedImages: string[];
   setImages: React.Dispatch<React.SetStateAction<string[]>>;
   setImageThumbnail: React.Dispatch<React.SetStateAction<string>>;
-  setSelectedImages: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function ProductImageManager({
-  images,
-  imageThumbnail,
-  selectedImages,
-  setImages,
-  setImageThumbnail,
-  setSelectedImages,
-}: ImageManagerProps) {
+export default function ProductImageManager({ images, imageThumbnail, setImages, setImageThumbnail }: ImageManagerProps) {
+  const [selectedImages, setSelectedImages] = useState([]);
+
   const deleteSelectedImages = useCallback(() => {
     setImages((prev) => {
       const updatedImages = prev.filter((item) => !selectedImages.includes(item));
       setSelectedImages([]);
       return updatedImages;
     });
-    setImageThumbnail(""); // This should be outside the setImages function to ensure it's executed once
+    setImageThumbnail("");
   }, [selectedImages]);
 
   const selectAllImages = useCallback(() => {
@@ -55,7 +48,7 @@ export default function ProductImageManager({
           Upload images that will represent the product.
           {images.length > 0 && (
             <InformationDescription>
-              Images with a blue border represent thumbnail. Click any image to change the thumbnail.
+              Images with <strong>a blue border</strong> represent thumbnail. Click any image to change the thumbnail.
             </InformationDescription>
           )}
         </CardDescription>

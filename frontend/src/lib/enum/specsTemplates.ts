@@ -1,5 +1,5 @@
-export const templates = {
-  ComputersAndLaptops: `{
+export const enum Templates {
+  ComputersAndTablets = `{
         "KEY SPECS": {
           "Battery Life": "8.5 hours +",
           "Computer Operating System": "Google Chrome",
@@ -33,9 +33,7 @@ export const templates = {
         },
         "ENVIRONMENTAL": {
           "ACMI AP nontoxic certified": "Yes",
-          "ENERGY STAR certified": "Yes",
-          "EPEAT verified": "EPEAT Silver verified",
-          "EcoID": "Yes, product meets Staples criteria for environmental features to earn the Eco-ID mark. Learn more at EcoIDProgram.com"
+          "ENERGY STAR certified": "Yes"
         },
         "FEATURES": {
           "2-in-1": "Not 2-in-1",
@@ -74,7 +72,7 @@ export const templates = {
         "Series or Collection": "Chromebook CX1",
         "True Color": "Transparent Silver"
     }`,
-  AudioAndHeadphones: `{"KEY SPECS": {
+  AudioAndHeadphones = `{"KEY SPECS": {
       "Bluetooth Compatible": "Yes",
       "Built-In Microphone": "No",
       "Color Family": "Black",
@@ -89,7 +87,7 @@ export const templates = {
       "Wireless or Wired": "Wireless"
     }
   }`,
-  CamerasAndPhotography: `{"KEY SPECS": {
+  CamerasAndPhotography = `{"KEY SPECS": {
     "Camera Kit": "No",
     "Camera or Camcorder Type": "Point & Shoot Camera",
     "Color Family": "White",
@@ -103,7 +101,7 @@ export const templates = {
     "Waterproof": "Not Waterproof"
     }
   }`,
-  WearableTechnology: `{"KEY SPECS": {
+  WearableTechnology = `{"KEY SPECS": {
     "Bluetooth Compatible": "Yes",
     "Depth (Inches)": 0.57,
     "Diameter (Inches)": 0.57,
@@ -119,7 +117,7 @@ export const templates = {
     "Width (Inches)": 1.73
     }
   }`,
-  HomeElectronics: `{"KEY SPECS": {
+  HomeElectronics = `{"KEY SPECS": {
     "Capacity (Cu. Ft.)": 4.7,
     "Capacity in Cubic Feet or Number of Bottles": "4.1-5",
     "Color Family": "Black",
@@ -140,7 +138,7 @@ export const templates = {
     "Width (Inches)": 19
     }
   }`,
-  GamingAndConsoles: `{
+  GamingAndConsoles = `{
     "KEY SPECS": {
     "Storage Size": "1,024 GB",
     "Storage Type": "SSD",
@@ -173,7 +171,7 @@ export const templates = {
     "SOCKET TYPE": {"Country": "Czech Republic, Slovakia, Hungary, Germany, Russia, Austria, Croatia, France, Poland, Romania, Slovenia"}
     
   }`,
-  CablesAndAdapters: `{"KEY SPECS": {
+  CablesAndAdapters = `{"KEY SPECS": {
     "Cable Length (Inches)": 59.06,
     "Cable Length (ft)": 5,
     "Cable Use": "Power",
@@ -185,7 +183,7 @@ export const templates = {
     "True Color": "Black",
     "USB": "Yes"
   }}`,
-  PowerBanksAndChargers: `{
+  PowerBanksAndChargers = `{
     "LENGTH & ENDS": {
       "Cable Included": "Cable Included",
       "Cable Length (Inches)": 6,
@@ -207,7 +205,7 @@ export const templates = {
       "Watts": 18
     }
   }`,
-  SmartphonesAndAccessories: `{
+  SmartphonesAndAccessories = `{
       "DISPLAY": {
         "Screen Size (Inches)": "6.8",
         "Display Resolution": "3088 × 1440",
@@ -321,6 +319,5 @@ export const templates = {
         "User Interface": "Samsung One UI",
         "Remote Management (MDM)": "Samsung Knox"
       }
-    
   }`,
-};
+}

@@ -1,16 +1,15 @@
+import { ThemeProvider } from "next-themes";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { EditProductForm, NewProductForm } from "./components/dashboard/forms/index.ts";
+import { Orders, Overview, Products, Settings } from "./components/dashboard/index.ts";
+import Header from "./components/global/Header.tsx";
+import { Toaster } from "./components/ui/toaster.tsx";
 import "./index.css";
 import Signup from "./pages/auth/access/Signup.tsx";
 import Login from "./pages/auth/signin/Signin.tsx";
 import Homepage from "./pages/Homepage.tsx";
-import { ThemeProvider } from "next-themes";
-import { Toaster } from "./components/ui/toaster.tsx";
-import { Orders, Overview, Products, Settings } from "./components/dashboard/index.ts";
-import NewProductForm from "./components/dashboard/forms/NewProductForm.tsx";
-import EditProductForm from "./components/dashboard/forms/EditProductForm.tsx";
-import Header from "./components/global/Header.tsx";
 
 const dashboard = "/:userId/dashboard";
 const router = createBrowserRouter([

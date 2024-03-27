@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 import Cookies from "js-cookie";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -125,4 +125,10 @@ export function makeEndBy99(num: number) {
   if (num) {
     return !num?.toFixed(2).endsWith(".99") ? (num + 0.99).toFixed(2) : num?.toFixed(2);
   }
+}
+
+export function removeLeadingZeroes(number) {
+  const stringWithoutZeroes = String(number).replace(/^0+/, "");
+  const result = parseInt(stringWithoutZeroes, 10);
+  return isNaN(result) ? 0 : result;
 }

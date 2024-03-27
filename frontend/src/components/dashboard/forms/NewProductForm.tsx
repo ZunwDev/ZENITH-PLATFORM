@@ -1,79 +1,59 @@
-import { Form } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Brand, Category } from "../products/interfaces";
-import { fetchFilterData } from "@/lib/api";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import ProductImageManager from "../products/components/ProductImageManager";
-import { CheckboxFormItem, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util/FormItems";
-import PageHeader from "@/components/global/PageHeader";
+import { ArrowUpButton, PageHeader } from "@/components/global";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
-import { json } from "@codemirror/lang-json";
-import CodeMirror from "@uiw/react-codemirror";
-import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import {
-  API_URL,
-  CATEGORY_TEMPLATE_MAPPING,
+  AlertInCardDescription,
+  CheckboxFormItem,
+  InformationDescription,
+  InputFormItem,
+  SelectFormItem,
+  TextareaFormItem,
+} from "@/components/util";
+import ProductListing from "@/components/view/ProductListing";
+import { useAdminCheck, useErrorToast, useScrollPosition, useSuccessToast } from "@/hooks";
+import { API_URL, fetchAttributeDataWithCategoryId, fetchFilterData } from "@/lib/api";
+import {
   IS_PARSE_ERROR_MESSAGE,
   NO_IMAGE_PROVIDED_MESSAGE,
   NO_SPECS_PROVIDED_MESSAGE,
   NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE,
+  TYPE_MAPPING,
 } from "@/lib/constants";
-import axios from "axios";
-import { newAbortSignal } from "@/lib/utils";
-import { useTheme } from "next-themes";
-import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
 import { uploadImagesToFirebase } from "@/lib/firebase";
-
-const FormSchema = z.object({
-  name: z.string().min(1).max(64),
-  description: z.string().min(1).max(512),
-  price: z.coerce.number().min(1),
-  discount: z.coerce.number().min(0).max(90).optional(),
-  quantity: z.coerce.number().min(1),
-  category: z.string().min(1, {
-    message: "You must specify the category of product.",
-  }),
-  brand: z.string().min(1, {
-    message: "You must specify the brand of product.",
-  }),
-  archived: z.boolean(),
-});
+import { cn, includesAny, newAbortSignal } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { FormSchema, SpecsGeneratorForm } from ".";
+import { CodeEditor, ProductImageManager } from "../products/components";
+import { FilterData } from "../products/interfaces";
 
 export default function NewProductForm() {
   useAdminCheck();
-  const { resolvedTheme, forcedTheme } = useTheme();
+  const showGoToTop = useScrollPosition();
+  const showErrorToast = useErrorToast();
+  const showSuccessToast = useSuccessToast();
 
-  //Data
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-
-  //Select stuff
-  const [openCategory, setOpenCategory] = useState(false);
-  const [openBrands, setOpenBrands] = useState(false);
-  const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
-  const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
-
-  //Images
+  // Data
+  const [filterData, setFilterData] = useState<FilterData>({ categories: [], brands: [], productTypes: [] });
   const [images, setImages] = useState([]);
-  const [selectedImages, setSelectedImages] = useState([]);
   const [imageThumbnail, setImageThumbnail] = useState("");
-
-  //Specs
   const [jsonData, setJsonData] = useState("");
   const [formattedJSON, setFormattedJSON] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
-
-  //Other
   const [isProductCreated, setIsProductCreated] = useState(false);
-  const [productStage, setProductStage] = useState("Create");
-
-  const showErrorToast = useErrorToast();
-  const showSuccessToast = useSuccessToast();
+  const [productStage, setProductStage] = useState("Create product");
+  const [categoryId, setCategoryId] = useState<number>();
+  const [brandId, setBrandId] = useState<number>();
+  const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
+  const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
+  const [typesSelectedValue, setTypesSelectedValue] = useState("");
+  const [addFormSchemaData, setAddFormSchemaData] = useState([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
@@ -86,13 +66,10 @@ export default function NewProductForm() {
       quantity: null,
       category: "",
       brand: "",
+      type: "",
       archived: false,
     },
   });
-
-  const onChange = useCallback((val) => {
-    setJsonData(val);
-  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -103,7 +80,7 @@ export default function NewProductForm() {
       } catch (error) {
         setParseError("Invalid JSON format: " + error.message);
       }
-    }, 500);
+    }, 100);
 
     return () => clearTimeout(timeoutId);
   }, [jsonData]);
@@ -111,25 +88,20 @@ export default function NewProductForm() {
   useEffect(() => {
     const fetchData = async () => {
       const [categoryData, brandData] = await fetchFilterData();
-      setCategories(categoryData);
-      setBrands(brandData);
+      const productTypesData = categoryId ? await fetchAttributeDataWithCategoryId(categoryId, 1) : []; //1 are product types id
+
+      setFilterData({ categories: categoryData, brands: brandData, productTypes: productTypesData });
     };
     fetchData();
-  }, []);
+  }, [categoryId]);
 
   useEffect(() => {
     setImageThumbnail(images[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
-  //if category changed, set corresponding jsonData template
   useEffect(() => {
-    if (categoriesSelectedValue && categoriesSelectedValue in CATEGORY_TEMPLATE_MAPPING) {
-      setJsonData(CATEGORY_TEMPLATE_MAPPING[categoriesSelectedValue]);
-    } else {
-      setJsonData("");
-    }
-  }, [categoriesSelectedValue]);
+    setAddFormSchemaData(typesSelectedValue in TYPE_MAPPING ? TYPE_MAPPING[typesSelectedValue] : []);
+  }, [typesSelectedValue]);
 
   const handleFormSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
@@ -148,11 +120,11 @@ export default function NewProductForm() {
           name: values.name,
           description: values.description,
           price: !values.price.toFixed(2).endsWith(".99") ? (values.price + 0.99).toFixed(2) : values.price.toFixed(2),
-          specifications: formattedJSON.trim(),
+          specifications: formattedJSON,
           quantity: values.quantity,
           discount: values.discount,
-          brand: brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
-          category: categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
+          brand: filterData.brands.find((brand) => brand.brandId === brandId),
+          category: filterData.categories.find((category) => category.categoryId === categoryId),
           archived: {
             archivedId: values.archived ? 1 : 2,
           },
@@ -166,7 +138,7 @@ export default function NewProductForm() {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      setProductStage("Create");
+      setProductStage("Create product");
       setIsProductCreated(false);
       if (error.response && error.response.data.errorCode === 409) {
         form.setError("name", { message: "Product with this name already exists." });
@@ -176,143 +148,232 @@ export default function NewProductForm() {
     }
   };
 
-  return (
-    <div className="flex flex-col gap-16 pb-32 mt-32 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
-      <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
-        <PageHeader title="New Product" description="Add new product to the store" />
-      </div>
-      <div className="flex md:flex-row md:gap-8 gap-32 flex-col">
-        <div className="flex flex-col md:w-80 w-full h-full">
-          <ProductImageManager
-            images={images}
-            imageThumbnail={imageThumbnail}
-            selectedImages={selectedImages}
-            setImageThumbnail={setImageThumbnail}
-            setImages={setImages}
-            setSelectedImages={setSelectedImages}
-          />
-        </div>
+  function findId(array: any[], selectedValue: string, id: string): number | null {
+    const foundData = array.find((item) => item.name.toLowerCase() === selectedValue.toLowerCase());
+    return foundData ? foundData[id] : null;
+  }
 
-        <div className="flex flex-col gap-8">
-          <Card className="w-full border h-fit rounded-md">
-            <CardHeader>
-              <CardTitle>Product Information</CardTitle>
-              <CardDescription>Enter key product details for comprehensive information.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form className="flex md:flex-row md:gap-20 gap-4 flex-col">
-                  <div className="flex flex-col md:w-1/3 w-full gap-4">
-                    <InputFormItem
-                      label="Product Name"
-                      id="name"
-                      placeholder="HP EliteBook 650 G10"
-                      form={form}
-                      required
-                      description="Enter the name of the product."></InputFormItem>
-                    <TextareaFormItem
-                      label="Product Description"
-                      id="description"
-                      form={form}
-                      required
-                      description="Briefly describe the product and its main features."
-                      placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'></TextareaFormItem>
-                  </div>
-                  <div className="flex flex-col md:w-1/4 w-full gap-4">
-                    <InputFormItem
-                      label="Price"
-                      id="price"
-                      type="number"
-                      placeholder="49.99"
-                      required
-                      description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
-                      form={form}
-                      prefix="$"></InputFormItem>
-                    <InputFormItem
-                      label="Discount"
-                      id="discount"
-                      type="number"
-                      placeholder="20"
-                      description="Set the discount percentage for the product (e.g., 20 for 20% off)."
-                      form={form}
-                      suffix="%"></InputFormItem>
-                    <InputFormItem
-                      label="Quantity"
-                      id="quantity"
-                      type="number"
-                      placeholder="100"
-                      required
-                      description="Enter the quantity of the product in stock."
-                      form={form}></InputFormItem>
-                  </div>
-                  <div className="flex flex-col md:w-1/4 w-full gap-4">
-                    <SelectFormItem
-                      label="Category"
-                      id="category"
-                      placeholder="Search categories..."
-                      description="Select corresponding category to the product."
-                      required
-                      form={form}
-                      data={categories}
-                      open={openCategory}
-                      setOpen={setOpenCategory}
-                      selectedValue={categoriesSelectedValue}
-                      setSelectedValue={setCategoriesSelectedValue}></SelectFormItem>
-                    <SelectFormItem
-                      label="Brand"
-                      id="brand"
-                      placeholder="Search brands..."
-                      description="Select corresponding brand to the product."
-                      required
-                      form={form}
-                      data={brands}
-                      open={openBrands}
-                      setOpen={setOpenBrands}
-                      selectedValue={brandsSelectedValue}
-                      setSelectedValue={setBrandsSelectedValue}></SelectFormItem>
-                    <CheckboxFormItem
-                      id="archived"
-                      label="Archived?"
-                      description="Whether is product archived or not"
-                      form={form}
-                      data={undefined}></CheckboxFormItem>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Specs</CardTitle>
-              <CardDescription>
-                Specify product specifications here. Ensure consistency across all products. These templates demonstrate the
-                content each category can include.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {jsonData !== "" && parseError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="size-5" />
-                  <AlertDescription>{parseError}</AlertDescription>
-                </Alert>
-              )}
-              <CodeMirror
-                value={formattedJSON}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                //@ts-ignore
-                theme={forcedTheme ?? (resolvedTheme === "dark" ? githubDark : githubLight)}
-                placeholder="Select any category, to get an editable template."
-                height="252px"
-                extensions={[json()]}
-                onChange={onChange}
-              />
-            </CardContent>
-          </Card>
-          <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="ml-auto" disabled={isProductCreated}>
-            {productStage}
-          </Button>
+  useEffect(() => {
+    const categoryId = findId(filterData.categories, categoriesSelectedValue, "categoryId");
+    const brandId = findId(filterData.brands, brandsSelectedValue, "brandId");
+
+    setCategoryId(categoryId);
+    setBrandId(brandId);
+  }, [brandsSelectedValue, categoriesSelectedValue, filterData]);
+
+  useEffect(() => {}, [form.watch()]);
+
+  return (
+    <>
+      <div className="flex flex-col gap-16 pb-32 mt-32 px-8 md:min-w-[1600px] min-w-[360px] max-w-[1600px]">
+        <div className="md:px-0 px-4 flex justify-between flex-row border-b pb-4">
+          <PageHeader title="New Product" description="Add new product to the store" />
+        </div>
+        <div className="flex md:flex-row md:gap-8 gap-32 flex-col">
+          <div className="flex flex-col md:w-96 w-full h-full gap-8">
+            <ProductImageManager
+              images={images}
+              imageThumbnail={imageThumbnail}
+              setImageThumbnail={setImageThumbnail}
+              setImages={setImages}
+            />
+            <Card className={cn("hidden", { block: categoriesSelectedValue || typesSelectedValue })}>
+              <CardHeader>
+                <CardTitle>Product Specs</CardTitle>
+                <CardDescription>These specs are only read-only for easier lookup. The editor is below.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {jsonData !== "" && parseError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="size-5" />
+                    <AlertDescription>{parseError}</AlertDescription>
+                  </Alert>
+                )}
+                <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} isReadOnly={true} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Preview</CardTitle>
+                <CardDescription>
+                  The preview may not fully act or display all details available on the real product listing.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProductListing
+                  previewData={{
+                    imageThumbnail: imageThumbnail,
+                    description: form.getValues("description"),
+                    price: form.getValues("price"),
+                    discount: form.getValues("discount"),
+                    quantity: form.getValues("quantity"),
+                    name: form.getValues("name"),
+                  }}
+                />
+              </CardContent>
+            </Card>
+            <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isProductCreated}>
+              {productStage}
+            </Button>
+          </div>
+
+          <div className="flex flex-col gap-8">
+            <Card className="w-full border h-fit rounded-md">
+              <CardHeader>
+                <CardTitle>Product Information</CardTitle>
+                <CardDescription>Enter key product details for comprehensive information.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form className="flex md:flex-row md:gap-20 gap-4 flex-col">
+                    <div className="flex flex-col md:w-1/3 w-full gap-4">
+                      <InputFormItem
+                        label="Product Name"
+                        id="name"
+                        placeholder="HP EliteBook 650 G10"
+                        form={form}
+                        required
+                        description="Enter the name of the product."
+                      />
+                      <TextareaFormItem
+                        label="Product Description"
+                        id="description"
+                        form={form}
+                        required
+                        description="Briefly describe the product and its main features."
+                        placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'
+                      />
+                    </div>
+                    <div className="flex flex-col md:w-1/4 w-full gap-4">
+                      <InputFormItem
+                        label="Price"
+                        id="price"
+                        type="number"
+                        placeholder="49.99"
+                        required
+                        description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
+                        form={form}
+                        prefix="$"
+                      />
+                      <InputFormItem
+                        label="Discount"
+                        id="discount"
+                        type="number"
+                        placeholder="20"
+                        description="Set the discount percentage for the product (e.g., 20 for 20% off)."
+                        form={form}
+                        suffix="%"
+                      />
+                      <InputFormItem
+                        label="Quantity"
+                        id="quantity"
+                        type="number"
+                        placeholder="100"
+                        required
+                        description="Enter the quantity of the product in stock."
+                        form={form}
+                      />
+                    </div>
+                    <div className="flex flex-col md:w-1/4 w-full gap-4">
+                      <SelectFormItem
+                        label="Category"
+                        id="category"
+                        placeholder="Search categories..."
+                        description="Select corresponding category to the product."
+                        required
+                        form={form}
+                        data={filterData.categories}
+                        selectedValue={categoriesSelectedValue}
+                        setSelectedValue={setCategoriesSelectedValue}
+                      />
+                      {includesAny(categoryId, [1, 6]) && (
+                        <SelectFormItem
+                          label="Product Type"
+                          id="type"
+                          placeholder="Search types..."
+                          description="Select corresponding type to the product."
+                          required
+                          form={form}
+                          data={filterData.productTypes}
+                          selectedValue={typesSelectedValue}
+                          setSelectedValue={setTypesSelectedValue}
+                        />
+                      )}
+                      <SelectFormItem
+                        label="Brand"
+                        id="brand"
+                        placeholder="Search brands..."
+                        description="Select corresponding brand to the product."
+                        required
+                        form={form}
+                        data={filterData.brands}
+                        selectedValue={brandsSelectedValue}
+                        setSelectedValue={setBrandsSelectedValue}
+                      />
+                      <CheckboxFormItem
+                        id="archived"
+                        label="Archived?"
+                        description="Whether is product archived or not"
+                        form={form}
+                        data={undefined}
+                      />
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Additional Product Information</CardTitle>
+                <CardDescription>
+                  This section is primarily used for generating specs that can be seen below this form. Please ensure
+                  consistency across all products.
+                  <InformationDescription>
+                    Note that changes made directly in the code editor <strong>will not</strong> be reflected in the form.
+                  </InformationDescription>
+                  <AlertInCardDescription>
+                    <strong>Key Information</strong> is automatically generated based on the product schema defined for any
+                    product type.
+                  </AlertInCardDescription>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SpecsGeneratorForm
+                  addFormSchemaData={addFormSchemaData}
+                  setJsonData={setJsonData}
+                  typesSelectedValue={filterData.productTypes.find(
+                    (item) => item.toLowerCase() === typesSelectedValue.toLowerCase()
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Specs</CardTitle>
+                <CardDescription>
+                  Specify product specifications here. Ensure consistency across all products in the category.
+                  <InformationDescription>
+                    You can directly edit here or use the form to make work easier.
+                  </InformationDescription>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {jsonData !== "" && parseError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="size-5" />
+                    <AlertDescription>{parseError}</AlertDescription>
+                  </Alert>
+                )}
+                <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+
+      {showGoToTop && <ArrowUpButton />}
+    </>
   );
 }
