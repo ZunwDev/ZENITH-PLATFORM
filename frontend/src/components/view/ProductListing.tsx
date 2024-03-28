@@ -30,7 +30,7 @@ export default function ProductListing({
                 <img
                   src={previewData?.imageThumbnail}
                   alt="Product Thumbnail"
-                  className="object-contain hover:cursor-pointer h-[288px] md:size-[288px]"
+                  className="object-contain hover:cursor-pointer h-[288px] md:size-[288px] pt-4"
                 />
               ) : (
                 <div className="flex justify-center items-center">
@@ -47,7 +47,7 @@ export default function ProductListing({
             </div>
           </CardContent>
           <CardFooter className="flex-col flex justify-start items-start gap-3">
-            <Button variant="link" className="font-semibold text-base p-0">
+            <Button variant="link" className="font-semibold text-base p-0 break-all text-left mb-1 whitespace-normal">
               {previewData?.name ? previewData?.name : "There will be a product name..."}
             </Button>
             <div className="text-sm mt-[-12px]">

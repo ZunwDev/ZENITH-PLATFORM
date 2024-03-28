@@ -56,7 +56,7 @@ export function InputFormItem({
         {suffix && (
           <div
             className={cn(
-              "bg-accent h-[38px] w-16 flex mb-[0.5px] justify-center items-center border rounded-tr-md rounded-br-md"
+              "bg-accent h-[38px] w-12 flex mb-[0.5px] justify-center items-center border rounded-tr-md rounded-br-md truncate"
             )}>
             <span className="text-sm">{suffix}</span>
           </div>
@@ -207,7 +207,7 @@ export function NoValidationInputFormItem({
         {suffix && (
           <div
             className={cn(
-              "bg-accent h-[38px] w-16 flex mb-[0.5px] justify-center items-center border rounded-tr-md rounded-br-md",
+              "bg-accent h-[38px] w-12 flex mb-[0.5px] justify-center items-center border rounded-tr-md rounded-br-md truncate",
               {
                 "opacity-50": disabled,
               }
