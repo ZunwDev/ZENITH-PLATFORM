@@ -57,12 +57,10 @@ export default function LoginForm() {
     } catch (error) {
       console.error("Login error", error);
       const errorMessage =
-        (error.response &&
-          {
-            401: LOGIN_INVALID_CREDENTIALS_MESSAGE,
-            404: LOGIN_ERROR_MESSAGE,
-          }[error.response.status]) ||
-        LOGIN_SERVER_ERROR_MESSAGE;
+        {
+          401: LOGIN_INVALID_CREDENTIALS_MESSAGE,
+          404: LOGIN_ERROR_MESSAGE,
+        }[error?.response?.status] || LOGIN_SERVER_ERROR_MESSAGE;
       form.setError("email", { message: errorMessage });
       form.setError("password", { message: errorMessage });
       setIsLogged(false);

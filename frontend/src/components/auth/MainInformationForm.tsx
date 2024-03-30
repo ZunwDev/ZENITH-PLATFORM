@@ -77,8 +77,7 @@ export default function MainInformationForm({ setFirstPhase, setVerifyCode, setU
     } catch (error) {
       console.error("Failed to create user", error);
       const errorMessage =
-        (error.response && { 409: ACCOUNT_CREATE_USER_EXISTS_MESSAGE }[error.response.status]) ||
-        ACCOUNT_CREATE_SERVER_ERROR_MESSAGE;
+        { 409: ACCOUNT_CREATE_USER_EXISTS_MESSAGE }[error?.response?.status] || ACCOUNT_CREATE_SERVER_ERROR_MESSAGE;
       form.setFocus("email");
       form.setError("email", { message: errorMessage });
       throw error;
