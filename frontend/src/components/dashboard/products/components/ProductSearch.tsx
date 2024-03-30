@@ -23,7 +23,7 @@ export default function ProductSearch({ setSearchQuery, className }: ProductSear
 
   return (
     <>
-      <div className={cn("sm:w-80 w-40 h-10 items-center rounded-md border pl-3 text-sm", className)}>
+      <div className={cn("md:w-80 w-40 h-10 items-center rounded-md border pl-3 text-sm", className)}>
         <Search className="size-4" />
         <Input
           type="search"

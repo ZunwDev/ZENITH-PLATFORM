@@ -22,7 +22,7 @@ export default function Sidebar({ className = "" }) {
   ];
 
   return (
-    <div className={cn("max-h-screen flex-col gap-2 fixed h-screen mt-16 z-50 hidden md:flex w-64 sm:w-64 xs:w-48", className)}>
+    <div className={cn("max-h-screen flex-col gap-2 fixed h-screen mt-16 z-50 hidden md:flex lg:w-64 w-48", className)}>
       <div className="flex-grow mt-8">
         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
           <span className="font-semibold text-muted-foreground">MAIN</span>
