@@ -148,7 +148,7 @@ export default function EditProductForm() {
     } catch (error) {
       setProductStage("Save changes");
       setIsProductUpdated(false);
-      if (error.response && error.response.data.errorCode === 409) {
+      if (error?.response?.data?.errorCode === 409) {
         form.setError("name", { message: "Product with this name already exists." });
       } else {
         console.error("Form validation failed:", error);

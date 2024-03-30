@@ -142,7 +142,7 @@ export default function NewProductForm() {
     } catch (error) {
       setProductStage("Create product");
       setIsProductCreated(false);
-      if (error.response && error.response.data.errorCode === 409) {
+      if (error?.response?.data?.errorCode === 409) {
         form.setError("name", { message: "Product with this name already exists." });
       } else {
         console.error("Form validation failed:", error);

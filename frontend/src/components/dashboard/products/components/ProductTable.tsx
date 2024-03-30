@@ -29,7 +29,7 @@ export default function ProductTable({ data }) {
   useEffect(() => {
     const fetchThumbnail = async () => {
       setLoading(true); // Set loading state to true when fetching thumbnails
-      if (data.content && data.content.length > 0) {
+      if (data?.content?.length > 0) {
         const promises = data.content.map(async (item) => {
           const thumbnail = await getThumbnailFromFirebase(item.productId);
           return thumbnail.url;
@@ -101,7 +101,7 @@ export default function ProductTable({ data }) {
         <>
           <Table className="table-auto w-full">
             <TableCaption className="text-wrap">
-              {data.content && data.content.length > 0 ? (
+              {data?.content?.length > 0 ? (
                 <span>
                   Showing {showingRange} of <strong>{data.totalElements}</strong> products
                 </span>
@@ -119,63 +119,59 @@ export default function ProductTable({ data }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.content &&
-                data.content.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    className="hover:cursor-pointer"
-                    onClick={() => goto(`products/edit/${item.productId}`)}>
-                    <TableCell className="relative flex flex-row gap-6">
-                      <img
-                        src={thumbnail[index]}
-                        loading="lazy"
-                        width={96}
-                        height={96}
-                        className="!size-20 object-contain lg:flex hidden flex-shrink-0"
-                        alt=""
-                      />
+              {data?.content?.map((item, index) => (
+                <TableRow key={index} className="hover:cursor-pointer" onClick={() => goto(`products/edit/${item.productId}`)}>
+                  <TableCell className="relative flex flex-row gap-6">
+                    <img
+                      src={thumbnail[index]}
+                      loading="lazy"
+                      width={96}
+                      height={96}
+                      className="!size-20 object-contain lg:flex hidden flex-shrink-0"
+                      alt=""
+                    />
+                    {item.discount > 0 && (
+                      <div className="absolute top-0 left-0 mt-1 mr-1 px-2 py-1 bg-destructive text-white rounded-md text-xs font-bold lg:block hidden">
+                        -{item.discount}%
+                      </div>
+                    )}
+                    <div className="flex flex-col text-start gap-0.5">
+                      <span className="font-semibold md:w-56 w-48">{item.name}</span>
+                      <span className="text-sm">{item.category.name}</span>
+                      <RatingStar rating={5} />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className={cn("font-bold flex flex-row md:gap-2 justify-center")}>
+                      <span
+                        className={item.discount > 0 ? "font-normal text-muted-foreground text-end" : ""}
+                        style={{
+                          backgroundImage:
+                            item.discount > 0
+                              ? "linear-gradient(to top right, transparent calc(50% - 1px), gray 50%, transparent calc(50% + 1px))"
+                              : "none",
+                        }}>
+                        ${item.price}
+                      </span>
                       {item.discount > 0 && (
-                        <div className="absolute top-0 left-0 mt-1 mr-1 px-2 py-1 bg-destructive text-white rounded-md text-xs font-bold lg:block hidden">
-                          -{item.discount}%
+                        <div
+                          className={cn("font-bold md:block hidden text-end", {
+                            "font-normal text-muted-foreground": item.discount == 0,
+                          })}>
+                          ${applyDiscount(item.price, item.discount)}
                         </div>
                       )}
-                      <div className="flex flex-col text-start gap-0.5">
-                        <span className="font-semibold md:w-56 w-48">{item.name}</span>
-                        <span className="text-sm">{item.category.name}</span>
-                        <RatingStar rating={5} />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className={cn("font-bold flex flex-row md:gap-2 justify-center")}>
-                        <span
-                          className={item.discount > 0 ? "font-normal text-muted-foreground text-end" : ""}
-                          style={{
-                            backgroundImage:
-                              item.discount > 0
-                                ? "linear-gradient(to top right, transparent calc(50% - 1px), gray 50%, transparent calc(50% + 1px))"
-                                : "none",
-                          }}>
-                          ${item.price}
-                        </span>
-                        {item.discount > 0 && (
-                          <div
-                            className={cn("font-bold md:block hidden text-end", {
-                              "font-normal text-muted-foreground": item.discount == 0,
-                            })}>
-                            ${applyDiscount(item.price, item.discount)}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{item.quantity} pcs</TableCell>
-                    <TableCell className="lg:table-cell hidden">{formatDateWithTime(item.createdAt)}</TableCell>
-                    <TableCell>
-                      <Badge variant={item.archived.archivedId === 1 ? "secondary" : "outline"}>
-                        {item.archived.archivedId === 1 ? "Archived" : "Active"}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>{item.quantity} pcs</TableCell>
+                  <TableCell className="lg:table-cell hidden">{formatDateWithTime(item.createdAt)}</TableCell>
+                  <TableCell>
+                    <Badge variant={item.archived.archivedId === 1 ? "secondary" : "outline"}>
+                      {item.archived.archivedId === 1 ? "Archived" : "Active"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
 
@@ -193,9 +189,7 @@ export default function ProductTable({ data }) {
                     />
                   </PaginationItem>
                 )}
-
                 {paginationItems}
-
                 {data.totalPages > 1 && (
                   <PaginationItem>
                     <PaginationNext

@@ -14,11 +14,11 @@ export default function Sidebar({ className = "" }) {
   const page = pathParts[pathParts.length - 1];
 
   const adminButtons: { name: string; goto: string; icon: ReactNode }[] = [
-    { name: "Dashboard", goto: "/overview", icon: <Home className="size-4" /> },
+    { name: "Overview", goto: "/overview", icon: <Home className="size-4" /> },
     { name: "Orders", goto: "/orders", icon: <ShoppingCart className="size-4" /> },
     { name: "Products", goto: "/products", icon: <Package className="size-4" /> },
-    { name: "Banners", goto: "/banner", icon: <Flag className="size-4" /> },
-    { name: "Attributes", goto: "/attribute", icon: <Folder className="size-4" /> },
+    { name: "Banners", goto: "/banners", icon: <Flag className="size-4" /> },
+    { name: "Attributes", goto: "/attributes", icon: <Folder className="size-4" /> },
   ];
 
   return (

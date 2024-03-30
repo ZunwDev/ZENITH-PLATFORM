@@ -1,7 +1,7 @@
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
 import { User } from "@/components/header";
 
-export default function Overview() {
+export default function Attributes() {
   return (
     <>
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

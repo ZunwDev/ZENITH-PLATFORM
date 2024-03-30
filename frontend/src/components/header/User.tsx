@@ -34,11 +34,11 @@ const items: { name: string; icon: JSX.Element; redirect: boolean; goto: string 
 
 export default function User() {
   const sessionData = useGetSessionData();
-  if (!sessionData) return;
+  const { sessionToken, firstName, isAdmin, userId } = sessionData ? sessionData : "";
 
   const logOut = async () => {
     try {
-      await axios.delete(`${API_URL}/users/session/delete/${sessionData.sessionToken}`, { signal: newAbortSignal() });
+      await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`, { signal: newAbortSignal() });
       removeAllCookies();
     } catch (error) {
       removeAllCookies();
@@ -51,7 +51,7 @@ export default function User() {
       <DropdownMenuTrigger className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition-all rounded-md px-4 group data-[state=open]:bg-accent/50">
         <UserRound className="size-7" />
         <p className="hidden md:block text-sm">
-          Hello, <strong>{sessionData.sessionToken ? sessionData && sessionData.firstName : "Sign in"}</strong>
+          Hello, <strong>{sessionToken ? firstName : "Sign in"}</strong>
         </p>
         <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
       </DropdownMenuTrigger>
@@ -65,11 +65,11 @@ export default function User() {
             </a>
           </DropdownMenuItem>
         ))}
-        {sessionData.sessionToken && sessionData.isAdmin && (
+        {sessionToken && isAdmin && (
           <>
             <DropdownMenuLabel>Administrator</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <a href={`/${sessionData.userId}/dashboard/overview`} className="flex flex-row items-center">
+              <a href={`/${userId}/dashboard/overview`} className="flex flex-row items-center">
                 <UserRoundCog className="mr-2 size-4" />
                 Dashboard
               </a>
@@ -79,16 +79,16 @@ export default function User() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <a
-            href={!sessionData.sessionToken ? "/auth/signin" : undefined}
-            onClick={sessionData.sessionToken ? logOut : undefined}
+            href={!sessionToken ? "/auth/signin" : undefined}
+            onClick={sessionToken ? logOut : undefined}
             className="flex flex-row items-center">
-            {sessionData.sessionToken ? (
+            {sessionToken ? (
               <DoorClosed className="mr-2 size-4 stroke-destructive" />
             ) : (
               <DoorOpen className="mr-2 size-4 stroke-primary" />
             )}
-            <strong className={sessionData.sessionToken ? "text-destructive" : "text-primary"}>
-              {sessionData.sessionToken ? "Sign Out" : "Sign In"}
+            <strong className={sessionToken ? "text-destructive" : "text-primary"}>
+              {sessionToken ? "Sign Out" : "Sign In"}
             </strong>
           </a>
         </DropdownMenuItem>
