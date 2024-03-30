@@ -4,7 +4,7 @@ import { goto } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
-export function useAdminCheck() {
+export const useAdminCheck = () => {
   const [isAdmin, setIsAdmin] = useState(null);
 
   useEffect(() => {
@@ -28,4 +28,4 @@ export function useAdminCheck() {
   }, [isAdmin]);
 
   return isAdmin;
-}
+};

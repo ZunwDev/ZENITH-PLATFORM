@@ -62,9 +62,6 @@
     font-family: "Inter", sans-serif;
     @apply bg-background text-foreground;
   }
-  .logoClass {
-    font-family: "Bruno Ace SC", sans-serif;
-  }
 
   .PopoverContent {
     width: var(--radix-popover-trigger-width);

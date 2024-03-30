@@ -13,6 +13,9 @@ const config: Config = {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      brunoac: ["ui-serif", "Bruno Ace SC"],
+    },
     extend: {
       screens: {
         xs: "360px",
