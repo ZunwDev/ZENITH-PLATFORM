@@ -1,10 +1,10 @@
-import React, { useState, ReactNode, ReactElement, Dispatch } from "react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import React, { Dispatch, ReactElement, ReactNode, useState } from "react";
 import { Button } from "./button";
 
 const chipStyles =
-  "w-fit inline-flex items-center rounded-full px-1 py-0.5 flex-shrink-0 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:border-accent-foreground hover:border transition border border-transparent";
+  "w-fit inline-flex items-center rounded-full px-1 py-0.5 flex-shrink-0 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:border-primary hover:border transition border border-transparent";
 
 const chipGroupStyles = "w-fit inline-flex items-center rounded-full border text-xs px-3 py-1 mx-1";
 
@@ -96,4 +96,4 @@ ChipGroup.displayName = "ChipGroup";
 const ChipGroupTitle = ({ children }: { children: ReactNode }) => <div className="font-semibold mr-1">{children}</div>;
 ChipGroupTitle.displayName = "ChipGroupTitle";
 
-export { Chip, ChipGroup, ChipGroupTitle, ChipGroupContent };
+export { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle };

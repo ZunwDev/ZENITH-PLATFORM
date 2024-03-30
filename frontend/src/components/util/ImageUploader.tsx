@@ -53,7 +53,7 @@ const ImageUploader = ({ setImages }: ImageUploaderProps) => {
 
   return (
     <div
-      className={`border border-dashed border-gray-500 py-4 px-2 mt-auto rounded-lg overflow-hidden flex flex-col justify-center items-center space-y-2 h-64 w-full ${
+      className={`border border-dashed border-gray-500 py-4 px-2 mt-auto rounded-lg overflow-hidden flex flex-col justify-center items-center space-y-2 h-32 w-full ${
         dragging ? "bg-gray-200" : ""
       }`}
       onDrop={handleDrop}

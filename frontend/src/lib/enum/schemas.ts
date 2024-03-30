@@ -240,6 +240,14 @@ export const FormFields = {
       }),
       createSection("PSU", {
         ...numberField("PSU", "700", "W"),
+        ...selectField("Efficiency Rating", null, [
+          "80 PLUS",
+          "80 PLUS Bronze",
+          "80 PLUS Silver",
+          "80 PLUS Gold",
+          "80 PLUS Platinum",
+          "80 PLUS Titanium",
+        ]),
       }),
       createSection("Features", {
         ...checkboxFieldGroup(["All in One Desktop", "Desktop Includes Monitor", "Bluetooth", "WiFi"]),

@@ -1,13 +1,15 @@
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface ProductSearchProps {
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  className?: string;
 }
 
-export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
+export default function ProductSearch({ setSearchQuery, className }: ProductSearchProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
@@ -21,7 +23,7 @@ export default function ProductSearch({ setSearchQuery }: ProductSearchProps) {
 
   return (
     <>
-      <div className="sm:w-80 w-40 h-10 items-center rounded-md border border-border pl-3 text-sm flex">
+      <div className={cn("sm:w-80 w-40 h-10 items-center rounded-md border pl-3 text-sm", className)}>
         <Search className="size-4" />
         <Input
           type="search"

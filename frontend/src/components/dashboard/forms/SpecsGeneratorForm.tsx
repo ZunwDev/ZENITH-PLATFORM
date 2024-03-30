@@ -120,7 +120,7 @@ const SpecsGeneratorForm = ({ addFormSchemaData, setJsonData, typesSelectedValue
     <>
       {addFormSchemaData?.sections?.length > 0 ? (
         <form>
-          <ResponsiveMasonry>
+          <ResponsiveMasonry columnsCountBreakPoints={{ 360: 1, 1450: 2, 1750: 3, 2050: 4, 2300: 5 }}>
             <Masonry gutter="1rem">
               {addFormSchemaData.sections.slice(1).map((item, index) => (
                 <div key={index}>

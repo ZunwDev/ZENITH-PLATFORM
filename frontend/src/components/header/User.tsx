@@ -1,9 +1,8 @@
-import { API_URL, fetchSessionData } from "@/lib/api";
+import { useGetSessionData } from "@/hooks";
+import { API_URL } from "@/lib/api";
 import { BASE_URL } from "@/lib/constants";
-import { SessionData } from "@/lib/interfaces";
 import { newAbortSignal, removeAllCookies } from "@/lib/utils";
 import axios from "axios";
-import Cookies from "js-cookie";
 import {
   ChevronDown,
   DoorClosed,
@@ -16,7 +15,6 @@ import {
   UserRound,
   UserRoundCog,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +23,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-
-const sessionToken = Cookies.get("sessionToken");
 
 const items: { name: string; icon: JSX.Element; redirect: boolean; goto: string }[] = [
   { name: "Favorites", icon: <Heart className="size-4" />, redirect: false, goto: "/account/favorites" },
@@ -37,21 +33,12 @@ const items: { name: string; icon: JSX.Element; redirect: boolean; goto: string 
 ];
 
 export default function User() {
-  const [data, setData] = useState<SessionData>({ roleId: "", userId: "", firstName: "", isAdmin: false });
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setData(await fetchSessionData(sessionToken));
-      } catch (error) {
-        return;
-      }
-    })();
-  }, []);
+  const sessionData = useGetSessionData();
+  if (!sessionData) return;
 
   const logOut = async () => {
     try {
-      await axios.delete(`${API_URL}/users/session/delete/${sessionToken}`, { signal: newAbortSignal() });
+      await axios.delete(`${API_URL}/users/session/delete/${sessionData.sessionToken}`, { signal: newAbortSignal() });
       removeAllCookies();
     } catch (error) {
       removeAllCookies();
@@ -64,7 +51,7 @@ export default function User() {
       <DropdownMenuTrigger className="flex flex-row gap-1 items-center hover:bg-accent hover:text-accent-foreground transition-all rounded-md px-4 group data-[state=open]:bg-accent/50">
         <UserRound className="size-7" />
         <p className="hidden md:block text-sm">
-          Hello, <strong>{sessionToken ? data && data.firstName : "Sign in"}</strong>
+          Hello, <strong>{sessionData.sessionToken ? sessionData && sessionData.firstName : "Sign in"}</strong>
         </p>
         <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
       </DropdownMenuTrigger>
@@ -78,11 +65,11 @@ export default function User() {
             </a>
           </DropdownMenuItem>
         ))}
-        {sessionToken && data.isAdmin && (
+        {sessionData.sessionToken && sessionData.isAdmin && (
           <>
             <DropdownMenuLabel>Administrator</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <a href={`/${data.userId}/dashboard/overview`} className="flex flex-row items-center">
+              <a href={`/${sessionData.userId}/dashboard/overview`} className="flex flex-row items-center">
                 <UserRoundCog className="mr-2 size-4" />
                 Dashboard
               </a>
@@ -92,16 +79,16 @@ export default function User() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <a
-            href={!sessionToken ? "/auth/signin" : undefined}
-            onClick={sessionToken ? logOut : undefined}
+            href={!sessionData.sessionToken ? "/auth/signin" : undefined}
+            onClick={sessionData.sessionToken ? logOut : undefined}
             className="flex flex-row items-center">
-            {sessionToken ? (
+            {sessionData.sessionToken ? (
               <DoorClosed className="mr-2 size-4 stroke-destructive" />
             ) : (
               <DoorOpen className="mr-2 size-4 stroke-primary" />
             )}
-            <strong className={sessionToken ? "text-destructive" : "text-primary"}>
-              {sessionToken ? "Sign Out" : "Sign In"}
+            <strong className={sessionData.sessionToken ? "text-destructive" : "text-primary"}>
+              {sessionData.sessionToken ? "Sign Out" : "Sign In"}
             </strong>
           </a>
         </DropdownMenuItem>

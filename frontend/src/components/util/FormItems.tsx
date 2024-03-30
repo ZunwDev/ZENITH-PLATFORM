@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import ScaleLoader from "react-spinners/ScaleLoader";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../ui/command";
@@ -279,7 +280,12 @@ export function NoValidationSelectFormItem({
   const data = preloadedData || asyncData;
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 h-screen text-center w-full">
+        <ScaleLoader color="#2563eb" />
+        Loading products...
+      </div>
+    );
   }
 
   return (

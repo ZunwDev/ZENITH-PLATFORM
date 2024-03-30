@@ -1,30 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { fetchSessionData } from "@/lib/api";
-import { SessionData } from "@/lib/interfaces";
-import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
-
-const sessionToken = Cookies.get("sessionToken");
+import { useGetSessionData } from "@/hooks";
 
 export default function NewProductButton() {
-  const [data, setData] = useState<SessionData>({ roleId: "", userId: "", firstName: "", isAdmin: false });
+  const sessionData = useGetSessionData();
+  if (!sessionData) return;
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setData(await fetchSessionData(sessionToken));
-      } catch (error) {
-        return;
-      }
-    })();
-  }, []);
   return (
-    <Button className="sm:flex flex-row gap-2 items-center justify-center hidden" asChild>
+    <Button className="sm:flex flex-row gap-2 items-center justify-center" asChild>
       <a
-        href={`/${data.userId}/dashboard/products/new`}
+        href={`/${sessionData.userId}/dashboard/products/new`}
         onClick={(e) => {
           e.preventDefault();
-          window.location.replace(`/${data.userId}/dashboard/products/new`);
+          window.location.replace(`/${sessionData.userId}/dashboard/products/new`);
         }}>
         <span className="text-2xl">+</span>New Product
       </a>

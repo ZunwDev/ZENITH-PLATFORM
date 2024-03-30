@@ -17,10 +17,32 @@ export function formatDate(dateString: string): string {
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
-    year: date.getFullYear() === currentDate.getFullYear() ? "numeric" : undefined,
+    year: date.getFullYear() === currentDate.getFullYear() ? undefined : "numeric",
   };
 
   return date.toLocaleDateString("en-US", options);
+}
+
+export function formatDateWithTime(dateString: string): string {
+  const date = new Date(dateString);
+  const currentDate = new Date();
+
+  const optionsDate: Intl.DateTimeFormatOptions = {
+    month: "numeric",
+    day: "2-digit",
+    year: "numeric",
+  };
+
+  const optionsTime: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  };
+
+  const formattedDate = date.toLocaleDateString("en-US", optionsDate);
+  const formattedTime = date.toLocaleTimeString("en-US", optionsTime);
+
+  return `${formattedDate} ${formattedTime}`;
 }
 
 export const scrollToTop = () => {
