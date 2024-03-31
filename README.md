@@ -20,8 +20,7 @@ Adding more schemas for specs generation, starting work on banner manager and at
 ## Images Of Progress Made
 
 ![Image 1](frontend/src/assets/image.png) ![Image 2](frontend/src/assets/image1.png) ![Image 3](frontend/src/assets/image2.png)
-![Image 4](frontend/src/assets/image3.png) ![Image 5](frontend/src/assets/image4.png) ![Image 6](frontend/src/assets/image5.png)
-![Image 7](frontend/src/assets/image6.png) ![Image 8](frontend/src/assets/image7.png)
+
 
 ## License
 
