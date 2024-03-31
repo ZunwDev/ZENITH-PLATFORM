@@ -135,12 +135,9 @@ export default function Products() {
             <User />
           </div>
         </div>
-        <main className="flex flex-1 flex-col gap-2 p-4 lg:gap-6 lg:p-6 pt-4">
+        <main className="flex flex-1 flex-col gap-2 p-4 lg:gap-4 lg:p-6 pt-4">
           <div className="flex items-center justify-between px-4 md:px-0">
-            <PageHeader
-              title={`Products (${pageData.totalElements > 0 ? pageData.totalElements : 0})`}
-              description="Manage products in the store"
-            />
+            <PageHeader title={`Products (${pageData.totalElements > 0 ? pageData.totalElements : 0})`} />
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
@@ -152,11 +149,11 @@ export default function Products() {
                   setChecked={setChecked}
                   amountData={amountData}
                 />
-                <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
                 <ProductSearch setSearchQuery={setSearchQuery} className="md:flex hidden" />
               </div>
               <div className="flex flex-row gap-1.5">
                 <ProductLimit setLimit={setLimit} limit={limit} />
+                <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
                 <ProductExport data={pageData.content} />
                 {pageData.totalElements > 0 && <NewProductButton />}
               </div>

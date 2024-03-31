@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useGetSessionData } from "@/hooks";
+import { PackagePlus } from "lucide-react";
 
 export default function NewProductButton() {
   const sessionData = useGetSessionData();
@@ -13,7 +14,8 @@ export default function NewProductButton() {
           e.preventDefault();
           window.location.replace(`/${sessionData.userId}/dashboard/products/new`);
         }}>
-        <span className="text-2xl">+</span>New Product
+        <PackagePlus className="size-4" />
+        New Product
       </a>
     </Button>
   );

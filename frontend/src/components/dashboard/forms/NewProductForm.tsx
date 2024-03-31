@@ -176,14 +176,14 @@ export default function NewProductForm() {
               <User />
             </div>
           </div>
-          <div className="flex flex-col gap-12 pb-32 p-8 w-full min-w-[360px]">
+          <div className="flex flex-col gap-8 pb-32 p-8 w-full min-w-[360px]">
             <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row border-b pb-4">
               <Button variant="outline" className="w-fit mb-4 md:mb-0" asChild>
                 <a href="../products">
                   <ArrowLeft className="size-5" />
                 </a>
               </Button>
-              <PageHeader title="New Product" description="Add new product to the store" />
+              <PageHeader title="New Product" />
               <div className="ml-auto space-x-2">
                 <Button
                   type="button"
