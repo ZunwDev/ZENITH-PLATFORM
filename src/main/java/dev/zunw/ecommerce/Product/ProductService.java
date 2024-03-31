@@ -1,7 +1,7 @@
 package dev.zunw.ecommerce.Product;
 
-import dev.zunw.ecommerce.Archived.Archived;
-import dev.zunw.ecommerce.Archived.ArchivedRepository;
+import dev.zunw.ecommerce.Status.Status;
+import dev.zunw.ecommerce.Status.StatusRepository;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Brand.BrandRepository;
 import dev.zunw.ecommerce.Category.Category;
@@ -22,29 +22,29 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
-    private final ArchivedRepository archivedRepository;
+    private final StatusRepository statusRepository;
     private Integer amount;
 
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, ArchivedRepository archivedRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, StatusRepository statusRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
-        this.archivedRepository = archivedRepository;
+        this.statusRepository = statusRepository;
     }
 
-    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Long> archiveIds, Pageable pageable, String sortBy, String sortDirection, String searchQuery) {
+    public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Long> statusIds, Pageable pageable, String sortBy, String sortDirection, String searchQuery) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        Specification<Product> specification = ProductSpecifications.withCategoryAndBrandAndArchived(categoryIds, brandIds, archiveIds, searchQuery);
+        Specification<Product> specification = ProductSpecifications.withCategoryAndBrandAndStatus(categoryIds, brandIds, statusIds, searchQuery);
         return productRepository.findAll(specification, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
     }
 
-    public Map<String, List<Map<String, Object>>> getFilterCounts(Long[] categoryIds, Long[] brandIds, Long[] archiveIds) {
+    public Map<String, List<Map<String, Object>>> getFilterCounts(Long[] categoryIds, Long[] brandIds, Long[] statusIds) {
         Map<String, List<Map<String, Object>>> filterCounts = new HashMap<>();
 
-        for (String filterType : List.of("brand", "category", "archived")) {
-            List<Object[]> counts = productRepository.findCountsByFilter(categoryIds, brandIds, archiveIds, filterType);
+        for (String filterType : List.of("brand", "category", "status")) {
+            List<Object[]> counts = productRepository.findCountsByFilter(categoryIds, brandIds, statusIds, filterType);
 
             List<Map<String, Object>> countsList = new ArrayList<>();
             for (Object[] count : counts) {
@@ -75,9 +75,9 @@ public class ProductService {
                 Optional<Category> categoryOptional = categoryRepository.findById(filterId);
                 yield categoryOptional.map(Category::getName).orElse(null);
             }
-            case "archived" -> {
-                Optional<Archived> archivedOptional = archivedRepository.findById(filterId);
-                yield archivedOptional.map(Archived::getName).orElse(null);
+            case "status" -> {
+                Optional<Status> statusOptional = statusRepository.findById(filterId);
+                yield statusOptional.map(Status::getName).orElse(null);
             }
             default -> null;
         };

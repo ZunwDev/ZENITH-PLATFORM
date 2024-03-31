@@ -16,7 +16,6 @@ import java.util.*;
 @RequestMapping("/api/products")
 public class ProductController {
     private final ProductService productService;
-    private List<Boolean> finalArchived;
 
     @Autowired
     public ProductController(ProductService productService) {
@@ -30,13 +29,13 @@ public class ProductController {
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) List<Long> brand,
             @RequestParam(required = false) List<Long> category,
-            @RequestParam(required = false) List<Long> archived,
+            @RequestParam(required = false) List<Long> status,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDirection,
             @RequestParam(required = false) String searchQuery
     ) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Product> products = productService.findByFilters(category, brand, archived, pageable, sortBy, sortDirection, searchQuery);
+        Page<Product> products = productService.findByFilters(category, brand, status, pageable, sortBy, sortDirection, searchQuery);
 
         if (products.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
@@ -51,8 +50,8 @@ public class ProductController {
     @GetMapping("/amounts")
     public ResponseEntity<Object> getAllProductAmounts(@RequestParam(required = false) Long[] brand,
                                                        @RequestParam(required = false) Long[] category,
-                                                       @RequestParam(required = false) Long[] archived) {
-        Map<String, List<Map<String, Object>>> products = productService.getFilterCounts(category, brand, archived);
+                                                       @RequestParam(required = false) Long[] status) {
+        Map<String, List<Map<String, Object>>> products = productService.getFilterCounts(category, brand, status);
         if (products.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "No products found");
@@ -134,7 +133,7 @@ public class ProductController {
             existingProduct.setDiscount(updatedProductData.getDiscount());
             existingProduct.setBrand(updatedProductData.getBrand());
             existingProduct.setCategory(updatedProductData.getCategory());
-            existingProduct.setArchived(updatedProductData.getArchived());
+            existingProduct.setStatus(updatedProductData.getStatus());
             return existingProduct;
         }
         return null;

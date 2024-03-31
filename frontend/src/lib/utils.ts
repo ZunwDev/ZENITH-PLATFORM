@@ -143,7 +143,6 @@ export function includesAny(value, arr) {
 }
 
 export function makeEndBy99(num: number) {
-  console.log(num);
   if (num) {
     return !num?.toFixed(2).endsWith(".99") ? (num + 0.99).toFixed(2) : num?.toFixed(2);
   }

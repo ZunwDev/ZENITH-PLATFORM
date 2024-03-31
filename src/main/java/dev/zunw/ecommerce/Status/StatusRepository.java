@@ -1,4 +1,4 @@
-package dev.zunw.ecommerce.Archived;
+package dev.zunw.ecommerce.Status;
 
 import io.micrometer.common.lang.NonNullApi;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 @NonNullApi
-public interface ArchivedRepository extends JpaRepository<Archived, Long> {
-    Optional<Archived> findById(Long id);
+public interface StatusRepository extends JpaRepository<Status, Long> {
+    Optional<Status> findById(Long id);
 }

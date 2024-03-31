@@ -2,7 +2,7 @@ export interface Product {
   productId: string;
   name: string;
   category: Category;
-  archived: Archived;
+  status: Status;
   description: string;
   rating: number;
   price: number;
@@ -20,9 +20,9 @@ export interface Category {
   amount: number;
 }
 
-export interface Archived {
+export interface Status {
   name: string;
-  archivedId: number;
+  statusId: number;
   amount: number;
 }
 
@@ -35,11 +35,11 @@ export interface Brand {
 export interface Checked {
   brand: number[];
   category: number[];
-  archived: number[];
+  status: number[];
 }
 
 export const initialCheckedState: Checked = {
-  archived: [],
+  status: [],
   category: [],
   brand: [],
 };

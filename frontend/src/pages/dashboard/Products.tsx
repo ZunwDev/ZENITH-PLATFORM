@@ -25,11 +25,11 @@ import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import {
   AmountData,
-  Archived,
   Brand,
   Category,
   Checked,
   Page,
+  Status,
   initialCheckedState,
 } from "../../components/dashboard/products/interfaces";
 
@@ -50,7 +50,7 @@ export default function Products() {
   const [filterData, setFilterData] = useState({
     category: [] as Category[],
     brand: [] as Brand[],
-    archived: [] as Archived[],
+    status: [] as Status[],
   });
 
   // Debounced values
@@ -67,7 +67,7 @@ export default function Products() {
       searchQuery: searchQueryParam || dbcSearch || "",
       brand: checked.brand,
       category: checked.category,
-      archived: checked.archived,
+      status: checked.status,
     };
 
     const queryString = buildQueryParams(paramsObj);
@@ -82,8 +82,8 @@ export default function Products() {
     const fetchData = async () => {
       try {
         // Fetch filter data
-        const [categoryData, brandData, , archivedData] = await fetchFilterData();
-        setFilterData({ category: categoryData, brand: brandData, archived: archivedData });
+        const [categoryData, brandData, , statusData] = await fetchFilterData();
+        setFilterData({ category: categoryData, brand: brandData, status: statusData });
       } catch (error) {
         console.error("Error fetching filter data:", error.response?.data?.message || error.message);
       }
@@ -190,7 +190,7 @@ export default function Products() {
           </div>
           <div className="flex flex-1 items-start justify-center p-4 rounded-lg border border-dashed shadow-sm">
             <div className="flex flex-col items-center gap-2 text-center w-full">
-              {pageData.totalElements === 0 ? (
+              {pageData?.totalElements === 0 ? (
                 <>
                   <h3 className="text-2xl font-bold tracking-tight">You have no products</h3>
                   <p className="text-sm text-muted-foreground">You can start selling as soon as you add a product.</p>

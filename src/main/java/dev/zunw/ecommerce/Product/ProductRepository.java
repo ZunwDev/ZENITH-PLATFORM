@@ -24,7 +24,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
                     "   CASE " +
                     "       WHEN :filterType = 'brand' THEN p.brand_id " +
                     "       WHEN :filterType = 'category' THEN p.category_id " +
-                    "       WHEN :filterType = 'archived' THEN p.archived_id " +
+                    "       WHEN :filterType = 'status' THEN p.status_id " +
                     "   END AS filterId, " +
                     "   COUNT(*) " +
                     "FROM " +
@@ -32,13 +32,13 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
                     "WHERE " +
                     "   (COALESCE(:categoryIdsArray, '{}') = '{}' OR p.category_id = ANY(:categoryIdsArray)) AND " +
                     "   (COALESCE(:brandIdsArray, '{}') = '{}' OR p.brand_id = ANY(:brandIdsArray)) AND " +
-                    "   (COALESCE(:archivedIdsArray, '{}') = '{}' OR p.archived_id = ANY(:archivedIdsArray)) " +
+                    "   (COALESCE(:statusIdsArray, '{}') = '{}' OR p.status_id = ANY(:statusIdsArray)) " +
                     "GROUP BY " +
                     "   filterId",
             nativeQuery = true)
     List<Object[]> findCountsByFilter(
             @Param("categoryIdsArray") Long[] categoryIdsArray,
             @Param("brandIdsArray") Long[] brandIdsArray,
-            @Param("archivedIdsArray") Long[] archivedIdsArray,
+            @Param("statusIdsArray") Long[] statusIdsArray,
             @Param("filterType") String filterType);
 }

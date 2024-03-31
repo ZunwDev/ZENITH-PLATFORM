@@ -2,7 +2,7 @@ package dev.zunw.ecommerce.Product;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.zunw.ecommerce.Archived.Archived;
+import dev.zunw.ecommerce.Status.Status;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Category.Category;
 import jakarta.persistence.*;
@@ -33,8 +33,8 @@ public class Product {
     private Brand brand;
 
     @OneToOne
-    @JoinColumn(name = "archived_id")
-    private Archived archived;
+    @JoinColumn(name = "status_id")
+    private Status status;
 
     @Transient
     private transient JsonNode parsedSpecifications;

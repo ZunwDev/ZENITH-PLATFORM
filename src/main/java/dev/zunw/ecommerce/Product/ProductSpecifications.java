@@ -6,11 +6,11 @@ import java.util.List;
 
 public class ProductSpecifications {
 
-    public static Specification<Product> withCategoryAndBrandAndArchived(
-            List<Long> categoryIds, List<Long> brandIds, List<Long> archivedIds, String searchQuery) {
+    public static Specification<Product> withCategoryAndBrandAndStatus(
+            List<Long> categoryIds, List<Long> brandIds, List<Long> statusIds, String searchQuery) {
         Specification<Product> spec = Specification.where(withCategories(categoryIds))
                 .and(withBrands(brandIds))
-                .and(withArchived(archivedIds));
+                .and(withStatus(statusIds));
 
         if (searchQuery != null && !searchQuery.isEmpty()) {
             spec = spec.and(withSearch(searchQuery));
@@ -37,10 +37,10 @@ public class ProductSpecifications {
         };
     }
 
-    public static Specification<Product> withArchived(List<Long> archivedIds) {
+    public static Specification<Product> withStatus(List<Long> statusIds) {
         return (root, query, builder) -> {
-            if (archivedIds != null && !archivedIds.isEmpty()) {
-                return root.get("archived").get("archivedId").in(archivedIds);
+            if (statusIds != null && !statusIds.isEmpty()) {
+                return root.get("status").get("statusId").in(statusIds);
             }
             return null;
         };

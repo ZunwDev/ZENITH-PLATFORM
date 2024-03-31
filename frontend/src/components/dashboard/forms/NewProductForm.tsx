@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form } from "@/components/ui/form";
 import {
   AlertInCardDescription,
-  CheckboxFormItem,
   InformationDescription,
   InputFormItem,
   SelectFormItem,
@@ -51,9 +50,11 @@ export default function NewProductForm() {
   const [productStage, setProductStage] = useState("Create product");
   const [categoryId, setCategoryId] = useState<number>();
   const [brandId, setBrandId] = useState<number>();
+  const [statusId, setStatusId] = useState<number>();
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
   const [typesSelectedValue, setTypesSelectedValue] = useState("");
+  const [statusSelectedValue, setStatusSelectedValue] = useState("Active");
   const [addFormSchemaData, setAddFormSchemaData] = useState([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -68,7 +69,7 @@ export default function NewProductForm() {
       category: "",
       brand: "",
       type: "",
-      archived: false,
+      status: "",
     },
   });
 
@@ -116,6 +117,22 @@ export default function NewProductForm() {
       setIsProductCreated(true);
       setProductStage("Storing in database...");
 
+      let statusId;
+
+      switch (values.status) {
+        case "archived":
+          statusId = 1;
+          break;
+        case "draft":
+          statusId = 2;
+          break;
+        case "active":
+          statusId = 3;
+          break;
+        default:
+          break;
+      }
+
       const response = await axios.post(`${API_URL}/products/create`, {
         signal: newAbortSignal(),
         product: {
@@ -127,9 +144,7 @@ export default function NewProductForm() {
           discount: values.discount,
           brand: filterData.brands.find((brand) => brand.brandId === brandId),
           category: filterData.categories.find((category) => category.categoryId === categoryId),
-          archived: {
-            archivedId: values.archived ? 1 : 2,
-          },
+          status: { statusId: statusId },
         },
       });
 
@@ -151,17 +166,19 @@ export default function NewProductForm() {
   };
 
   function findId(array: any[], selectedValue: string, id: string): number | null {
-    const foundData = array.find((item) => item.name.toLowerCase() === selectedValue.toLowerCase());
+    const foundData = array?.find((item) => item?.name?.toLowerCase() === selectedValue?.toLowerCase());
     return foundData ? foundData[id] : null;
   }
 
   useEffect(() => {
     const categoryId = findId(filterData.categories, categoriesSelectedValue, "categoryId");
     const brandId = findId(filterData.brands, brandsSelectedValue, "brandId");
+    const statusId = findId(["Active", "Draft", "Archived"], statusSelectedValue, "statusId");
 
     setCategoryId(categoryId);
     setBrandId(brandId);
-  }, [brandsSelectedValue, categoriesSelectedValue, filterData]);
+    setStatusId(statusId);
+  }, [brandsSelectedValue, categoriesSelectedValue, statusSelectedValue, filterData]);
 
   useEffect(() => {}, [form.watch()]);
 
@@ -332,12 +349,16 @@ export default function NewProductForm() {
                             selectedValue={brandsSelectedValue}
                             setSelectedValue={setBrandsSelectedValue}
                           />
-                          <CheckboxFormItem
-                            id="archived"
-                            label="Archived?"
-                            description="Whether is product archived or not"
+                          <SelectFormItem
+                            label="Status"
+                            id="status"
+                            placeholder="Search statuses..."
+                            description="Select corresponding status to the product."
+                            required
                             form={form}
-                            data={undefined}
+                            data={["Active", "Draft", "Archived"]}
+                            selectedValue={statusSelectedValue}
+                            setSelectedValue={setStatusSelectedValue}
                           />
                         </div>
                       </form>

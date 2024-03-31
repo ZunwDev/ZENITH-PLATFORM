@@ -82,8 +82,8 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
   );
 }
 
-export function CheckboxFormItem({ id, label, description, form, data, ...rest }) {
-  const initialValue = data && data.archived.archivedId === 1;
+/* export function CheckboxFormItem({ id, label, description, form, data, ...rest }) {
+  const initialValue = data && data.status.statusId === 1;
   const [isChecked, setIsChecked] = useState(initialValue);
 
   const handleCheckboxChange = () => {
@@ -108,7 +108,7 @@ export function CheckboxFormItem({ id, label, description, form, data, ...rest }
       {description && <FormDescription>{description}</FormDescription>}
     </FormItem>
   );
-}
+} */
 
 export function SelectFormItem({
   id,

@@ -19,7 +19,7 @@ export async function fetchSessionData(sessionToken) {
 
 export async function fetchFilterData() {
   try {
-    const [categoriesResponse, brandsResponse, brandsNonZeroResponse, archivedResponse] = await Promise.all([
+    const [categoriesResponse, brandsResponse, brandsNonZeroResponse, statusResponse] = await Promise.all([
       axios.get(`${API_URL}/categories`, {
         signal: newAbortSignal(),
       }),
@@ -29,13 +29,13 @@ export async function fetchFilterData() {
       axios.get(`${API_URL}/brands/nonzero`, {
         signal: newAbortSignal(),
       }),
-      axios.get(`${API_URL}/archived`),
+      axios.get(`${API_URL}/status`),
     ]);
     const categories = categoriesResponse.data;
     const brands = brandsResponse.data;
     const brandsNonZero = brandsNonZeroResponse.data;
-    const archived = archivedResponse.data;
-    return [categories, brands, brandsNonZero, archived];
+    const status = statusResponse.data;
+    return [categories, brands, brandsNonZero, status];
   } catch (error) {
     console.error("Error fetching filters:", error.response?.data?.message || error.message);
     return [[], []];

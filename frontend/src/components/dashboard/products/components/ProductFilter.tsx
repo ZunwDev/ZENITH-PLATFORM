@@ -12,13 +12,12 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
-import { Filter, ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { Archived, Brand, Category, Checked } from "../interfaces";
-import { fetchFilterData } from "@/lib/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React from "react";
+import { fetchFilterData } from "@/lib/api";
+import { cn, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
+import { ChevronDown, Filter } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { Brand, Category, Checked, Status } from "../interfaces";
 
 interface ProductFilter {
   setFilterAmount: React.Dispatch<React.SetStateAction<number>>;
@@ -59,12 +58,12 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
   const [data, setData] = useState({
     category: [] as Category[],
     brandsNonZero: [] as Brand[],
-    archived: [] as Archived[],
+    status: [] as Status[],
   });
   const [filteredData, setFilteredData] = useState({
     category: [] as Category[],
     brand: [] as Brand[],
-    archived: [] as Archived[],
+    status: [] as Status[],
   });
 
   const handleFilterChange = useCallback(
@@ -79,8 +78,8 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, , brandNonZero, archivedData] = await fetchFilterData();
-      setData({ category: categoryData, brandsNonZero: brandNonZero, archived: archivedData });
+      const [categoryData, , brandNonZero, statusData] = await fetchFilterData();
+      setData({ category: categoryData, brandsNonZero: brandNonZero, status: statusData });
     };
 
     fetchData();
@@ -92,7 +91,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
     setFilteredData({
       category: checked.brand.length > 0 ? amountData.category : data.category,
       brand: checked.category.length > 0 ? amountData.brand : data.brandsNonZero,
-      archived: checked.category.length > 0 || checked.brand.length > 0 ? amountData.archived : data.archived,
+      status: checked.category.length > 0 || checked.brand.length > 0 ? amountData.status : data.status,
     });
     setFilterAmount(getAmountOfValuesInObjectOfObjects(checked));
   }, [checked, data, setFilterAmount, amountData]);
@@ -145,7 +144,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
           getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
-          filterType="archived"
+          filterType="status"
           filteredData={filteredData}
           data={data}
         />

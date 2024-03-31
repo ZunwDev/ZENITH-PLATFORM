@@ -13,5 +13,7 @@ export const FormSchema = z.object({
     message: "You must specify the brand of product.",
   }),
   type: z.string().min(1, { message: "You must specify the type of product." }).optional(),
-  archived: z.boolean(),
+  status: z.string().min(1, {
+    message: "You must specify the status of product.",
+  }),
 });

@@ -95,6 +95,29 @@ export default function ProductTable({ data }) {
     );
   }
 
+  const getStatus = (item) => {
+    let status;
+    let color;
+
+    switch (item.status.statusId) {
+      case 1:
+        status = "Archived";
+        color = "secondary";
+        break;
+      case 2:
+        status = "Draft";
+        color = "draft";
+        break;
+      case 3:
+        status = "Active";
+        color = "outline";
+        break;
+      default:
+        break;
+    }
+    return { status, color };
+  };
+
   return (
     <>
       {thumbnail.length > 0 && showingRange && (
@@ -166,9 +189,7 @@ export default function ProductTable({ data }) {
                   <TableCell>{item.quantity} pcs</TableCell>
                   <TableCell className="lg:table-cell hidden">{formatDateWithTime(item.createdAt)}</TableCell>
                   <TableCell>
-                    <Badge variant={item.archived.archivedId === 1 ? "secondary" : "outline"}>
-                      {item.archived.archivedId === 1 ? "Archived" : "Active"}
-                    </Badge>
+                    <Badge variant={getStatus(item).color}>{getStatus(item).status}</Badge>
                   </TableCell>
                 </TableRow>
               ))}

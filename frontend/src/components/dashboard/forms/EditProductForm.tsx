@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { CheckboxFormItem, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
+import { InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
 import ProductListing from "@/components/view/ProductListing";
 import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
 import { API_URL, fetchFilterData, fetchProductDataById } from "@/lib/api";
@@ -41,6 +41,7 @@ export default function EditProductForm() {
   //Select stuff
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
+  const [statusSelectedValue, setStatusSelectedValue] = useState("");
 
   //Images
   const [images, setImages] = useState([]);
@@ -85,9 +86,10 @@ export default function EditProductForm() {
 
       setCategoriesSelectedValue(productData.data.category.name);
       setBrandsSelectedValue(productData.data.brand.name);
+      setStatusSelectedValue(productData.data.status.name);
       setJsonData(productData.data.specifications);
 
-      const { name, description, price, discount, quantity, archived, category, brand } = productData.data;
+      const { name, description, price, discount, quantity, status, category, brand } = productData.data;
       form.setValue("name", name);
       form.setValue("description", description);
       form.setValue("price", price);
@@ -95,7 +97,7 @@ export default function EditProductForm() {
       form.setValue("quantity", quantity);
       form.setValue("category", category.name);
       form.setValue("brand", brand.name);
-      form.setValue("archived", archived.archivedId === 2 ? false : true);
+      form.setValue("status", status.name);
 
       const thumbnailFromFB = await getThumbnailFromFirebase(productId);
       setImageThumbnail(thumbnailFromFB.url);
@@ -122,6 +124,22 @@ export default function EditProductForm() {
       setIsProductUpdated(true);
       setProductStage("Updating...");
 
+      let statusId;
+
+      switch (values.status) {
+        case "archived":
+          statusId = 1;
+          break;
+        case "draft":
+          statusId = 2;
+          break;
+        case "active":
+          statusId = 3;
+          break;
+        default:
+          break;
+      }
+
       const response = await axios.put(`${API_URL}/products/${productId}`, {
         signal: newAbortSignal(),
         product: {
@@ -133,8 +151,8 @@ export default function EditProductForm() {
           discount: values.discount,
           brand: filterData.brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
           category: filterData.categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
-          archived: {
-            archivedId: values.archived ? 1 : 2,
+          status: {
+            statusId,
           },
         },
       });
@@ -289,12 +307,16 @@ export default function EditProductForm() {
                             data={filterData.brands}
                             selectedValue={brandsSelectedValue}
                             setSelectedValue={setBrandsSelectedValue}></SelectFormItem>
-                          <CheckboxFormItem
-                            id="archived"
-                            label="Archived?"
-                            description="Whether the product is archived or not"
+                          <SelectFormItem
+                            label="Status"
+                            id="status"
+                            placeholder="Search statuses..."
+                            description="Select corresponding status to the product."
+                            required
                             form={form}
-                            data={productData}
+                            data={["Active", "Draft", "Archived"]}
+                            selectedValue={statusSelectedValue}
+                            setSelectedValue={setStatusSelectedValue}
                           />
                         </div>
                       </form>

@@ -1,4 +1,4 @@
-package dev.zunw.ecommerce.Archived;
+package dev.zunw.ecommerce.Status;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,12 +7,12 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "archived")
-public class Archived {
+@Table(name = "status")
+public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "archived_id")
-    private Long archivedId;
+    @Column(name = "status_id")
+    private Long statusId;
 
     private String name;
 
