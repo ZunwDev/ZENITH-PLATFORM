@@ -153,3 +153,26 @@ export function removeLeadingZeroes(number) {
   const result = parseInt(stringWithoutZeroes, 10);
   return isNaN(result) ? 0 : result;
 }
+
+export function getStatus(item) {
+  let status;
+  let color;
+
+  switch (item.status.statusId) {
+    case 1:
+      status = "Archived";
+      color = "secondary";
+      break;
+    case 2:
+      status = "Draft";
+      color = "draft";
+      break;
+    case 3:
+      status = "Active";
+      color = "outline";
+      break;
+    default:
+      break;
+  }
+  return { status, color };
+}

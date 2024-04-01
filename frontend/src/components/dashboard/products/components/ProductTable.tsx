@@ -1,22 +1,17 @@
+import { PaginationControls, Thumbnail } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import RatingStar from "@/components/util/RatingStars";
 import { putUserToFirstPage } from "@/hooks";
 import { getThumbnailFromFirebase } from "@/lib/firebase";
-import { applyDiscount, cn, formatDateWithTime, goto } from "@/lib/utils";
+import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/utils";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { useLocation, useNavigate } from "react-router-dom";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
-export default function ProductTable({ data }) {
+export default function ProductTable({ data, viewToggle }) {
   const location = useLocation();
   const navigate = useNavigate();
   putUserToFirstPage();
@@ -37,7 +32,7 @@ export default function ProductTable({ data }) {
         const thumbnails = await Promise.all(promises);
         setThumbnail(thumbnails);
       }
-      setLoading(false); // Set loading state to false after fetching thumbnails
+      setLoading(false);
     };
 
     fetchThumbnail();
@@ -69,22 +64,6 @@ export default function ProductTable({ data }) {
     [queryParams, navigate, location.pathname]
   );
 
-  const paginationItems = [];
-  for (let i = 1; i <= Math.min(data.totalPages || 0, 3); i++) {
-    paginationItems.push(
-      <PaginationItem
-        key={i}
-        className={cn("cursor-pointer", { "opacity-50 pointer-events-none": currentPage == "1" && data.totalPages == "1" })}>
-        <PaginationLink
-          href={`?p=${i}`}
-          isActive={i === (data.number + 1 || 1)}
-          onClick={(event) => handlePageChange(i, event)}>
-          {i}
-        </PaginationLink>
-      </PaginationItem>
-    );
-  }
-
   // Render loading state while fetching data
   if (loading) {
     return (
@@ -95,32 +74,9 @@ export default function ProductTable({ data }) {
     );
   }
 
-  const getStatus = (item) => {
-    let status;
-    let color;
-
-    switch (item.status.statusId) {
-      case 1:
-        status = "Archived";
-        color = "secondary";
-        break;
-      case 2:
-        status = "Draft";
-        color = "draft";
-        break;
-      case 3:
-        status = "Active";
-        color = "outline";
-        break;
-      default:
-        break;
-    }
-    return { status, color };
-  };
-
   return (
     <>
-      {thumbnail.length > 0 && showingRange && (
+      {thumbnail.length > 0 && showingRange && viewToggle === "list" && (
         <>
           <Table className="table-auto w-full">
             <TableCaption className="text-wrap">
@@ -145,14 +101,8 @@ export default function ProductTable({ data }) {
               {data?.content?.map((item, index) => (
                 <TableRow key={index} className="hover:cursor-pointer" onClick={() => goto(`products/edit/${item.productId}`)}>
                   <TableCell className="relative flex flex-row gap-6">
-                    <img
-                      src={thumbnail[index]}
-                      loading="lazy"
-                      width={96}
-                      height={96}
-                      className="!size-20 object-contain lg:flex hidden flex-shrink-0"
-                      alt=""
-                    />
+                    <Thumbnail url={thumbnail[index]} intristicSize={96} className="!size-20 lg:flex hidden flex-shrink-0" />
+
                     {item.discount > 0 && (
                       <div className="absolute top-0 left-0 mt-1 mr-1 px-2 py-1 bg-destructive text-white rounded-md text-xs font-bold lg:block hidden">
                         -{item.discount}%
@@ -195,37 +145,102 @@ export default function ProductTable({ data }) {
               ))}
             </TableBody>
           </Table>
-
           {data.content && (
-            <Pagination className="z-50 mt-[-2.5rem]">
-              <PaginationContent className="">
-                {data.totalPages > 1 && (
-                  <PaginationItem>
-                    <PaginationPrevious
-                      className={parseInt(currentPage) <= 1 ? "pointer-events-none opacity-50" : undefined}
-                      aria-disabled={parseInt(currentPage) === 1}
-                      tabIndex={parseInt(currentPage) <= 1 ? -1 : undefined}
-                      href={`?p=${Math.max(1, parseInt(currentPage) - 1)}`}
-                      onClick={(event) => handlePageChange(Math.max(1, parseInt(currentPage) - 1), event)}
-                    />
-                  </PaginationItem>
-                )}
-                {paginationItems}
-                {data.totalPages > 1 && (
-                  <PaginationItem>
-                    <PaginationNext
-                      className={parseInt(currentPage) === data.totalPages ? "pointer-events-none opacity-50" : undefined}
-                      aria-disabled={parseInt(currentPage) === data.totalPages}
-                      tabIndex={parseInt(currentPage) >= data.totalPages ? -1 : undefined}
-                      href={`?p=${Math.min(data.totalPages, parseInt(currentPage) + 1)}`}
-                      onClick={(event) => handlePageChange(Math.min(data.totalPages, parseInt(currentPage) + 1), event)}
-                    />
-                  </PaginationItem>
-                )}
-              </PaginationContent>
-            </Pagination>
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={data.totalPages}
+              handlePageChange={handlePageChange}
+              number={data.number}
+              marginTop={"mt-[-2.5rem]"}
+            />
           )}
         </>
+      )}
+      {thumbnail.length > 0 && showingRange && viewToggle === "card" && (
+        <div className="w-full">
+          <ResponsiveMasonry columnsCountBreakPoints={{ 360: 1, 700: 2, 1450: 3, 1750: 4, 2050: 5, 2300: 6 }}>
+            <Masonry gutter="1rem">
+              {data?.content?.map((item, index) => (
+                <Card
+                  onClick={() => goto(`products/edit/${item.productId}`)}
+                  className="hover:shadow-lg transition  hover:cursor-pointer pt-16 md:pt-0"
+                  key={index}>
+                  <CardContent className="relative">
+                    <div className="flex justify-center items-center h-[144px] md:h-[288px]">
+                      <Thumbnail url={thumbnail[index]} />
+
+                      {item.discount > 0 && (
+                        <div className="absolute top-0 right-0 mt-2 mr-2 px-2 py-1 bg-destructive text-white rounded-md text-xs font-bold">
+                          {item.discount}% OFF
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="mt-16 md:mt-0">
+                    <div className="flex flex-col gap-1 w-full">
+                      <div className="flex justify-between w-full">
+                        <span className="font-semibold text-start w-56 truncate">{item.name}</span>
+                        <div className="flex-shrink-0">
+                          <Badge variant={getStatus(item).color}>{getStatus(item).status}</Badge>
+                        </div>
+                      </div>
+                      <div className="flex justify-between w-full mt-2">
+                        <span className="text-start text-sm">Category:</span>
+                        <span className="text-sm">{item.category.name}</span>
+                      </div>
+                      <div className="flex justify-between w-full">
+                        <span className="text-start text-sm">Price:</span>
+                        <div className="flex flex-row gap-2 items-center">
+                          <div className="font-bold text-sm">
+                            ${item.discount > 0 ? applyDiscount(item.price, item.discount) : item.price ? item.price : NaN}
+                          </div>
+
+                          {item.discount > 0 && (
+                            <span
+                              className={item.discount > 0 ? "font-normal text-sm text-muted-foreground" : ""}
+                              style={{
+                                backgroundImage:
+                                  item.discount > 0
+                                    ? "linear-gradient(to top right, transparent calc(50% - 1px), gray 50%, transparent calc(50% + 1px))"
+                                    : "none",
+                              }}>
+                              ${item.price ? item.price : NaN}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex justify-between w-full">
+                        <span className="text-start text-sm">Stock:</span>
+                        <span className="text-sm">{item.quantity} pcs</span>
+                      </div>
+                      <div className="flex justify-between w-full">
+                        <span className="text-start text-sm">Created At:</span>
+                        <span className="text-sm">{formatDateWithTime(item.createdAt)}</span>
+                      </div>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </Masonry>
+          </ResponsiveMasonry>
+          <div className="flex flex-row mt-2">
+            {data?.content?.length > 0 ? (
+              <span className="w-64 text-muted-foreground text-sm">
+                Showing {showingRange} of <strong>{data.totalElements}</strong> products
+              </span>
+            ) : (
+              <span className="w-fit text-muted-foreground text-sm">No products found. Try changing/removing filters.</span>
+            )}
+            {data.content && (
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={data.totalPages}
+                handlePageChange={handlePageChange}
+                number={data.number}
+              />
+            )}
+          </div>
+        </div>
       )}
     </>
   );

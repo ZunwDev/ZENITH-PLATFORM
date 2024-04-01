@@ -123,71 +123,67 @@ const SpecsGeneratorForm = ({ addFormSchemaData, setJsonData, typesSelectedValue
           <ResponsiveMasonry columnsCountBreakPoints={{ 360: 1, 1450: 2, 1750: 3, 2050: 4, 2300: 5 }}>
             <Masonry gutter="1rem">
               {addFormSchemaData.sections.slice(1).map((item, index) => (
-                <div key={index}>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{item.section}</CardTitle>
-                      {item.description ? <CardDescription>{item.description}</CardDescription> : ""}
-                    </CardHeader>
-                    <CardContent>
-                      {Object.entries(item).map(([_section, fields], index) => (
-                        <div key={index}>
-                          <div className="flex flex-col gap-2">
-                            {Object.entries(fields).map(([fieldName, field], fieldIndex) => {
-                              if (field.type === undefined || field.type === "section") return null;
-                              switch (field.type) {
-                                case "number":
-                                case "text":
-                                  return (
-                                    <NoValidationInputFormItem
-                                      key={fieldIndex}
-                                      id={fieldName}
-                                      defaultValue={formData?.[item.section]?.[fieldName] || ""}
-                                      onChange={(event) => handleChange(item.section, event, field)}
-                                      {...field}
-                                    />
-                                  );
-                                case "checkbox":
-                                  return (
-                                    <NoValidationCheckboxFormItem
-                                      key={fieldIndex}
-                                      id={fieldName}
-                                      checked={formData?.[item.section]?.[fieldName] || false}
-                                      onChange={(event) => handleChange(item.section, event, field)}
-                                      {...field}
-                                    />
-                                  );
-                                case "select":
-                                  return (
-                                    <NoValidationSelectFormItem
-                                      key={fieldIndex}
-                                      id={fieldName}
-                                      setSelectedValue={(value) => {
-                                        setFormData((prevData) => ({
-                                          ...prevData,
-                                          [item.section.toUpperCase()]: {
-                                            ...prevData[item.section.toUpperCase()],
-                                            [field.label]: value,
-                                          },
-                                        }));
-                                      }}
-                                      section={item.section}
-                                      field={field}
-                                      asyncFetchData={getAttributeData(field.attributeTypeId)}
-                                      handleSelect={handleChange}
-                                      {...field}
-                                    />
-                                  );
-                                default:
-                                  return null;
-                              }
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle>{item.section}</CardTitle>
+                    {item.description ? <CardDescription>{item.description}</CardDescription> : ""}
+                  </CardHeader>
+                  <CardContent>
+                    {Object.entries(item).map(([_section, fields], index) => (
+                      <div key={index} className="flex flex-col gap-2">
+                        {Object.entries(fields).map(([fieldName, field], fieldIndex) => {
+                          if (field.type === undefined || field.type === "section") return null;
+                          switch (field.type) {
+                            case "number":
+                            case "text":
+                              return (
+                                <NoValidationInputFormItem
+                                  key={fieldIndex}
+                                  id={fieldName}
+                                  defaultValue={formData?.[item.section]?.[fieldName] || ""}
+                                  onChange={(event) => handleChange(item.section, event, field)}
+                                  {...field}
+                                />
+                              );
+                            case "checkbox":
+                              return (
+                                <NoValidationCheckboxFormItem
+                                  key={fieldIndex}
+                                  id={fieldName}
+                                  checked={formData?.[item.section]?.[fieldName] || false}
+                                  onChange={(event) => handleChange(item.section, event, field)}
+                                  {...field}
+                                />
+                              );
+                            case "select":
+                              return (
+                                <NoValidationSelectFormItem
+                                  key={fieldIndex}
+                                  id={fieldName}
+                                  setSelectedValue={(value) => {
+                                    setFormData((prevData) => ({
+                                      ...prevData,
+                                      [item.section.toUpperCase()]: {
+                                        ...prevData[item.section.toUpperCase()],
+                                        [field.label]: value,
+                                      },
+                                    }));
+                                  }}
+                                  section={item.section}
+                                  field={field}
+                                  asyncFetchData={getAttributeData(field.attributeTypeId)}
+                                  handleSelect={handleChange}
+                                  {...field}
+                                />
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
               ))}
             </Masonry>
           </ResponsiveMasonry>

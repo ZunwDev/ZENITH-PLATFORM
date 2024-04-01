@@ -1,5 +1,6 @@
 import { applyDiscount, removeLeadingZeroes, shortenText } from "@/lib/utils";
 import { ShoppingCart } from "lucide-react";
+import { Thumbnail } from "../global";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 
@@ -25,18 +26,7 @@ export default function ProductListing({
         <Card>
           <CardContent className="relative">
             <div className="flex flex-col justify-center items-center h-[288px] md:size-[288px]">
-              {/* Thumbnail Image */}
-              {previewData.imageThumbnail ? (
-                <img
-                  src={previewData?.imageThumbnail}
-                  alt="Product Thumbnail"
-                  className="object-contain hover:cursor-pointer h-[288px] md:size-[288px] pt-4"
-                />
-              ) : (
-                <div className="flex justify-center items-center">
-                  <p className="break-words">No thumbnail image uploaded yet.</p>
-                </div>
-              )}
+              <Thumbnail url={previewData?.imageThumbnail} intristicSize={360} className="h-[288px] md:size-[288px] pt-4" />
 
               {/* Discount Badge (show only if discount is applied) */}
               {removeLeadingZeroes(previewData.discount) > 0 && (

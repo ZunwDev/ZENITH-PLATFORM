@@ -7,6 +7,7 @@ import {
   ProductSearch,
   ProductSort,
   ProductTable,
+  ProductViewToggle,
   ResetFilter,
 } from "@/components/dashboard/products/components";
 import { PageHeader } from "@/components/global";
@@ -44,6 +45,7 @@ export default function Products() {
   const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [sortBy, setSortBy] = useState("createdAt_desc");
+  const [viewToggle, setViewToggle] = useState("list");
   const [pageData, setPageData] = useState<Page>({} as Page);
   const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
@@ -155,6 +157,7 @@ export default function Products() {
                 <ProductLimit setLimit={setLimit} limit={limit} />
                 <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
                 <ProductExport data={pageData.content} />
+                <ProductViewToggle viewToggle={viewToggle} setViewToggle={setViewToggle} />
                 {pageData.totalElements > 0 && <NewProductButton />}
               </div>
               <ProductSearch setSearchQuery={setSearchQuery} className="md:hidden flex w-full" />
@@ -197,9 +200,7 @@ export default function Products() {
                   <Button className="mt-4">Add Product</Button>
                 </>
               ) : (
-                <>
-                  <ProductTable data={pageData} />
-                </>
+                <ProductTable data={pageData} viewToggle={viewToggle} />
               )}
             </div>
           </div>
