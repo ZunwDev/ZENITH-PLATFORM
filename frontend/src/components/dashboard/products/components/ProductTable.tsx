@@ -156,7 +156,7 @@ export default function ProductTable({ data, viewToggle }) {
           )}
         </>
       )}
-      {thumbnail.length > 0 && showingRange && viewToggle === "card" && (
+      {thumbnail.length > 0 && showingRange && viewToggle === "grid" && (
         <div className="w-full">
           <ResponsiveMasonry columnsCountBreakPoints={{ 360: 1, 700: 2, 1450: 3, 1750: 4, 2050: 5, 2300: 6 }}>
             <Masonry gutter="1rem">
@@ -216,6 +216,10 @@ export default function ProductTable({ data, viewToggle }) {
                       <div className="flex justify-between w-full">
                         <span className="text-start text-sm">Created At:</span>
                         <span className="text-sm">{formatDateWithTime(item.createdAt)}</span>
+                      </div>
+                      <div className="flex justify-between w-full">
+                        <span className="text-start text-sm">Rating:</span>
+                        <RatingStar rating={5} />
                       </div>
                     </div>
                   </CardFooter>

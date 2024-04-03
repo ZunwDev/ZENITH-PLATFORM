@@ -7,7 +7,7 @@ export default function ProductViewToggle({ viewToggle, setViewToggle }) {
         <TabsTrigger value="list" onClick={() => setViewToggle("list")}>
           <List className="size-4" />
         </TabsTrigger>
-        <TabsTrigger value="card" onClick={() => setViewToggle("card")}>
+        <TabsTrigger value="grid" onClick={() => setViewToggle("grid")}>
           <LayoutGrid className="size-4" />
         </TabsTrigger>
       </TabsList>
