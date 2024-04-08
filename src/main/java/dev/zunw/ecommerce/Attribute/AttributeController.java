@@ -26,13 +26,13 @@ public class AttributeController {
         this.attributeRepository = attributeRepository;
     }
 
-    @GetMapping("{attributeTypeId}")
+    @GetMapping("/{attributeTypeId}")
     public ResponseEntity<Object> getAttributesByAttributeTypeId(
             @PathVariable Long attributeTypeId) {
         return ResponseEntity.ok(attributeService.getByAttributeTypeId(attributeTypeId));
     }
 
-    @GetMapping("{attributeTypeId}/{categoryId}")
+    @GetMapping("/{attributeTypeId}/{categoryId}")
     public ResponseEntity<Object> getAttributesByCategoryIdAndAttributeTypeId(
             @PathVariable Long attributeTypeId, @PathVariable Long categoryId) {
         return ResponseEntity.ok(attributeService.getByCategoryIdAndAttributeTypeId(categoryId, attributeTypeId));
@@ -40,28 +40,27 @@ public class AttributeController {
 
     @GetMapping
     public ResponseEntity<Object> getAttributes() {
-        return ResponseEntity.ok(getAllEntities(attributeRepository));
+        return ResponseEntity.ok(getAllRows(attributeRepository));
     }
 
     @PutMapping("/{attributeId}")
     public ResponseEntity<Object> updateAnAttribute(@PathVariable Long attributeId,
-                                                    @RequestBody AttributeRequest data) {
-        BiFunction<String, Optional<Attribute>, Attribute> updateFunction =
-                (name, optionalAttribute) -> updateEntity(name, optionalAttribute,
+                                                    @RequestBody AttributeRequest requestedData) {
+        BiFunction<AttributeRequest, Optional<Attribute>, Attribute> updateFunction =
+                (data, optionalAttribute) -> updateEntity(data, optionalAttribute,
                         attribute -> saveEntity(attribute, attributeRepository));
-        return updateAttribute(attributeId, data.getData().getName(), data.getData().getOldValue(),
-                () -> findEntityById(attributeId, attributeRepository),
+        return updateAttribute(attributeId, requestedData,
+                () -> findRowById(attributeId, attributeRepository),
                 attributeRepository,
                 updateFunction,
                 "Attribute");
     }
 
     @PostMapping
-    public ResponseEntity<Object> newAttribute(@RequestBody AttributeRequest data) {
-        String name = data.getData().getName();
-        Supplier<Attribute> newFunction = () -> newEntity(data, Attribute::new,
+    public ResponseEntity<Object> newAttribute(@RequestBody AttributeRequest requestedData) {
+        Supplier<Attribute> newFunction = () -> newEntity(requestedData, Attribute::new,
                 attribute -> saveEntity(attribute, attributeRepository));
-        return createAttribute(name, attributeRepository, newFunction,
+        return createAttribute(requestedData, attributeRepository, newFunction,
                 "Attribute");
     }
 
@@ -69,11 +68,11 @@ public class AttributeController {
     public ResponseEntity<Object> deleteAnAttribute(@PathVariable Long attributeId) {
         BiFunction<String, Optional<?>, Boolean> deleteFunction =
                 (name, optionalCategory) -> {
-                    ServiceUtils.deleteEntityById(attributeId, attributeRepository);
+                    ServiceUtils.deleteRowById(attributeId, attributeRepository);
                     return true; // Indicate successful deletion
                 };
         return deleteAttribute(attributeId,
-                () -> findEntityById(attributeId, attributeRepository),
+                () -> findRowById(attributeId, attributeRepository),
                 null,
                 deleteFunction, "Attribute"
         );

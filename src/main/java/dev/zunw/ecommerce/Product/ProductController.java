@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static dev.zunw.ecommerce.ServiceUtils.findEntityById;
+import static dev.zunw.ecommerce.ServiceUtils.findRowById;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -110,7 +110,7 @@ public class ProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<Object> updateProduct(@PathVariable UUID productId, @RequestBody CreateProductRequest updatedProductData) {
         try {
-            Optional<Product> existingProductOptional = findEntityById(productId, productRepository);
+            Optional<Product> existingProductOptional = findRowById(productId, productRepository);
             if (existingProductOptional.isPresent()) {
                 Product existingProduct = getExistingProduct(updatedProductData.getProduct(), existingProductOptional);
                 Product updatedProduct = productService.saveProduct(existingProduct);

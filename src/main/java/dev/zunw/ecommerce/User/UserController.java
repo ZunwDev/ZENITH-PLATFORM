@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static dev.zunw.ecommerce.ServiceUtils.getAllEntities;
+import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Object> getAllUsers() {
-        List<User> users = getAllEntities(userRepository);
+        List<User> users = getAllRows(userRepository);
         if (users.isEmpty()) {
             return ResponseUtils.notFoundResponse("Users not found");
         } else {

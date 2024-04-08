@@ -34,7 +34,7 @@ public class ServiceUtils {
     }
 
     @Transactional
-    public static <T> void deleteEntityById(Long id, JpaRepository<T, Long> repository) {
+    public static <T, ID> void deleteRowById(ID id, JpaRepository<T, ID> repository) {
         try {
             repository.deleteById(id);
         } catch (Exception e) {
@@ -48,11 +48,17 @@ public class ServiceUtils {
     }
 
     @Transactional(readOnly = true)
-    public static <T, ID> Optional<T> findEntityById(ID id, JpaRepository<T, ID> repository) {
+    public static <T, ID> Optional<T> findRowById(ID id, JpaRepository<T, ID> repository) {
         return repository.findById(id);
     }
 
-    public static <T> List<T> getAllEntities(JpaRepository<T, ?> repository) {
+    public static <T> List<T> getAllRows(JpaRepository<T, ?> repository) {
         return repository.findAll();
+    }
+
+    public static <T> void setProperty(T entity, String methodName, Class<?> parameterType, Object value)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method method = entity.getClass().getMethod(methodName, parameterType);
+        method.invoke(entity, value);
     }
 }

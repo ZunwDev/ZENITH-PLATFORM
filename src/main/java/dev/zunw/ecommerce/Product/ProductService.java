@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static dev.zunw.ecommerce.ServiceUtils.findEntityById;
+import static dev.zunw.ecommerce.ServiceUtils.findRowById;
 
 @Service
 public class ProductService {
@@ -69,15 +69,15 @@ public class ProductService {
         return switch (filterType) {
             case "brand" -> {
                 Optional<Brand> brandOptional =
-                        findEntityById(filterId, brandRepository);
+                        findRowById(filterId, brandRepository);
                 yield brandOptional.map(Brand::getName).orElse(null);
             }
             case "category" -> {
-                Optional<Category> categoryOptional = findEntityById(filterId, categoryRepository);
+                Optional<Category> categoryOptional = findRowById(filterId, categoryRepository);
                 yield categoryOptional.map(Category::getName).orElse(null);
             }
             case "status" -> {
-                Optional<Status> statusOptional = findEntityById(filterId, statusRepository);
+                Optional<Status> statusOptional = findRowById(filterId, statusRepository);
                 yield statusOptional.map(Status::getName).orElse(null);
             }
             default -> null;

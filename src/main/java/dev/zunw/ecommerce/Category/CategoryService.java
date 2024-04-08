@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dev.zunw.ecommerce.ServiceUtils.getAllEntities;
+import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
 
 @Service
 public class CategoryService {
@@ -23,8 +23,8 @@ public class CategoryService {
     }
 
     public List<Category> getAllProductCategories() {
-        List<Category> categories = getAllEntities(categoryRepository);
-        List<Product> products = getAllEntities(productRepository);
+        List<Category> categories = getAllRows(categoryRepository);
+        List<Product> products = getAllRows(productRepository);
 
         Map<Long, Integer> occurrences = new HashMap<>();
         for (Product product : products) {

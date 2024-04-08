@@ -20,6 +20,6 @@ export const FormSchema = z.object({
 
 export const ActionDialogSchema = z.object({
   name: z.string().min(1).max(64),
-  categoryId: z.number().optional(),
-  attributeTypeId: z.number().optional(),
+  categoryId: z.coerce.number().optional(),
+  attributeTypeId: z.coerce.number().optional(),
 });

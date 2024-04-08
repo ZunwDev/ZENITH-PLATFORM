@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import static dev.zunw.ecommerce.Attribute.AttributeUtils.*;
-import static dev.zunw.ecommerce.ServiceUtils.findEntityById;
+import static dev.zunw.ecommerce.ServiceUtils.findRowById;
 import static dev.zunw.ecommerce.ServiceUtils.saveEntity;
 
 @RestController
@@ -41,20 +41,21 @@ public class BrandController {
     }
 
     @PutMapping("/{brandId}")
-    public ResponseEntity<Object> updateBrand(@PathVariable Long brandId, @RequestBody AttributeRequest data) {
-        BiFunction<String, Optional<Brand>, Brand> updateFunction = (name,
-                                                                     optionalBrand) -> updateEntity(name, optionalBrand, brand -> saveEntity(brand, brandRepository));
-        return updateAttribute(brandId, data.getData().getName(), data.getData().getOldValue(),
-                () -> findEntityById(brandId, brandRepository), brandRepository,
+    public ResponseEntity<Object> updateBrand(@PathVariable Long brandId,
+                                              @RequestBody AttributeRequest requestedData) {
+        BiFunction<AttributeRequest, Optional<Brand>, Brand> updateFunction =
+                (data, optionalBrand) -> updateEntity(data, optionalBrand,
+                        brand -> saveEntity(brand, brandRepository));
+        return updateAttribute(brandId, requestedData,
+                () -> findRowById(brandId, brandRepository), brandRepository,
                 updateFunction, "Brand");
     }
 
     @PostMapping
-    public ResponseEntity<Object> newBrand(@RequestBody AttributeRequest data) {
-        String name = data.getData().getName();
-        Supplier<Brand> newFunction = () -> newEntity(data,
+    public ResponseEntity<Object> newBrand(@RequestBody AttributeRequest requestedData) {
+        Supplier<Brand> newFunction = () -> newEntity(requestedData,
                 Brand::new, brand -> saveEntity(brand, brandRepository));
-        return createAttribute(name, brandRepository, newFunction,
+        return createAttribute(requestedData, brandRepository, newFunction,
                 "Brand");
     }
 
@@ -62,11 +63,11 @@ public class BrandController {
     public ResponseEntity<Object> deleteBrand(@PathVariable Long brandId) {
         BiFunction<String, Optional<?>, Boolean> deleteFunction =
                 (name, optionalCategory) -> {
-                    ServiceUtils.deleteEntityById(brandId, brandRepository);
+                    ServiceUtils.deleteRowById(brandId, brandRepository);
                     return true; // Indicate successful deletion
                 };
         return deleteAttribute(brandId,
-                () -> findEntityById(brandId, brandRepository),
+                () -> findRowById(brandId, brandRepository),
                 productService::getProductCountByBrandId,
                 deleteFunction, "Brand"
         );

@@ -36,32 +36,33 @@ public class CategoryController {
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<Object> updateCategory(@PathVariable Long categoryId,
-                                                 @RequestBody AttributeRequest data) {
-        BiFunction<String, Optional<Category>, Category> updateFunction = (name, optionalCategory) -> updateEntity(name, optionalCategory, category -> saveEntity(category, categoryRepository));
-        return updateAttribute(categoryId, data.getData().getName(), data.getData().getOldValue(),
-                () -> findEntityById(categoryId, categoryRepository),
+                                                 @RequestBody AttributeRequest requestedData) {
+        BiFunction<AttributeRequest, Optional<Category>, Category> updateFunction =
+                (data, optionalCategory) -> updateEntity(data, optionalCategory,
+                        category -> saveEntity(category, categoryRepository));
+        return updateAttribute(categoryId, requestedData,
+                () -> findRowById(categoryId, categoryRepository),
                 categoryRepository,
                 updateFunction,
                 "Category");
     }
 
     @PostMapping
-    public ResponseEntity<Object> newCategory(@RequestBody AttributeRequest data) {
-        String name = data.getData().getName();
-        Supplier<Category> newFunction = () -> newEntity(data, Category::new,
+    public ResponseEntity<Object> newCategory(@RequestBody AttributeRequest requestedData) {
+        Supplier<Category> newFunction = () -> newEntity(requestedData, Category::new,
                 category -> saveEntity(category, categoryRepository));
-        return createAttribute(name, categoryRepository, newFunction, "Category");
+        return createAttribute(requestedData, categoryRepository, newFunction, "Category");
     }
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<Object> deleteCategory(@PathVariable Long categoryId) {
         BiFunction<String, Optional<?>, Boolean> deleteFunction =
                 (name, optionalCategory) -> {
-                    deleteEntityById(categoryId, categoryRepository);
+                    deleteRowById(categoryId, categoryRepository);
                     return true; // Indicate successful deletion
                 };
         return deleteAttribute(categoryId,
-                () -> findEntityById(categoryId, categoryRepository),
+                () -> findRowById(categoryId, categoryRepository),
                 productService::getProductCountByCategoryId,
                 deleteFunction, "Category"
         );

@@ -139,16 +139,14 @@ export default function ActionDialog({
           <DialogTitle>{actionType === "edit" ? "Edit " + title : "New " + title}</DialogTitle>
           <DialogDescription>
             {actionType === "edit" ? (
-              <>
-                <span>
-                  Make changes to {title.toLowerCase()} <strong>{item?.name}</strong>. Click <strong>save changes</strong> when
-                  you're done.
-                </span>
-              </>
+              <span>
+                Make changes to {title.toLowerCase()} <strong>{item?.name}</strong>. Click <strong>save changes</strong> when
+                you're done.
+              </span>
             ) : (
-              <>
-                <span>You are about to add a new {title.toLowerCase()}</span>. Click <strong>add</strong> when you're done
-              </>
+              <span>
+                You are about to add a new {title.toLowerCase()}. Click <strong>add</strong> when you're done
+              </span>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -175,6 +173,17 @@ export default function ActionDialog({
                     className="col-span-3 border rounded-md"
                     {...form.register("attributeTypeId")}
                     disabled
+                  />
+                  <Label htmlFor="categoryid" className="text-right">
+                    Category ID:
+                  </Label>
+                  <Input
+                    id="catid"
+                    defaultValue={item.categoryId}
+                    className="col-span-3 border rounded-md"
+                    type="number"
+                    {...form.register("categoryId")}
+                    placeholder="Set the ID only if it's required"
                   />
                 </>
               )}
