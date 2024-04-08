@@ -17,3 +17,9 @@ export const FormSchema = z.object({
     message: "You must specify the status of product.",
   }),
 });
+
+export const ActionDialogSchema = z.object({
+  name: z.string().min(1).max(64),
+  categoryId: z.number().optional(),
+  attributeTypeId: z.number().optional(),
+});

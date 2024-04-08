@@ -22,7 +22,7 @@ import {
 } from "@/lib/constants";
 import { FormFields } from "@/lib/enum/schemas";
 import { uploadImagesToFirebase } from "@/lib/firebase";
-import { cn, includesAny, newAbortSignal } from "@/lib/utils";
+import { cn, getStatusId, includesAny, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { AlertCircle, ArrowLeft } from "lucide-react";
@@ -50,7 +50,6 @@ export default function NewProductForm() {
   const [productStage, setProductStage] = useState("Create product");
   const [categoryId, setCategoryId] = useState<number>();
   const [brandId, setBrandId] = useState<number>();
-  const [statusId, setStatusId] = useState<number>();
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
   const [typesSelectedValue, setTypesSelectedValue] = useState("");
@@ -117,22 +116,6 @@ export default function NewProductForm() {
       setIsProductCreated(true);
       setProductStage("Storing in database...");
 
-      let statusId;
-
-      switch (values.status) {
-        case "archived":
-          statusId = 1;
-          break;
-        case "draft":
-          statusId = 2;
-          break;
-        case "active":
-          statusId = 3;
-          break;
-        default:
-          break;
-      }
-
       const response = await axios.post(`${API_URL}/products/create`, {
         signal: newAbortSignal(),
         product: {
@@ -144,7 +127,7 @@ export default function NewProductForm() {
           discount: values.discount,
           brand: filterData.brands.find((brand) => brand.brandId === brandId),
           category: filterData.categories.find((category) => category.categoryId === categoryId),
-          status: { statusId: statusId },
+          status: { statusId: getStatusId(values) },
         },
       });
 
@@ -173,11 +156,9 @@ export default function NewProductForm() {
   useEffect(() => {
     const categoryId = findId(filterData.categories, categoriesSelectedValue, "categoryId");
     const brandId = findId(filterData.brands, brandsSelectedValue, "brandId");
-    const statusId = findId(["Active", "Draft", "Archived"], statusSelectedValue, "statusId");
 
     setCategoryId(categoryId);
     setBrandId(brandId);
-    setStatusId(statusId);
   }, [brandsSelectedValue, categoriesSelectedValue, statusSelectedValue, filterData]);
 
   useEffect(() => {}, [form.watch()]);

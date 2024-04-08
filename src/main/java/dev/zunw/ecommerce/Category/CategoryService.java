@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.zunw.ecommerce.ServiceUtils.getAllEntities;
+
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
@@ -21,8 +23,8 @@ public class CategoryService {
     }
 
     public List<Category> getAllProductCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        List<Product> products = productRepository.findAll();
+        List<Category> categories = getAllEntities(categoryRepository);
+        List<Product> products = getAllEntities(productRepository);
 
         Map<Long, Integer> occurrences = new HashMap<>();
         for (Product product : products) {

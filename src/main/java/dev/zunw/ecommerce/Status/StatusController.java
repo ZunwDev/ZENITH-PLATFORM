@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/status")
 public class StatusController {
     private final StatusService statusService;
@@ -17,7 +18,6 @@ public class StatusController {
         this.statusService = statusService;
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping()
     public ResponseEntity<Object> getProductStatus() {
         return ResponseEntity.ok(statusService.getAllProductStatuses());

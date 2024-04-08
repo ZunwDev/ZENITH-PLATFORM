@@ -2,7 +2,7 @@ import { fetchSessionData } from "@/lib/api";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
-export function useGetSessionData() {
+export const useGetSessionData = () => {
   const sessionToken = Cookies.get("sessionToken");
   const [sessionData, setSessionData] = useState(null);
 
@@ -22,4 +22,4 @@ export function useGetSessionData() {
   }, []);
 
   return sessionData;
-}
+};

@@ -15,7 +15,7 @@ import {
   NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE,
 } from "@/lib/constants";
 import { getImagesFromFirebase, getThumbnailFromFirebase, updateProductImages } from "@/lib/firebase";
-import { newAbortSignal } from "@/lib/utils";
+import { getStatusId, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { AlertCircle, ArrowLeft } from "lucide-react";
@@ -124,22 +124,6 @@ export default function EditProductForm() {
       setIsProductUpdated(true);
       setProductStage("Updating...");
 
-      let statusId;
-
-      switch (values.status) {
-        case "archived":
-          statusId = 1;
-          break;
-        case "draft":
-          statusId = 2;
-          break;
-        case "active":
-          statusId = 3;
-          break;
-        default:
-          break;
-      }
-
       const response = await axios.put(`${API_URL}/products/${productId}`, {
         signal: newAbortSignal(),
         product: {
@@ -152,7 +136,7 @@ export default function EditProductForm() {
           brand: filterData.brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
           category: filterData.categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
           status: {
-            statusId,
+            status: { statusId: getStatusId(values) },
           },
         },
       });

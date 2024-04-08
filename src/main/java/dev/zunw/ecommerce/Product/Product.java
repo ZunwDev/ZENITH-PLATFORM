@@ -2,9 +2,9 @@ package dev.zunw.ecommerce.Product;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.zunw.ecommerce.Status.Status;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Category.Category;
+import dev.zunw.ecommerce.Status.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,11 +24,11 @@ public class Product {
 
     private String name;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
 

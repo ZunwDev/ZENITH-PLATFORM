@@ -1,5 +1,6 @@
 package dev.zunw.ecommerce.User;
 
+import dev.zunw.ecommerce.ResponseUtils;
 import dev.zunw.ecommerce.Session.Session;
 import dev.zunw.ecommerce.UserCredentials.UserCredentials;
 import dev.zunw.ecommerce.dto.CreateUserRequest;
@@ -12,29 +13,32 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static dev.zunw.ecommerce.ServiceUtils.getAllEntities;
+
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
-    @CrossOrigin(origins = "*")
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+    @GetMapping
+    public ResponseEntity<Object> getAllUsers() {
+        List<User> users = getAllEntities(userRepository);
         if (users.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseUtils.notFoundResponse("Users not found");
         } else {
-            return ResponseEntity.ok(users);
+            return ResponseUtils.successResponse(Optional.of(users));
         }
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping("/session/{id}")
     public ResponseEntity<Object> getSessionById(@PathVariable UUID id) {
         Optional<Session> sessionOptional = userService.getSessionById(id);
@@ -42,40 +46,37 @@ public class UserController {
             Session session = sessionOptional.get();
             return ResponseEntity.ok(session);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: Session not found");
+            return ResponseUtils.notFoundResponse("Session not found");
         }
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            return ResponseEntity.ok(user);
+            return ResponseUtils.successResponse(Optional.of(user));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: User not found");
+            return ResponseUtils.notFoundResponse("User not found");
         }
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping("/email")
     public ResponseEntity<Object> getUserByEmailAddress(@RequestBody Map<String, String> requestBody) {
         String email = requestBody.get("email");
         if (email == null || email.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ERR: Email parameter is missing");
+            return ResponseUtils.badRequestResponse("Email parameter is missing");
         }
 
         Optional<User> userOptional = userService.getUserByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            return ResponseEntity.ok(user);
+            return ResponseUtils.successResponse(Optional.of(user));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: User not found");
+            return ResponseUtils.notFoundResponse("User not found");
         }
     }
 
-    @CrossOrigin(origins = "*")
     @PostMapping("/check-login")
     public ResponseEntity<Object> checkUserLogin(@RequestBody Map<String, Object> requestBody) throws Exception {
         String email = (String) requestBody.get("email");
@@ -94,13 +95,13 @@ public class UserController {
 
         Optional<User> userOptional = userService.getUserByEmail(email);
         if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERR: User not found");
+            return ResponseUtils.notFoundResponse("User not found");
         }
 
         User user = userOptional.get();
         Optional<UserCredentials> credentialsOptional = userService.getUserCredentialsById(user.getUserId());
         if (credentialsOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
+            return ResponseUtils.unauthorizedResponse("Invalid credentials");
         }
 
         UserCredentials credentials = credentialsOptional.get();
@@ -110,38 +111,27 @@ public class UserController {
             response.put("sessionToken", sessionId);
             return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ERR: Invalid credentials");
+            return ResponseUtils.unauthorizedResponse("Invalid credentials");
         }
     }
 
-    @CrossOrigin(origins = "*")
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody CreateUserRequest createUserRequest) {
+    public ResponseEntity<Object> createUser(@RequestBody CreateUserRequest createUserRequest) {
         User user = createUserRequest.getUser();
         UserCredentials credentials = createUserRequest.getCredentials();
-
         if (userService.userExists(user)) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "User already exists");
-            errorResponse.put("errorCode", 409);
-            return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+            return ResponseUtils.conflictResponse("User already exists");
         }
         try {
             User createdUser = userService.createUser(user, credentials);
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", createdUser);
-            response.put("message", "User created successfully");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return ResponseUtils.createdResponse("User created successfully", "User Creation", Optional.ofNullable(createdUser));
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Failed to create user");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseUtils.serverErrorResponse("Failed to create user");
         }
     }
 
-    @CrossOrigin(origins = "*")
     @PutMapping("/verify/{id}")
-    public ResponseEntity<Map<String, Object>> verifyUser(@PathVariable UUID id) {
+    public ResponseEntity<Object> verifyUser(@PathVariable UUID id) {
         try {
             Optional<User> userOptional = userService.getUserById(id);
             if (userOptional.isPresent()) {
@@ -149,26 +139,21 @@ public class UserController {
                 user.setVerified(true);
                 userService.verifyUser(user);
             }
-            Map<String, Object> response = new HashMap<>();
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseUtils.successResponse("User was verified", "User Verify", null);
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Failed to verify user by email");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseUtils.serverErrorResponse("Failed to verify user by email");
         }
     }
 
-    @CrossOrigin(origins = "*")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable UUID id) {
         User deletedUser = userService.deleteUser(id);
         return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
     }
 
-    @CrossOrigin(origins = "*")
     @DeleteMapping("/session/delete/{id}")
     public ResponseEntity<Object> deleteSession(@PathVariable UUID id) {
         userService.deleteSession(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted a session");
+        return ResponseUtils.noContentResponse("Session was deleted");
     }
 }

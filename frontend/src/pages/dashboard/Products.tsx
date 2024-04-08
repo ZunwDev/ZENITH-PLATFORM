@@ -60,13 +60,12 @@ export default function Products() {
 
   const productAPIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
-    const searchQueryParam = queryParams.get("q") || "";
     const paramsObj = {
       limit,
       page: pageQueryParam - 1,
       sortBy: sortBy.slice(0, sortBy.indexOf("_")),
       sortDirection: sortBy.slice(sortBy.indexOf("_") + 1, sortBy.length),
-      searchQuery: searchQueryParam || dbcSearch || "",
+      searchQuery: dbcSearch || "",
       brand: checked.brand,
       category: checked.category,
       status: checked.status,

@@ -176,3 +176,26 @@ export function getStatus(item) {
   }
   return { status, color };
 }
+
+export function getStatusId(values) {
+  let statusId;
+
+  switch (values.status) {
+    case "archived":
+      statusId = 1;
+      break;
+    case "draft":
+      statusId = 2;
+      break;
+    case "active":
+      statusId = 3;
+      break;
+    default:
+      break;
+  }
+  return { statusId };
+}
+
+export function sortByIds(array: [], id: string) {
+  return array.slice().sort((a, b) => a[id] - b[id]);
+}

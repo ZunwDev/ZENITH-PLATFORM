@@ -1,11 +1,11 @@
 package dev.zunw.ecommerce.Product;
 
-import dev.zunw.ecommerce.Status.Status;
-import dev.zunw.ecommerce.Status.StatusRepository;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Brand.BrandRepository;
 import dev.zunw.ecommerce.Category.Category;
 import dev.zunw.ecommerce.Category.CategoryRepository;
+import dev.zunw.ecommerce.Status.Status;
+import dev.zunw.ecommerce.Status.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,14 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static dev.zunw.ecommerce.ServiceUtils.findEntityById;
+
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
     private final StatusRepository statusRepository;
-    private Integer amount;
-
 
     @Autowired
     public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, StatusRepository statusRepository) {
@@ -68,15 +68,16 @@ public class ProductService {
     private String getNameFromRepository(String filterType, Long filterId) {
         return switch (filterType) {
             case "brand" -> {
-                Optional<Brand> brandOptional = brandRepository.findById(filterId);
+                Optional<Brand> brandOptional =
+                        findEntityById(filterId, brandRepository);
                 yield brandOptional.map(Brand::getName).orElse(null);
             }
             case "category" -> {
-                Optional<Category> categoryOptional = categoryRepository.findById(filterId);
+                Optional<Category> categoryOptional = findEntityById(filterId, categoryRepository);
                 yield categoryOptional.map(Category::getName).orElse(null);
             }
             case "status" -> {
-                Optional<Status> statusOptional = statusRepository.findById(filterId);
+                Optional<Status> statusOptional = findEntityById(filterId, statusRepository);
                 yield statusOptional.map(Status::getName).orElse(null);
             }
             default -> null;
@@ -84,23 +85,10 @@ public class ProductService {
     }
 
     @Transactional
-    public Boolean productExists(Product product) {
-        Optional<Product> existingProduct = productRepository.findByName(product.getName());
-        return existingProduct.isPresent();
-    }
-
-    @Transactional
-    public Product createProduct(Product product) {
+    public Product saveProduct(Product product) {
         Product savedProduct = productRepository.save(product);
         updateCategoryAndBrandAmounts();
         return savedProduct;
-    }
-
-    @Transactional
-    public Product updateProduct(Product product) {
-        Product updatedProduct = productRepository.save(product);
-        updateCategoryAndBrandAmounts();
-        return updatedProduct;
     }
 
     @Transactional
@@ -111,6 +99,14 @@ public class ProductService {
 
     public Optional<Product> getProductById(UUID id) {
         return productRepository.findById(id);
+    }
+
+    public long getProductCountByCategoryId(Long id) {
+        return productRepository.countByCategoryCategoryId(id);
+    }
+
+    public long getProductCountByBrandId(Long id) {
+        return productRepository.countByBrandBrandId(id);
     }
 
     private void updateCategoryAndBrandAmounts() {

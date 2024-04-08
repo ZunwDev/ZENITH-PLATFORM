@@ -11,9 +11,10 @@ import java.util.Optional;
 @Repository
 @NonNullApi
 public interface BrandRepository extends JpaRepository<Brand, Long> {
-    Optional<Brand> findById(Long id);
 
     @Modifying
     @Query("UPDATE Brand b SET b.amount = (SELECT COUNT(p) FROM Product p WHERE p.brand.brandId = b.brandId)")
     void updateBrandAmount();
+
+    Optional<Brand> findByName(String name);
 }

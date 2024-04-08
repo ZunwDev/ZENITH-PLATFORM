@@ -53,7 +53,7 @@ export async function fetchProductDataById(id: string) {
 
 export async function fetchAttributeData(attributeTypeId: number) {
   try {
-    const response = await axios.get(`${API_URL}/attribute/${attributeTypeId}`, { signal: newAbortSignal() });
+    const response = await axios.get(`${API_URL}/attributes/${attributeTypeId}`, { signal: newAbortSignal() });
     return response.data;
   } catch (error) {
     console.error(
@@ -64,12 +64,30 @@ export async function fetchAttributeData(attributeTypeId: number) {
 }
 export async function fetchAttributeDataWithCategoryId(categoryId: number, attributeTypeId: number) {
   try {
-    const response = await axios.get(`${API_URL}/attribute/${attributeTypeId}/${categoryId}`, { signal: newAbortSignal() });
+    const response = await axios.get(`${API_URL}/attributes/${attributeTypeId}/${categoryId}`, { signal: newAbortSignal() });
     return response.data;
   } catch (error) {
     console.error(
       `Error fetching attribute data with category id ${categoryId} and attribute type id ${attributeTypeId}`,
       error.response?.data?.message || error.message
     );
+  }
+}
+
+export async function fetchAttributeTypes() {
+  try {
+    const response = await axios.get(`${API_URL}/attribute_types`, { signal: newAbortSignal() });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching attribute types`, error.response?.data?.message || error.message);
+  }
+}
+
+export async function fetchAttributes() {
+  try {
+    const response = await axios.get(`${API_URL}/attributes`, { signal: newAbortSignal() });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching attributes`, error.response?.data?.message || error.message);
   }
 }

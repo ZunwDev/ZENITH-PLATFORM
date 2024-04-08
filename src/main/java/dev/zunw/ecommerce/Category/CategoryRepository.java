@@ -11,9 +11,10 @@ import java.util.Optional;
 @Repository
 @NonNullApi
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    Optional<Category> findById(Long id);
 
     @Modifying
     @Query("UPDATE Category c SET c.amount = (SELECT COUNT(p) FROM Product p WHERE p.category.categoryId = c.categoryId)")
     void updateCategoryAmount();
+
+    Optional<Category> findByName(String name);
 }

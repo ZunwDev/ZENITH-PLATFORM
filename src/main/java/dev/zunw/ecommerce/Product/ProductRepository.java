@@ -15,7 +15,9 @@ import java.util.UUID;
 @NonNullApi
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
 
-    Optional<Product> findById(UUID id);
+    long countByCategoryCategoryId(Long categoryId);
+
+    long countByBrandBrandId(Long brandId);
 
     Optional<Product> findByName(String name);
 

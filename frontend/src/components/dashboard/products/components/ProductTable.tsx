@@ -42,7 +42,7 @@ export default function ProductTable({ data, viewToggle }) {
     if (Object.keys(data).length === 0) return;
 
     const currentPage = data.number + 1;
-    const pageSize = data.pageable.pageSize;
+    const pageSize = data?.pageable?.pageSize;
 
     const startItem = (currentPage - 1) * pageSize + 1;
     const endItem = Math.min(currentPage * pageSize, data.totalElements);
