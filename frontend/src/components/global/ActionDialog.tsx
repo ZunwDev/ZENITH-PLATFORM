@@ -39,7 +39,7 @@ interface ActionDialogTypes {
   fetchData;
   title: string;
   item?: AttributeType | Attribute | any;
-  actionType?: "edit" | "add" | "delete" | "specialedit";
+  actionType?: "edit" | "add" | "delete";
   endpoint?: "categories" | "brands" | "attributes" | "attribute_types";
   attributeId: string;
 }
@@ -157,10 +157,15 @@ export default function ActionDialog({
             <div className="grid grid-cols-4 items-center gap-4">
               {endpoint === "attributes" && (
                 <>
-                  <Label htmlFor="id" className="text-right">
-                    Attribute ID:
-                  </Label>
-                  <Input id="id" defaultValue={item[attributeId]} className="col-span-3 border rounded-md" disabled />
+                  {actionType === "edit" && (
+                    <>
+                      <Label htmlFor="id" className="text-right">
+                        Attribute ID:
+                      </Label>
+                      <Input id="id" defaultValue={item[attributeId]} className="col-span-3 border rounded-md" disabled />
+                    </>
+                  )}
+
                   <Label htmlFor="attributetype" className="text-right">
                     Attribute Type ID:
                   </Label>
