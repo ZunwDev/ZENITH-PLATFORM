@@ -1,6 +1,5 @@
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
 import {
-  NewProductButton,
   ProductExport,
   ProductFilter,
   ProductLimit,
@@ -10,7 +9,7 @@ import {
   ProductViewToggle,
   ResetFilter,
 } from "@/components/dashboard/products/components";
-import { PageHeader } from "@/components/global";
+import { NewButton, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
@@ -21,6 +20,7 @@ import { DEFAULT_LIMIT } from "@/lib/constants";
 import { buildQueryParams, newAbortSignal } from "@/lib/utils";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import axios from "axios";
+import { PackagePlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
@@ -157,7 +157,7 @@ export default function Products() {
                 <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
                 <ProductExport data={pageData.content} />
                 <ProductViewToggle viewToggle={viewToggle} setViewToggle={setViewToggle} />
-                {pageData.totalElements > 0 && <NewProductButton />}
+                {pageData.totalElements > 0 && <NewButton path="products" icon={<PackagePlus />} type="Product" />}
               </div>
               <ProductSearch setSearchQuery={setSearchQuery} className="md:hidden flex w-full" />
             </div>

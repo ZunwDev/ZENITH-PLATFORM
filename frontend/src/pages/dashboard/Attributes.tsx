@@ -65,7 +65,7 @@ export default function Attributes() {
             <div className="flex flex-col gap-2">
               <Card>
                 <div className="flex items-center p-4 border-b">
-                  <h1 className="text-lg font-semibold">Attribute Types</h1>
+                  <h1 className="text-lg font-semibold">Attribute Types ({data.attributeTypes.length})</h1>
                   <ActionDialog
                     fetchData={fetchData}
                     title="Attribute Type"
@@ -119,7 +119,7 @@ export default function Attributes() {
             <div className="flex flex-col gap-2">
               <Card>
                 <div className="flex items-center p-4 border-b">
-                  <h1 className="text-lg font-semibold">Category</h1>
+                  <h1 className="text-lg font-semibold">Categories ({data.filterData.categories.length})</h1>
                   <ActionDialog
                     fetchData={fetchData}
                     title="Category"
@@ -145,7 +145,7 @@ export default function Attributes() {
             <div className="flex flex-col gap-2">
               <Card>
                 <div className="flex items-center p-4 border-b">
-                  <h1 className="text-lg font-semibold">Brand</h1>
+                  <h1 className="text-lg font-semibold">Brands ({data.filterData.brands.length})</h1>
                   <ActionDialog fetchData={fetchData} title="Brand" endpoint="brands" attributeId="brandId" actionType="add" />
                 </div>
                 <CardContent className="flex flex-wrap gap-3 py-4">

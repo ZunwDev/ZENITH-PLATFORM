@@ -1,5 +1,4 @@
 export { default as CodeEditor } from "./CodeEditor";
-export { default as NewProductButton } from "./NewProductButton";
 export { default as ProductExport } from "./ProductExport";
 export { default as ProductFilter } from "./ProductFilter";
 export { default as ProductImageManager } from "./ProductImageManager";

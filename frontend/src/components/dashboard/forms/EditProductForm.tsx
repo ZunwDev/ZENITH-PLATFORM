@@ -53,8 +53,8 @@ export default function EditProductForm() {
   const [parseError, setParseError] = useState<string | null>(null);
 
   //Other
-  const [isProductUpdated, setIsProductUpdated] = useState(false);
-  const [productStage, setProductStage] = useState("Save changes");
+  const [isUpdated, setIsUpdated] = useState(false);
+  const [stage, setStage] = useState("Save changes");
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
@@ -121,8 +121,8 @@ export default function EditProductForm() {
       if (parseError) return showErrorToast("Product Creation", IS_PARSE_ERROR_MESSAGE);
       if (imageThumbnail == "") return showErrorToast("Product Creation", NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE);
 
-      setIsProductUpdated(true);
-      setProductStage("Updating...");
+      setIsUpdated(true);
+      setStage("Updating...");
 
       const response = await axios.put(`${API_URL}/products/${productId}`, {
         signal: newAbortSignal(),
@@ -141,15 +141,15 @@ export default function EditProductForm() {
         },
       });
 
-      setProductStage("Uploading images...");
+      setStage("Uploading images...");
       await updateProductImages(response.data.product.productId, images, imageThumbnail);
       showSuccessToast("Product Update", `Product "${values.name}" successfully updated.`);
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      setProductStage("Save changes");
-      setIsProductUpdated(false);
+      setStage("Save changes");
+      setIsUpdated(false);
       if (error?.response?.data?.errorCode === 409) {
         form.setError("name", { message: "Product with this name already exists." });
       } else {
@@ -170,8 +170,8 @@ export default function EditProductForm() {
             <User />
           </div>
         </div>
-        <div className="flex flex-col gap-8 pb-32 p-8 w-full min-w-[360px]">
-          <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row border-b pb-4">
+        <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
+          <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
             <Button variant="outline" className="w-fit mb-4 md:mb-0" asChild>
               <a href="../../products">
                 <ArrowLeft className="size-5" />
@@ -182,151 +182,151 @@ export default function EditProductForm() {
               <Button variant="outline" onClick={handleDiscardEdit}>
                 Discard
               </Button>
-              <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isProductUpdated}>
-                {productStage}
+              <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isUpdated}>
+                {stage}
               </Button>
             </div>
           </div>
-          <div className="flex md:flex-row md:gap-8 gap-32 flex-col">
-            <div className="flex flex-col md:w-96 w-full h-full gap-8">
-              <ProductImageManager
-                images={images}
-                imageThumbnail={imageThumbnail}
-                setImageThumbnail={setImageThumbnail}
-                setImages={setImages}
-              />
-              <Card>
-                <CardHeader>
-                  <CardTitle>Product Preview</CardTitle>
-                  <CardDescription>
-                    The preview may not fully act or display all details available on the real product listing.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ProductListing
-                    previewData={{
-                      imageThumbnail: imageThumbnail,
-                      description: form.getValues("description"),
-                      price: form.getValues("price"),
-                      discount: form.getValues("discount"),
-                      quantity: form.getValues("quantity"),
-                      name: form.getValues("name"),
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+        </div>
+        <div className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
+          <div className="flex flex-col md:w-96 w-full h-full gap-8">
+            <ProductImageManager
+              images={images}
+              imageThumbnail={imageThumbnail}
+              setImageThumbnail={setImageThumbnail}
+              setImages={setImages}
+            />
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Preview</CardTitle>
+                <CardDescription>
+                  The preview may not fully act or display all details available on the real product listing.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProductListing
+                  previewData={{
+                    imageThumbnail: imageThumbnail,
+                    description: form.getValues("description"),
+                    price: form.getValues("price"),
+                    discount: form.getValues("discount"),
+                    quantity: form.getValues("quantity"),
+                    name: form.getValues("name"),
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </div>
 
-            <div className="flex flex-col gap-8 w-full">
-              <Card className="w-full border h-fit rounded-md">
-                <CardHeader>
-                  <CardTitle>Product Information</CardTitle>
-                  <CardDescription>Update key product details for comprehensive information.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {productData && (
-                    <Form {...form}>
-                      <form className="flex md:flex-row md:gap-20 gap-4 flex-col">
-                        <div className="flex flex-col md:w-1/4 w-full gap-4">
-                          <InputFormItem
-                            label="Product Name"
-                            id="name"
-                            placeholder="HP EliteBook 650 G10"
-                            form={form}
-                            required
-                            description="Enter the name of the product."></InputFormItem>
-                          <TextareaFormItem
-                            label="Product Description"
-                            id="description"
-                            form={form}
-                            required
-                            description="Briefly describe the product and its main features."
-                            placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'></TextareaFormItem>
-                        </div>
-                        <div className="flex flex-col md:w-1/4 w-full gap-4">
-                          <InputFormItem
-                            label="Price"
-                            id="price"
-                            type="number"
-                            placeholder="49.99"
-                            required
-                            description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
-                            form={form}
-                            prefix="$"></InputFormItem>
-                          <InputFormItem
-                            label="Discount"
-                            id="discount"
-                            type="number"
-                            placeholder="20"
-                            description="Set the discount percentage for the product (e.g., 20 for 20% off)."
-                            form={form}
-                            suffix="%"></InputFormItem>
-                          <InputFormItem
-                            label="Quantity"
-                            id="quantity"
-                            type="number"
-                            placeholder="100"
-                            required
-                            description="Enter the quantity of the product in stock."
-                            form={form}></InputFormItem>
-                        </div>
-                        <div className="flex flex-col md:w-1/4 w-full gap-4">
-                          <SelectFormItem
-                            label="Category"
-                            id="category"
-                            placeholder="Search categories..."
-                            description="Select corresponding category to the product."
-                            required
-                            form={form}
-                            data={filterData.categories}
-                            selectedValue={categoriesSelectedValue}
-                            setSelectedValue={setCategoriesSelectedValue}></SelectFormItem>
-                          <SelectFormItem
-                            label="Brand"
-                            id="brand"
-                            placeholder="Search brands..."
-                            description="Select corresponding brand to the product."
-                            required
-                            form={form}
-                            data={filterData.brands}
-                            selectedValue={brandsSelectedValue}
-                            setSelectedValue={setBrandsSelectedValue}></SelectFormItem>
-                          <SelectFormItem
-                            label="Status"
-                            id="status"
-                            placeholder="Search statuses..."
-                            description="Select corresponding status to the product."
-                            required
-                            form={form}
-                            data={["Active", "Draft", "Archived"]}
-                            selectedValue={statusSelectedValue}
-                            setSelectedValue={setStatusSelectedValue}
-                          />
-                        </div>
-                      </form>
-                    </Form>
-                  )}
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Product Specs</CardTitle>
-                  <CardDescription>
-                    Update product specifications here. Ensure consistency across all products. These templates demonstrate the
-                    content each category can include.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {jsonData !== "" && parseError && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="size-5" />
-                      <AlertDescription>{parseError}</AlertDescription>
-                    </Alert>
-                  )}
-                  <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
-                </CardContent>
-              </Card>
-            </div>
+          <div className="flex flex-col gap-8 w-full">
+            <Card className="w-full border h-fit rounded-md">
+              <CardHeader>
+                <CardTitle>Product Information</CardTitle>
+                <CardDescription>Update key product details for comprehensive information.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {productData && (
+                  <Form {...form}>
+                    <form className="flex md:flex-row md:gap-20 gap-4 flex-col">
+                      <div className="flex flex-col md:w-1/4 w-full gap-4">
+                        <InputFormItem
+                          label="Product Name"
+                          id="name"
+                          placeholder="HP EliteBook 650 G10"
+                          form={form}
+                          required
+                          description="Enter the name of the product."></InputFormItem>
+                        <TextareaFormItem
+                          label="Product Description"
+                          id="description"
+                          form={form}
+                          required
+                          description="Briefly describe the product and its main features."
+                          placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'></TextareaFormItem>
+                      </div>
+                      <div className="flex flex-col md:w-1/4 w-full gap-4">
+                        <InputFormItem
+                          label="Price"
+                          id="price"
+                          type="number"
+                          placeholder="49.99"
+                          required
+                          description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
+                          form={form}
+                          prefix="$"></InputFormItem>
+                        <InputFormItem
+                          label="Discount"
+                          id="discount"
+                          type="number"
+                          placeholder="20"
+                          description="Set the discount percentage for the product (e.g., 20 for 20% off)."
+                          form={form}
+                          suffix="%"></InputFormItem>
+                        <InputFormItem
+                          label="Quantity"
+                          id="quantity"
+                          type="number"
+                          placeholder="100"
+                          required
+                          description="Enter the quantity of the product in stock."
+                          form={form}></InputFormItem>
+                      </div>
+                      <div className="flex flex-col md:w-1/4 w-full gap-4">
+                        <SelectFormItem
+                          label="Category"
+                          id="category"
+                          placeholder="Search categories..."
+                          description="Select corresponding category to the product."
+                          required
+                          form={form}
+                          data={filterData.categories}
+                          selectedValue={categoriesSelectedValue}
+                          setSelectedValue={setCategoriesSelectedValue}></SelectFormItem>
+                        <SelectFormItem
+                          label="Brand"
+                          id="brand"
+                          placeholder="Search brands..."
+                          description="Select corresponding brand to the product."
+                          required
+                          form={form}
+                          data={filterData.brands}
+                          selectedValue={brandsSelectedValue}
+                          setSelectedValue={setBrandsSelectedValue}></SelectFormItem>
+                        <SelectFormItem
+                          label="Status"
+                          id="status"
+                          placeholder="Search statuses..."
+                          description="Select corresponding status to the product."
+                          required
+                          form={form}
+                          data={["Active", "Draft", "Archived"]}
+                          selectedValue={statusSelectedValue}
+                          setSelectedValue={setStatusSelectedValue}
+                        />
+                      </div>
+                    </form>
+                  </Form>
+                )}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Specs</CardTitle>
+                <CardDescription>
+                  Update product specifications here. Ensure consistency across all products. These templates demonstrate the
+                  content each category can include.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {jsonData !== "" && parseError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="size-5" />
+                    <AlertDescription>{parseError}</AlertDescription>
+                  </Alert>
+                )}
+                <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

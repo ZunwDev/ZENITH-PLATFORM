@@ -129,7 +129,7 @@ export default function ActionDialog({
             </span>
           </div>
         ) : (
-          <Button className="ml-auto rounded-full w-8 h-8 border" size="icon" variant="ghost">
+          <Button className="ml-auto rounded-full size-8 border" size="icon" variant="ghost">
             <PlusIcon className="size-4" />
           </Button>
         )}
