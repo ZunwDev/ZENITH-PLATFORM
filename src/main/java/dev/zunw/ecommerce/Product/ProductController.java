@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static dev.zunw.ecommerce.ServiceUtils.findRowById;
+import static dev.zunw.ecommerce.ServiceUtils.saveEntity;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -97,11 +98,11 @@ public class ProductController {
     public ResponseEntity<Object> createProduct(@RequestBody CreateProductRequest requestBody) {
         Product product = requestBody.getProduct();
         if (ServiceUtils.existsByName(product.getName(), productRepository)) {
-            return ResponseUtils.conflictResponse("Product already exists");
+            return ResponseUtils.conflictAlreadyExistsResponse("Product", product.getName());
         }
         try {
-            Product createdProduct = productService.saveProduct(product);
-            return ResponseUtils.createdResponse("Product created successfully", "Product Creation", Optional.ofNullable(createdProduct));
+            Product createdProduct = saveEntity(product, productRepository);
+            return ResponseUtils.createdResponse("Product created successfully", "Product Creation", Optional.of(createdProduct));
         } catch (Exception e) {
             return ResponseUtils.serverErrorResponse("Failed to create product");
         }
@@ -113,8 +114,8 @@ public class ProductController {
             Optional<Product> existingProductOptional = findRowById(productId, productRepository);
             if (existingProductOptional.isPresent()) {
                 Product existingProduct = getExistingProduct(updatedProductData.getProduct(), existingProductOptional);
-                Product updatedProduct = productService.saveProduct(existingProduct);
-                return ResponseUtils.successResponse("Product updated successfully", "Product Update", Optional.ofNullable(updatedProduct));
+                Product updatedProduct = saveEntity(existingProduct, productRepository);
+                return ResponseUtils.successResponse("Product updated successfully", "Product Update", Optional.of(updatedProduct));
             } else {
                 return ResponseUtils.notFoundResponse("Product not found");
             }

@@ -43,8 +43,8 @@ public class ServiceUtils {
     }
 
     @Transactional
-    public static <T, ID> void saveEntity(T entity, JpaRepository<T, ID> repository) {
-        repository.save(entity);
+    public static <T, ID> T saveEntity(T entity, JpaRepository<T, ID> repository) {
+       return repository.save(entity);
     }
 
     @Transactional(readOnly = true)

@@ -54,6 +54,13 @@ public class ResponseUtils {
                 .body(Map.of("message", "<span>" + message + ".</span>", "errorCode", 409));
     }
 
+    public static ResponseEntity<Object> conflictAlreadyExistsResponse(String type, String name) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", "<span>" + type + "named <strong>" + name + "</strong> " +
+                                "already exists" +
+                                ".</span>", "errorCode",
+                        409));
+    }
 
     public static ResponseEntity<Object> serverErrorResponse(String message) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

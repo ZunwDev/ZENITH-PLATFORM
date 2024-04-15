@@ -24,11 +24,11 @@ public class Product {
 
     private String name;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
 

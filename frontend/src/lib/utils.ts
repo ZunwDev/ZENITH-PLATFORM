@@ -180,7 +180,7 @@ export function getStatus(item) {
 export function getStatusId(values) {
   let statusId;
 
-  switch (values.status) {
+  switch (values.status.toLowerCase()) {
     case "archived":
       statusId = 1;
       break;
@@ -198,4 +198,9 @@ export function getStatusId(values) {
 
 export function sortByIds(array: [], id: string) {
   return array.slice().sort((a, b) => a[id] - b[id]);
+}
+
+export function findId(array: any[], selectedValue: string, id: string): number | null {
+  const foundData = array?.find((item) => item?.name?.toLowerCase() === selectedValue?.toLowerCase());
+  return foundData ? foundData[id] : null;
 }

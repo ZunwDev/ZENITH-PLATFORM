@@ -9,8 +9,8 @@ import {
   updateMetadata,
   uploadBytes,
 } from "firebase/storage";
-import { firebaseConfig } from "./configs";
 import { v4 as uuidv4 } from "uuid";
+import { firebaseConfig } from "./configs";
 
 export function initializeFirebase() {
   const app = initializeApp(firebaseConfig);
@@ -38,6 +38,18 @@ function getImageNameFromUrl(imageUrl: string): string {
 
 function getImageNameFromFileName(fileName: string) {
   return fileName.split("/").pop();
+}
+
+export async function uploadImageToFirebase(path: string, blob: string) {
+  try {
+    const storage = initializeFirebase();
+    const imageRef = ref(storage, `${path}/image_${uuidv4()}`);
+    const imageBlob = await fetch(blob).then((response) => response.blob());
+    await uploadBytes(imageRef, imageBlob);
+  } catch (error) {
+    console.error("Error of uploading an image to Firebase Storage:", error);
+    throw error;
+  }
 }
 
 export async function getImagesFromFirebase(productId: string) {
