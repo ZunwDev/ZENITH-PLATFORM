@@ -90,11 +90,11 @@ export default function ProductTable({ data, viewToggle }) {
             </TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px] text-center">PRODUCT</TableHead>
-                <TableHead className="text-center">PRICE</TableHead>
-                <TableHead className="text-center">STOCK</TableHead>
-                <TableHead className="text-center lg:table-cell hidden">CREATED AT</TableHead>
-                <TableHead className="text-center">STATUS</TableHead>
+                <TableHead className="w-[200px] text-center">Product</TableHead>
+                <TableHead className="text-center">Price</TableHead>
+                <TableHead className="text-center">Stock</TableHead>
+                <TableHead className="text-center lg:table-cell hidden">Created on</TableHead>
+                <TableHead className="text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

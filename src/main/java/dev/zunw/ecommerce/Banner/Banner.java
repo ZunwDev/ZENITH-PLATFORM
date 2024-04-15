@@ -3,11 +3,11 @@ package dev.zunw.ecommerce.Banner;
 import dev.zunw.ecommerce.Category.Category;
 import dev.zunw.ecommerce.Status.Status;
 import jakarta.persistence.*;
-import java.sql.Date;
-import java.util.UUID;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.sql.Date;
+import java.util.UUID;
 
 @Setter
 @Getter
