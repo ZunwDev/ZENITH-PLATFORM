@@ -1,15 +1,18 @@
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ChevronsUpDown } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarIcon, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import ScaleLoader from "react-spinners/ScaleLoader";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../ui/command";
-import { FormDescription, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { ScrollArea } from "../ui/scroll-area";
-import { Textarea } from "../ui/textarea";
+import { Button } from "../../ui/button";
+import { Checkbox } from "../../ui/checkbox";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../../ui/command";
+import { FormDescription, FormItem, FormLabel, FormMessage } from "../../ui/form";
+import { Input } from "../../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { ScrollArea } from "../../ui/scroll-area";
+import { Textarea } from "../../ui/textarea";
 
 const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
   (e.target as HTMLInputElement).blur();
@@ -18,7 +21,7 @@ const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
 export function InputFormItem({
   id,
   label,
-  placeholder,
+  placeholder = "",
   description,
   form,
   type = "text",
@@ -48,7 +51,7 @@ export function InputFormItem({
           onWheel={handleWheel}
           placeholder={placeholder}
           {...form.register(id)}
-          className={cn("border border-border rounded-md p-2", {
+          className={cn("border rounded-md p-2", {
             "rounded-tl-none rounded-bl-none border-l-0": prefix,
             "rounded-tr-none rounded-br-none border-r-0": suffix,
           })}
@@ -82,14 +85,12 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
   );
 }
 
-/* export function CheckboxFormItem({ id, label, description, form, data, ...rest }) {
-  const initialValue = data && data.status.statusId === 1;
-  const [isChecked, setIsChecked] = useState(initialValue);
+export function CheckboxFormItem({ id, label, description, form, ...rest }) {
+  const [isChecked, setIsChecked] = useState(false);
 
-  const handleCheckboxChange = () => {
-    const newValue = !isChecked;
-    setIsChecked(newValue);
-    form.setValue(id, newValue ? true : false);
+  const handleCheckboxChange = (e) => {
+    setIsChecked(e);
+    form.setValue(id, e);
   };
 
   return (
@@ -101,14 +102,61 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
           {...form.register(id)}
           {...rest}
           checked={isChecked}
-          onCheckedChange={handleCheckboxChange}
+          onCheckedChange={handleCheckboxChange} // Use onChange instead of onCheckedChange
         />
         <FormLabel htmlFor={id}>{label}</FormLabel>
       </div>
       {description && <FormDescription>{description}</FormDescription>}
     </FormItem>
   );
-} */
+}
+
+export function DateRangeFormItem({ id, label, description, form, required = false, date, setDate, ...rest }) {
+  return (
+    <FormItem>
+      <FormLabel htmlFor={id} className="block" isRequired={required}>
+        {label}
+      </FormLabel>
+      <div className={cn("grid gap-2")}>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id={id}
+              {...form.register(id)}
+              variant="outline"
+              {...rest}
+              className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}>
+              <CalendarIcon className="mr-2 size-4" />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="!w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={setDate}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      {description && <FormDescription>{description}</FormDescription>}
+      <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
+    </FormItem>
+  );
+}
 
 export function SelectFormItem({
   id,
@@ -133,12 +181,18 @@ export function SelectFormItem({
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" name={`${id}Select`} aria-expanded={open}>
             {selectedValue && data
-              ? data.includes(selectedValue)
-                ? selectedValue
-                : data.find((item) => typeof item === "object" && item.name.toLowerCase() === selectedValue.toLowerCase())
-                    ?.name || data.find((item) => item.toLowerCase() === selectedValue.toLowerCase())
-              : `Select ${id}...`}
-            <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+              ? (() => {
+                  const selectedItem = data?.find((item) => {
+                    if (typeof item === "object") {
+                      return item.name?.toLowerCase() === selectedValue?.toLowerCase();
+                    } else {
+                      return item?.toLowerCase() === selectedValue?.toLowerCase();
+                    }
+                  });
+                  return selectedItem ? selectedItem.name || selectedItem : `Select ${id || "default"}...`;
+                })()
+              : `Select ${id || "default"}...`}
+            <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className={cn({ "h-96": data.length > 10 })}>
@@ -199,7 +253,7 @@ export function NoValidationInputFormItem({
           type={inputType}
           onWheel={handleWheel}
           placeholder={placeholder}
-          className={cn("border border-border rounded-md p-2", {
+          className={cn("border rounded-md p-2", {
             "rounded-tl-none rounded-bl-none border-l-0": prefix,
             "rounded-tr-none rounded-br-none border-r-0": suffix,
           })}
@@ -298,7 +352,7 @@ export function NoValidationSelectFormItem({
           <Button variant="outline" role="combobox" name={`${id}Select`} aria-expanded={open} disabled={disabled}>
             {(data?.length > 0 && data?.find((item) => item?.toLowerCase() === selectedValue?.toLowerCase())) ||
               `Select ${label}...`}
-            <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className={cn({ "h-96": data?.length > 10 })}>
@@ -342,6 +396,33 @@ export function NoValidationSelectFormItem({
           </Command>
         </PopoverContent>
       </Popover>
+    </div>
+  );
+}
+
+export function NoValidationInputFile({ id, label, setImage }) {
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const blob = URL.createObjectURL(file);
+        setImage(blob);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  return (
+    <div className="grid w-full items-center gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Input
+        id={id}
+        type="file"
+        className="border w-full rounded-md"
+        onChange={handleFileChange}
+        accept=".png, .jpg, .jpeg, .webp"
+      />
     </div>
   );
 }

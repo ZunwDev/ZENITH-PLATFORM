@@ -1,4 +1,4 @@
-import { PageHeader } from "@/components/global";
+import { BackArrow, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
   TextareaFormItem,
 } from "@/components/util";
 import ProductListing from "@/components/view/ProductListing";
-import { useAdminCheck, useErrorToast, useSuccessToast } from "@/hooks";
+import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchAttributeDataWithCategoryId, fetchFilterData } from "@/lib/api";
 import {
   IS_PARSE_ERROR_MESSAGE,
@@ -22,10 +22,11 @@ import {
 } from "@/lib/constants";
 import { FormFields } from "@/lib/enum/schemas";
 import { uploadImagesToFirebase } from "@/lib/firebase";
-import { cn, getStatusId, includesAny, newAbortSignal } from "@/lib/utils";
+import { cn, findId, getStatusId, includesAny, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import parse from "html-react-parser";
+import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,6 +39,7 @@ export default function NewProductForm() {
   useAdminCheck();
   const showErrorToast = useErrorToast();
   const showSuccessToast = useSuccessToast();
+  const { stage, isSubmitting, updateStage, setSubmittingState, resetFormStatus } = useFormStatus("Create product");
 
   // Data
   const [filterData, setFilterData] = useState<FilterData>({ categories: [], brands: [], productTypes: [] });
@@ -46,14 +48,12 @@ export default function NewProductForm() {
   const [jsonData, setJsonData] = useState("");
   const [formattedJSON, setFormattedJSON] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
-  const [isCreated, setIsCreated] = useState(false);
-  const [stage, setStage] = useState("Create product");
   const [categoryId, setCategoryId] = useState<number>();
   const [brandId, setBrandId] = useState<number>();
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
   const [typesSelectedValue, setTypesSelectedValue] = useState("");
-  const [statusSelectedValue, setStatusSelectedValue] = useState("Active");
+  const [statusSelectedValue, setStatusSelectedValue] = useState("active");
   const [addFormSchemaData, setAddFormSchemaData] = useState([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -90,7 +90,6 @@ export default function NewProductForm() {
     const fetchData = async () => {
       const [categoryData, brandData] = await fetchFilterData();
       const productTypesData = categoryId ? await fetchAttributeDataWithCategoryId(categoryId, 1) : []; //1 are product types id
-
       setFilterData({ categories: categoryData, brands: brandData, productTypes: productTypesData });
     };
     fetchData();
@@ -113,8 +112,8 @@ export default function NewProductForm() {
       if (parseError) return showErrorToast(action, IS_PARSE_ERROR_MESSAGE);
       if (imageThumbnail == "") return showErrorToast(action, NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE);
 
-      setIsCreated(true);
-      setStage("Storing in database...");
+      setSubmittingState(true);
+      updateStage("Storing in database...");
 
       const response = await axios.post(`${API_URL}/products/create`, {
         signal: newAbortSignal(),
@@ -131,27 +130,26 @@ export default function NewProductForm() {
         },
       });
 
-      setStage("Uploading images...");
+      updateStage("Uploading images...");
       await uploadImagesToFirebase(response.data.product.productId, images, imageThumbnail);
       showSuccessToast("Product Creation", `Product "${values.name}" successfully created.`);
       setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+        form.reset();
+        resetFormStatus();
+        setImageThumbnail("");
+        setImages([]);
+      }, 1000);
     } catch (error) {
-      setStage("Create product");
-      setIsCreated(false);
+      updateStage("Create product");
+      setSubmittingState(false);
       if (error?.response?.data?.errorCode === 409) {
         form.setError("name", { message: "Product with this name already exists." });
       } else {
         console.error("Form validation failed:", error);
       }
+      showErrorToast(error.response.data.action, parse(error.response.data.message));
     }
   };
-
-  function findId(array: any[], selectedValue: string, id: string): number | null {
-    const foundData = array?.find((item) => item?.name?.toLowerCase() === selectedValue?.toLowerCase());
-    return foundData ? foundData[id] : null;
-  }
 
   useEffect(() => {
     const categoryId = findId(filterData.categories, categoriesSelectedValue, "categoryId");
@@ -159,7 +157,7 @@ export default function NewProductForm() {
 
     setCategoryId(categoryId);
     setBrandId(brandId);
-  }, [brandsSelectedValue, categoriesSelectedValue, statusSelectedValue, filterData]);
+  }, [brandsSelectedValue, categoriesSelectedValue, filterData]);
 
   useEffect(() => {}, [form.watch()]);
 
@@ -176,14 +174,10 @@ export default function NewProductForm() {
           </div>
           <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
             <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
-              <Button variant="outline" className="w-fit md:mb-0" asChild>
-                <a href="../products">
-                  <ArrowLeft className="size-5" />
-                </a>
-              </Button>
+              <BackArrow link="../products" />
               <PageHeader title="New Product" />
               <div className="ml-auto space-x-2">
-                <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isCreated}>
+                <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isSubmitting}>
                   {stage}
                 </Button>
               </div>
@@ -242,7 +236,7 @@ export default function NewProductForm() {
                 </CardHeader>
                 <CardContent>
                   <Form {...form}>
-                    <form className="flex md:flex-row md:gap-20 gap-4 flex-wrap">
+                    <form className="flex xl:flex-row xl:gap-20 gap-4 flex-wrap">
                       <div className="flex flex-col xl:w-1/4 w-full gap-4">
                         <InputFormItem
                           label="Product Name"

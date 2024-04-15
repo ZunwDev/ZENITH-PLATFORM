@@ -23,7 +23,7 @@ export default function ProductListing({
   return (
     <>
       {previewData && (
-        <Card>
+        <Card title={previewData.name}>
           <CardContent className="relative">
             <div className="flex flex-col justify-center items-center h-[288px] md:size-[288px]">
               <Thumbnail url={previewData?.imageThumbnail} intristicSize={360} className="h-[288px] md:size-[288px] pt-4" />
