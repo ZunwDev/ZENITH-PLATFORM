@@ -1,4 +1,4 @@
-import { PaginationControls, Thumbnail } from "@/components/global";
+import { Loading, PaginationControls, Thumbnail } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,7 +8,6 @@ import { getThumbnailFromFirebase } from "@/lib/firebase";
 import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import ScaleLoader from "react-spinners/ScaleLoader";
 
 export default function ProductTable({ data, viewToggle }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
@@ -32,14 +31,8 @@ export default function ProductTable({ data, viewToggle }) {
     fetchThumbnail();
   }, [data]);
 
-  // Render loading state while fetching data
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-2 h-screen text-center w-full">
-        <ScaleLoader color="#2563eb" />
-        Loading products...
-      </div>
-    );
+    return <Loading text="products" />;
   }
 
   return (

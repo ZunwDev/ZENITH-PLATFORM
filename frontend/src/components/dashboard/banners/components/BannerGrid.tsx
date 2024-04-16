@@ -1,3 +1,4 @@
+import { Loading } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { PaginationControls, Thumbnail } from "@/components/util";
@@ -6,7 +7,6 @@ import { getImagesFromFirebase } from "@/lib/firebase";
 import { getStatus, goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import ScaleLoader from "react-spinners/ScaleLoader";
 
 export default function BannerGrid({ data }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
@@ -31,12 +31,7 @@ export default function BannerGrid({ data }) {
   }, [data]);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-2 h-screen text-center w-full">
-        <ScaleLoader color="#2563eb" />
-        Loading banners...
-      </div>
-    );
+    return <Loading text="banners" />;
   }
 
   return (
