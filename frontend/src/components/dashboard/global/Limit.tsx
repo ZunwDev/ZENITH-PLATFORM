@@ -10,14 +10,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, FileDigit } from "lucide-react";
 
-interface ProductLimitProps {
+interface LimitProps {
   limit: string;
   setLimit: React.Dispatch<React.SetStateAction<string>>;
+  type: string;
 }
 
-const productEntries = ["10", "25", "50", "100"];
+const entries = ["10", "25", "50", "100"];
 
-export default function ProductLimit({ setLimit, limit }: ProductLimitProps) {
+export default function Limit({ setLimit, limit, type }: LimitProps) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="group data-[state=open]:bg-accent/50">
@@ -31,9 +32,9 @@ export default function ProductLimit({ setLimit, limit }: ProductLimitProps) {
         <DropdownMenuLabel>Change limit</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={limit} onValueChange={setLimit}>
-          {productEntries.map((item, index) => (
+          {entries.map((item, index) => (
             <DropdownMenuRadioItem key={index} value={`${item}`}>
-              {item} Products
+              {item} {type}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

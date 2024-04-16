@@ -1,18 +1,16 @@
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
+import { Limit, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
 import {
   ProductExport,
   ProductFilter,
-  ProductLimit,
-  ProductSearch,
   ProductSort,
   ProductTable,
   ProductViewToggle,
-  ResetFilter,
 } from "@/components/dashboard/products/components";
-import { NewButton, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollBar } from "@/components/ui/scroll-area";
+import { NewButton } from "@/components/util";
 import { useAdminCheck } from "@/hooks";
 import { API_URL, fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
@@ -141,16 +139,16 @@ export default function Products() {
                   setChecked={setChecked}
                   amountData={amountData}
                 />
-                <ProductSearch setSearchQuery={setSearchQuery} className="md:flex hidden" />
+                <SearchBar setSearchQuery={setSearchQuery} type="products" className="md:flex hidden" />
               </div>
               <div className="flex flex-row gap-1.5">
-                <ProductLimit setLimit={setLimit} limit={limit} />
+                <Limit setLimit={setLimit} limit={limit} type="Products" />
                 <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
                 <ProductExport data={pageData.content} />
                 <ProductViewToggle viewToggle={viewToggle} setViewToggle={setViewToggle} />
                 {pageData.totalElements > 0 && <NewButton path="products" icon={<PackagePlus />} type="Product" />}
               </div>
-              <ProductSearch setSearchQuery={setSearchQuery} className="md:hidden flex w-full" />
+              <SearchBar setSearchQuery={setSearchQuery} type="products" className="md:hidden flex w-full" />
             </div>
             {filterAmount > 0 && (
               <ScrollArea className="w-full overflow-y-hidden whitespace-nowrap">

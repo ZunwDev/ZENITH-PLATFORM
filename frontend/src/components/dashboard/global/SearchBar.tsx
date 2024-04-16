@@ -4,12 +4,13 @@ import { Search } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-interface ProductSearchProps {
+interface SearchBarProps {
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  type: string;
   className?: string;
 }
 
-export default function ProductSearch({ setSearchQuery, className }: ProductSearchProps) {
+export default function SearchBar({ setSearchQuery, type, className }: SearchBarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
@@ -27,7 +28,7 @@ export default function ProductSearch({ setSearchQuery, className }: ProductSear
         <Search className="size-4" />
         <Input
           type="search"
-          placeholder="Search products..."
+          placeholder={`Search ${type}...`}
           className=" rounded-none rounded-tr-md rounded-br-md"
           onChange={(e) => handleSearch(e.target.value, e)}
           value={queryParams.get("q") || ""}

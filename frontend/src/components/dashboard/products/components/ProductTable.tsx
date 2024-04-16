@@ -1,8 +1,8 @@
-import { Loading, PaginationControls, Thumbnail } from "@/components/global";
+import { Loading } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { RatingStars } from "@/components/util";
+import { PaginationControls, RatingStars, Thumbnail } from "@/components/util";
 import { usePageControls } from "@/hooks";
 import { getThumbnailFromFirebase } from "@/lib/firebase";
 import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/utils";

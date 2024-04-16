@@ -1,7 +1,8 @@
 import { Attribute, AttributeType } from "@/components/dashboard/attributes/interface";
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
+import { PageHeader } from "@/components/dashboard/global";
 import { FilterData } from "@/components/dashboard/products/interfaces";
-import { ActionDialog, PageHeader } from "@/components/global";
+import { ActionDialog } from "@/components/global";
 import { User } from "@/components/header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";

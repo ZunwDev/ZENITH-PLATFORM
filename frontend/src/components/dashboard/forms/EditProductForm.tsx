@@ -1,10 +1,9 @@
-import { BackArrow, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
+import { BackArrow, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
 import ProductListing from "@/components/view/ProductListing";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchFilterData, fetchProductDataById } from "@/lib/api";
@@ -26,6 +25,7 @@ import { useParams } from "react-router-dom";
 import { z } from "zod";
 import { FormSchema } from ".";
 import { FullSidebar, SheetSidebar } from "../components";
+import { PageHeader } from "../global";
 import { CodeEditor, ProductImageManager } from "../products/components";
 import { FilterData, Product } from "../products/interfaces";
 
@@ -105,9 +105,9 @@ export default function EditProductForm() {
   }, []);
 
   const handleDiscardEdit = () => {
+    showSuccessToast("Discard Successful", "The changes to the product have been successfully discarded.");
     setTimeout(() => {
       window.location.reload();
-      showSuccessToast("Discard Successful", "The changes to the product have been successfully discarded.");
     }, 1000);
   };
 

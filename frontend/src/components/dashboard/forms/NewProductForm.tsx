@@ -1,4 +1,3 @@
-import { BackArrow, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form } from "@/components/ui/form";
 import {
   AlertInCardDescription,
+  BackArrow,
   InformationDescription,
   InputFormItem,
   SelectFormItem,
@@ -32,6 +32,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { FormSchema, SpecsGeneratorForm } from ".";
 import { FullSidebar, SheetSidebar } from "../components";
+import { PageHeader } from "../global";
 import { CodeEditor, ProductImageManager } from "../products/components";
 import { FilterData } from "../products/interfaces";
 

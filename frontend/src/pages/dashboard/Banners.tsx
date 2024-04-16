@@ -1,8 +1,11 @@
 import BannerGrid from "@/components/dashboard/banners/components/BannerGrid";
 import { Page } from "@/components/dashboard/banners/interfaces";
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
-import { NewButton, PageHeader } from "@/components/global";
+import { Limit, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
 import { User } from "@/components/header";
+import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { NewButton } from "@/components/util";
 import { useAdminCheck } from "@/hooks";
 import { API_URL, fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
@@ -48,6 +51,10 @@ export default function Banners() {
     const queryString = buildQueryParams(paramsObj);
     return queryString;
   }, [checked, limit, dbcSearch, queryParams]);
+
+  const handleResetFilters = useCallback(() => {
+    setChecked(initialCheckedState);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,8 +118,54 @@ export default function Banners() {
             <div className="flex items-center justify-between px-4 md:px-0">
               <PageHeader title="Banner Manager" />
             </div>
-            <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
-              {pageData.totalElements > 0 && <NewButton path="banners" icon={<BookPlus />} type="Banner" className="ml-auto" />}
+            <div className="flex flex-col gap-2">
+              <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
+                <div className="flex flex-row gap-1.5">
+                  {/*                   <ProductFilter
+                    setFilterAmount={setFilterAmount}
+                    filterAmount={filterAmount}
+                    checked={checked}
+                    setChecked={setChecked}
+                    amountData={amountData}
+                  /> */}
+                  <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:flex hidden" />
+                </div>
+                <div className="flex flex-row gap-1.5">
+                  <Limit setLimit={setLimit} limit={limit} type="Banners" />
+                  {pageData.totalElements > 0 && (
+                    <NewButton path="banners" icon={<BookPlus />} type="Banner" className="ml-auto" />
+                  )}
+                </div>
+                <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:hidden flex w-full" />
+              </div>
+              {filterAmount > 0 && (
+                <ScrollArea className="w-full overflow-y-hidden whitespace-nowrap">
+                  {Object.entries(checked)
+                    .reverse()
+                    .map(([key, value], index) => {
+                      if (value.length > 0) {
+                        return (
+                          <ChipGroup key={index}>
+                            <ChipGroupTitle>{key.capitalize()}:</ChipGroupTitle>
+                            <ChipGroupContent>
+                              {value.map((item, index) => (
+                                <Chip key={index} onRemove={() => handleChipRemove(key, item)}>
+                                  {filterData &&
+                                    filterData[key]
+                                      .filter((filtered) => filtered[key + "Id"] === item)
+                                      .map((filteredItem) => filteredItem.name)}
+                                </Chip>
+                              ))}
+                            </ChipGroupContent>
+                          </ChipGroup>
+                        );
+                      }
+                      return null;
+                    })}
+                  <ResetFilter onReset={handleResetFilters} filterAmount={filterAmount} />
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              )}
             </div>
             <div
               className={`flex flex-1 ${

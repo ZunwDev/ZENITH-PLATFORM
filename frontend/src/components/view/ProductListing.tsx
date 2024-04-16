@@ -1,8 +1,8 @@
 import { applyDiscount, removeLeadingZeroes, shortenText } from "@/lib/utils";
 import { ShoppingCart } from "lucide-react";
-import { Thumbnail } from "../global";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
+import { Thumbnail } from "../util";
 
 interface ProductListingProps {
   productId?: string;
