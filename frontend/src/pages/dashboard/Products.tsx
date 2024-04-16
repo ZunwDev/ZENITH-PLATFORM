@@ -13,7 +13,7 @@ import { NewButton, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollBar } from "@/components/ui/scroll-area";
-import { putUserToFirstPage, useAdminCheck } from "@/hooks";
+import { useAdminCheck } from "@/hooks";
 import { API_URL, fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { AmountData, Brand, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
@@ -30,7 +30,6 @@ export default function Products() {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   useAdminCheck();
-  putUserToFirstPage();
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);

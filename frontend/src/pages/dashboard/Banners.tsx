@@ -3,7 +3,7 @@ import { Page } from "@/components/dashboard/banners/interfaces";
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
 import { NewButton, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
-import { useAdminCheck, usePageControls } from "@/hooks";
+import { useAdminCheck } from "@/hooks";
 import { API_URL, fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { AmountData, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
@@ -17,10 +17,8 @@ import { useDebounce } from "use-debounce";
 export default function Banners() {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const { putUserToFirstPage } = usePageControls();
 
   useAdminCheck();
-  putUserToFirstPage();
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);

@@ -11,8 +11,7 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
 export default function ProductTable({ data, viewToggle }) {
-  const { handlePageChange, calculateShowingRange, currentPage, putUserToFirstPage } = usePageControls(data);
-  putUserToFirstPage();
+  const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
   const [thumbnail, setThumbnail] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
 

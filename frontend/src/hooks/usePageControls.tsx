@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export const usePageControls = (data?: any) => {
@@ -31,12 +31,16 @@ export const usePageControls = (data?: any) => {
     );
   };
 
-  const putUserToFirstPage = () => {
-    if (!queryParams.has("p")) {
-      queryParams.set("p", "1");
-      navigate(`${location.pathname}?${queryParams.toString()}`);
-    }
-  };
+  useEffect(() => {
+    const putUserToFirstPage = () => {
+      if (!queryParams.has("p")) {
+        queryParams.set("p", "1");
+        navigate(`${location.pathname}?${queryParams.toString()}`);
+      }
+    };
 
-  return { handlePageChange, calculateShowingRange, currentPage, putUserToFirstPage };
+    putUserToFirstPage();
+  }, [queryParams, navigate, location.pathname]);
+
+  return { handlePageChange, calculateShowingRange, currentPage };
 };

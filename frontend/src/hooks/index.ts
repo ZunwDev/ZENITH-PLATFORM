@@ -1,4 +1,3 @@
-export { putUserToFirstPage } from "./putUserToFirstPage";
 export { useAdminCheck } from "./useAdminCheck";
 export { useDebounce } from "./useDebounce";
 export { useErrorToast } from "./useErrorToast";
