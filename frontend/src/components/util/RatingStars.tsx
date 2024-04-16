@@ -1,6 +1,6 @@
 import { Star, StarHalf } from "lucide-react";
 
-export default function RatingStar({ rating }) {
+export default function RatingStars({ rating }) {
   const generateStars = () => {
     const fullStars = Math.floor(rating);
     const halfStar = rating - Math.floor(rating);

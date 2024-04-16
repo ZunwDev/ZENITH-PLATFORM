@@ -2,7 +2,7 @@ import { PaginationControls, Thumbnail } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import RatingStar from "@/components/util/RatingStars";
+import { RatingStars } from "@/components/util";
 import { usePageControls } from "@/hooks";
 import { getThumbnailFromFirebase } from "@/lib/firebase";
 import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/utils";
@@ -45,7 +45,7 @@ export default function ProductTable({ data, viewToggle }) {
 
   return (
     <>
-      {thumbnail.length > 0 && calculateShowingRange && viewToggle === "list" && (
+      {thumbnail.length > 0 && viewToggle === "list" && (
         <>
           <Table className="table-auto w-full">
             <TableCaption className="text-wrap">
@@ -80,7 +80,7 @@ export default function ProductTable({ data, viewToggle }) {
                     <div className="flex flex-col text-start gap-0.5">
                       <span className="font-semibold md:w-56 w-48">{item.name}</span>
                       <span className="text-sm">{item.category.name}</span>
-                      <RatingStar rating={5} />
+                      <RatingStars rating={5} />
                     </div>
                   </TableCell>
                   <TableCell>
@@ -125,7 +125,7 @@ export default function ProductTable({ data, viewToggle }) {
           )}
         </>
       )}
-      {thumbnail.length > 0 && calculateShowingRange && viewToggle === "grid" && (
+      {thumbnail.length > 0 && viewToggle === "grid" && (
         <div className="w-full">
           <ResponsiveMasonry columnsCountBreakPoints={{ 360: 1, 700: 2, 1450: 3, 1750: 4, 2050: 5, 2300: 6 }}>
             <Masonry gutter="1rem">
@@ -188,7 +188,7 @@ export default function ProductTable({ data, viewToggle }) {
                       </div>
                       <div className="flex justify-between w-full">
                         <span className="text-start text-sm">Rating:</span>
-                        <RatingStar rating={5} />
+                        <RatingStars rating={5} />
                       </div>
                     </div>
                   </CardFooter>
