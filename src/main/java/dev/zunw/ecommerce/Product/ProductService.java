@@ -36,7 +36,8 @@ public class ProductService {
 
     public Page<Product> findByFilters(List<Long> categoryIds, List<Long> brandIds, List<Long> statusIds, Pageable pageable, String sortBy, String sortDirection, String searchQuery) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        Specification<Product> specification = ProductSpecifications.withCategoryAndBrandAndStatus(categoryIds, brandIds, statusIds, searchQuery);
+        Specification<Product> specification = ProductSpecifications.withAllFilters(categoryIds,
+                brandIds, statusIds, searchQuery);
         return productRepository.findAll(specification, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
     }
 

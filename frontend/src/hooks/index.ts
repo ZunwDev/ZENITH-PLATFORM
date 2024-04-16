@@ -4,6 +4,7 @@ export { useDebounce } from "./useDebounce";
 export { useErrorToast } from "./useErrorToast";
 export { useFormStatus } from "./useFormStatus";
 export { useGetSessionData } from "./useGetSessionData";
+export { usePageControls } from "./usePageControls";
 export { useScrollPosition } from "./useScrollPosition";
 export { useSuccessToast } from "./useSuccessToast";
 export { useTimeout } from "./useTimeout";

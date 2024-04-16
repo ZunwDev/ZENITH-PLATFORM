@@ -77,7 +77,7 @@ export default function EditProductForm() {
     const fetchData = async () => {
       const [categoryData, brandData, , ,] = await fetchFilterData();
       const productData = await fetchProductDataById(productId);
-      const imagesFromFB = await getImagesFromFirebase(productId);
+      const imagesFromFB = await getImagesFromFirebase("images", productId);
       setImages(imagesFromFB);
       setFilterData({ categories: categoryData, brands: brandData, productTypes: [] });
       setProductData(productData.data);

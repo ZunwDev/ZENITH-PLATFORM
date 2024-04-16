@@ -3,22 +3,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import RatingStar from "@/components/util/RatingStars";
-import { putUserToFirstPage } from "@/hooks";
+import { usePageControls } from "@/hooks";
 import { getThumbnailFromFirebase } from "@/lib/firebase";
 import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/utils";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { useLocation, useNavigate } from "react-router-dom";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
 export default function ProductTable({ data, viewToggle }) {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { handlePageChange, calculateShowingRange, currentPage, putUserToFirstPage } = usePageControls(data);
   putUserToFirstPage();
-  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const [thumbnail, setThumbnail] = useState([]);
-  const [currentPage, setCurrentPage] = useState("1");
-  const [showingRange, setShowingRange] = useState<ReactNode>();
   const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
@@ -38,32 +33,6 @@ export default function ProductTable({ data, viewToggle }) {
     fetchThumbnail();
   }, [data]);
 
-  useEffect(() => {
-    if (Object.keys(data).length === 0) return;
-
-    const currentPage = data.number + 1;
-    const pageSize = data?.pageable?.pageSize;
-
-    const startItem = (currentPage - 1) * pageSize + 1;
-    const endItem = Math.min(currentPage * pageSize, data.totalElements);
-
-    setShowingRange(
-      <span>
-        <strong>{startItem}</strong>-<strong>{endItem}</strong>
-      </span>
-    );
-  }, [data]);
-
-  const handlePageChange = useCallback(
-    (page, event) => {
-      event.preventDefault();
-      queryParams.set("p", page);
-      setCurrentPage(page);
-      navigate(`${location.pathname}?${queryParams.toString()}`);
-    },
-    [queryParams, navigate, location.pathname]
-  );
-
   // Render loading state while fetching data
   if (loading) {
     return (
@@ -76,13 +45,13 @@ export default function ProductTable({ data, viewToggle }) {
 
   return (
     <>
-      {thumbnail.length > 0 && showingRange && viewToggle === "list" && (
+      {thumbnail.length > 0 && calculateShowingRange && viewToggle === "list" && (
         <>
           <Table className="table-auto w-full">
             <TableCaption className="text-wrap">
               {data?.content?.length > 0 ? (
                 <span>
-                  Showing {showingRange} of <strong>{data.totalElements}</strong> products
+                  Showing {calculateShowingRange()} of <strong>{data.totalElements}</strong> products
                 </span>
               ) : (
                 "No products found. Try changing/removing filters."
@@ -156,7 +125,7 @@ export default function ProductTable({ data, viewToggle }) {
           )}
         </>
       )}
-      {thumbnail.length > 0 && showingRange && viewToggle === "grid" && (
+      {thumbnail.length > 0 && calculateShowingRange && viewToggle === "grid" && (
         <div className="w-full">
           <ResponsiveMasonry columnsCountBreakPoints={{ 360: 1, 700: 2, 1450: 3, 1750: 4, 2050: 5, 2300: 6 }}>
             <Masonry gutter="1rem">
@@ -227,22 +196,21 @@ export default function ProductTable({ data, viewToggle }) {
               ))}
             </Masonry>
           </ResponsiveMasonry>
-          <div className="flex flex-row mt-2">
-            {data?.content?.length > 0 ? (
-              <span className="w-64 text-muted-foreground text-sm">
-                Showing {showingRange} of <strong>{data.totalElements}</strong> products
-              </span>
-            ) : (
-              <span className="w-fit text-muted-foreground text-sm">No products found. Try changing/removing filters.</span>
-            )}
-            {data.content && (
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={data.totalPages}
-                handlePageChange={handlePageChange}
-                number={data.number}
-              />
-            )}
+          <div className="flex items-center justify-center mt-2 relative">
+            <span className="text-muted-foreground text-sm absolute left-0 text-wrap lg:block hidden">
+              Showing {calculateShowingRange()} of <strong>{data.totalElements}</strong> products
+            </span>
+
+            <div className="flex-grow flex justify-center">
+              {data.content && (
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={data.totalPages}
+                  handlePageChange={handlePageChange}
+                  number={data.number}
+                />
+              )}
+            </div>
           </div>
         </div>
       )}

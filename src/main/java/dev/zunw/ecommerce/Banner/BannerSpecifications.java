@@ -1,15 +1,13 @@
-package dev.zunw.ecommerce.Product;
+package dev.zunw.ecommerce.Banner;
 
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
-public class ProductSpecifications {
-
-    public static Specification<Product> withAllFilters(
-            List<Long> categoryIds, List<Long> brandIds, List<Long> statusIds, String searchQuery) {
-        Specification<Product> spec = Specification.where(withCategories(categoryIds))
-                .and(withBrands(brandIds))
+public class BannerSpecifications {
+    public static Specification<Banner> withAllFilters(
+            List<Long> categoryIds, List<Long> statusIds, String searchQuery) {
+        Specification<Banner> spec = Specification.where(withCategories(categoryIds))
                 .and(withStatus(statusIds));
 
         if (searchQuery != null && !searchQuery.isEmpty()) {
@@ -19,7 +17,7 @@ public class ProductSpecifications {
         return spec;
     }
 
-    public static Specification<Product> withCategories(List<Long> categoryIds) {
+    public static Specification<Banner> withCategories(List<Long> categoryIds) {
         return (root, query, builder) -> {
             if (categoryIds != null && !categoryIds.isEmpty()) {
                 return root.get("category").get("categoryId").in(categoryIds);
@@ -28,16 +26,7 @@ public class ProductSpecifications {
         };
     }
 
-    public static Specification<Product> withBrands(List<Long> brandIds) {
-        return (root, query, builder) -> {
-            if (brandIds != null && !brandIds.isEmpty()) {
-                return root.get("brand").get("brandId").in(brandIds);
-            }
-            return null;
-        };
-    }
-
-    public static Specification<Product> withStatus(List<Long> statusIds) {
+    public static Specification<Banner> withStatus(List<Long> statusIds) {
         return (root, query, builder) -> {
             if (statusIds != null && !statusIds.isEmpty()) {
                 return root.get("status").get("statusId").in(statusIds);
@@ -46,7 +35,7 @@ public class ProductSpecifications {
         };
     }
 
-    public static Specification<Product> withSearch(String searchQuery) {
+    public static Specification<Banner> withSearch(String searchQuery) {
         return (root, query, builder) -> {
             if (searchQuery != null) {
                 return builder.like(builder.lower(root.get("name")), "%" + searchQuery.toLowerCase() + "%");

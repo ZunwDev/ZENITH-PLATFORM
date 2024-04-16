@@ -11,12 +11,12 @@ import {
 } from "@/components/dashboard/products/components";
 import { NewButton, PageHeader } from "@/components/global";
 import { User } from "@/components/header";
-import { Button } from "@/components/ui/button";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollBar } from "@/components/ui/scroll-area";
 import { putUserToFirstPage, useAdminCheck } from "@/hooks";
 import { API_URL, fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
+import { AmountData, Brand, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
 import { buildQueryParams, newAbortSignal } from "@/lib/utils";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import axios from "axios";
@@ -24,15 +24,7 @@ import { PackagePlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
-import {
-  AmountData,
-  Brand,
-  Category,
-  Checked,
-  Page,
-  Status,
-  initialCheckedState,
-} from "../../components/dashboard/products/interfaces";
+import { Page } from "../../components/dashboard/products/interfaces";
 
 export default function Products() {
   const location = useLocation();
@@ -192,11 +184,11 @@ export default function Products() {
           </div>
           <div className="flex flex-1 items-start justify-center p-4 rounded-lg border border-dashed shadow-sm">
             <div className="flex flex-col items-center gap-2 text-center w-full">
-              {pageData?.totalElements === 0 ? (
+              {!pageData || Object.keys(pageData).length === 0 ? (
                 <>
                   <h3 className="text-2xl font-bold tracking-tight">You have no products</h3>
                   <p className="text-sm text-muted-foreground">You can start selling as soon as you add a product.</p>
-                  <Button className="mt-4">Add Product</Button>
+                  <NewButton path="products" icon={<PackagePlus />} type="Product" className="mt-4" />
                 </>
               ) : (
                 <ProductTable data={pageData} viewToggle={viewToggle} />

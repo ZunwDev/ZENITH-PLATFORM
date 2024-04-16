@@ -52,10 +52,10 @@ export async function uploadImageToFirebase(path: string, blob: string) {
   }
 }
 
-export async function getImagesFromFirebase(productId: string) {
+export async function getImagesFromFirebase(path: string, id: string) {
   try {
     const storage = initializeFirebase();
-    const storageRef = ref(storage, `images/${productId}`);
+    const storageRef = ref(storage, `${path}/${id}`);
 
     const items = await listAll(storageRef);
     const downloadURLs = await Promise.all(items.items.map(async (itemRef) => getDownloadURL(itemRef)));
