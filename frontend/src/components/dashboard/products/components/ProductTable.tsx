@@ -1,4 +1,4 @@
-import { Loading } from "@/components/global";
+import { FailedToLoad, Loading } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,7 +9,7 @@ import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/ut
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
-export default function ProductTable({ data, viewToggle }) {
+export default function ProductTable({ data, viewToggle, pageError, amountError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
   const [thumbnail, setThumbnail] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
@@ -31,8 +31,12 @@ export default function ProductTable({ data, viewToggle }) {
     fetchThumbnail();
   }, [data]);
 
+  if (pageError || amountError) {
+    return <FailedToLoad text="products" />;
+  }
+
   if (loading) {
-    return <Loading text="products" />;
+    return <Loading text="product" />;
   }
 
   return (
@@ -41,13 +45,9 @@ export default function ProductTable({ data, viewToggle }) {
         <>
           <Table className="table-auto w-full">
             <TableCaption className="text-wrap">
-              {data?.content?.length > 0 ? (
-                <span>
-                  Showing {calculateShowingRange()} of <strong>{data.totalElements}</strong> products
-                </span>
-              ) : (
-                "No products found. Try changing/removing filters."
-              )}
+              <span>
+                Showing {calculateShowingRange()} of <strong>{data.totalElements}</strong> products
+              </span>
             </TableCaption>
             <TableHeader>
               <TableRow>

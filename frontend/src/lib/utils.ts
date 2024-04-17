@@ -80,7 +80,6 @@ export function setStateDelayed(setState: void, time: number) {
 export function newAbortSignal() {
   const abortController = new AbortController();
   setTimeout(() => abortController.abort(), 5000 || 0);
-
   return abortController.signal;
 }
 
@@ -127,7 +126,7 @@ export function buildQueryParams(paramsObj: ParamsObject) {
         break;
     }
   }
-  return queryParams.toString();
+  return "?" + queryParams.toString();
 }
 
 export function getAmountOfValuesInObjectOfObjects(obj: object) {

@@ -1,17 +1,15 @@
 import BannerGrid from "@/components/dashboard/banners/components/BannerGrid";
-import { Page } from "@/components/dashboard/banners/interfaces";
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
-import { Limit, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
+import { Limit, NoDataFound, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
 import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
-import { useAdminCheck } from "@/hooks";
-import { API_URL, fetchFilterData } from "@/lib/api";
+import { useAdminCheck, useApiData } from "@/hooks";
+import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { AmountData, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
-import { buildQueryParams, newAbortSignal } from "@/lib/utils";
-import axios from "axios";
+import { buildQueryParams } from "@/lib/utils";
 import { BookPlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -20,14 +18,12 @@ import { useDebounce } from "use-debounce";
 export default function Banners() {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
-
   useAdminCheck();
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
-  const [pageData, setPageData] = useState<Page>({} as Page);
   const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterData, setFilterData] = useState({
@@ -48,13 +44,14 @@ export default function Banners() {
       status: checked.status,
     };
 
-    const queryString = buildQueryParams(paramsObj);
-    return queryString;
+    return buildQueryParams(paramsObj);
   }, [checked, limit, dbcSearch, queryParams]);
 
   const handleResetFilters = useCallback(() => {
     setChecked(initialCheckedState);
   }, []);
+
+  const { data: pageData, loading: pageLoading, error: pageError } = useApiData("banners", APIURL, [APIURL]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,29 +64,8 @@ export default function Banners() {
       }
     };
 
-    const fetchBanners = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/banners?${APIURL}`, {
-          signal: newAbortSignal(),
-        });
-        //const amountsResponse = await axios.get(`${API_URL}/banners/amounts?${APIURL}`);
-
-        setPageData(response.data);
-        //setAmountData(amountsResponse.data);
-      } catch (error) {
-        console.error("Error fetching banners:", error.response?.data?.message || error.message);
-        setPageData({} as Page);
-        //setAmountData({} as AmountData);
-      }
-    };
-
     fetchData();
-    fetchBanners();
-
-    return () => {
-      // Clean up any resources if necessary
-    };
-  }, [limit, APIURL]);
+  }, [APIURL]);
 
   const handleChipRemove = useCallback(
     (key, idToRemove) => {
@@ -132,7 +108,7 @@ export default function Banners() {
                 </div>
                 <div className="flex flex-row gap-1.5">
                   <Limit setLimit={setLimit} limit={limit} type="Banners" />
-                  {pageData.totalElements > 0 && (
+                  {pageData?.totalElements > 0 && (
                     <NewButton path="banners" icon={<BookPlus />} type="Banner" className="ml-auto" />
                   )}
                 </div>
@@ -169,19 +145,21 @@ export default function Banners() {
             </div>
             <div
               className={`flex flex-1 ${
-                !pageData || Object.keys(pageData).length === 0 ? "items-center justify-center" : "items-start w-full"
+                !pageData || Object.keys(pageData)?.length === 0 ? "items-center justify-center" : "items-start w-full"
               } p-4 rounded-lg border border-dashed shadow-sm`}>
               <div className="flex flex-col items-center gap-2 text-center w-full">
-                {!pageData || Object.keys(pageData).length === 0 ? (
+                {!pageData || Object.keys(pageData)?.length === 0 ? (
                   <>
-                    <h3 className="text-2xl font-bold tracking-tight">You have no banners</h3>
-                    <p className="text-sm text-muted-foreground">
-                      You can start advertising stuff as soon as you add an active banner.
-                    </p>
-                    <NewButton path="banners" icon={<BookPlus />} type="Banner" className="mt-4" />
+                    <NoDataFound
+                      filterAmount={filterAmount}
+                      dbcSearch={dbcSearch}
+                      type="banners"
+                      description="You can start advertising stuff as soon as you add an active banner."
+                    />
+                    <NewButton path="banners" icon={<BookPlus />} type="Banner" className="mt-2" />
                   </>
                 ) : (
-                  <BannerGrid data={pageData} />
+                  <BannerGrid data={pageData} pageError={pageError} />
                 )}
               </div>
             </div>

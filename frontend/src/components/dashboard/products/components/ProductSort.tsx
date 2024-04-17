@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
-import React, { useMemo } from "react";
+import React from "react";
 
 const sorts = [
   {
@@ -54,20 +54,30 @@ const sorts = [
   },
 ];
 
-export default function ProductSort({ sortBy, setSortBy }) {
-  const dropdownMenuItems = useMemo(
-    () =>
-      sorts.map((item, index) => (
-        <React.Fragment key={index}>
-          <DropdownMenuLabel>{item.name}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioItem value={`${item.sortOptions.name}_desc`}>{item.sortOptions.desc}</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={`${item.sortOptions.name}_asc`}>{item.sortOptions.asc}</DropdownMenuRadioItem>
-          {index !== sorts.length - 1 && <DropdownMenuSeparator key={`separator-${index}`} />}
-        </React.Fragment>
-      )),
-    []
-  );
+export default function ProductSort({ sortBy, sortDirection, setSortBy, setSortDirection }) {
+  const dropdownMenuItems = sorts.map((item, index) => (
+    <React.Fragment key={index + `${item}`}>
+      <DropdownMenuLabel>{item.name}</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <DropdownMenuRadioItem
+        value={`${item.sortOptions.name}_desc`}
+        onClick={() => {
+          setSortBy(item.sortOptions.name);
+          setSortDirection("desc");
+        }}>
+        {item.sortOptions.desc}
+      </DropdownMenuRadioItem>
+      <DropdownMenuRadioItem
+        value={`${item.sortOptions.name}_asc`}
+        onClick={() => {
+          setSortBy(item.sortOptions.name);
+          setSortDirection("asc");
+        }}>
+        {item.sortOptions.asc}
+      </DropdownMenuRadioItem>
+      {index !== sorts.length - 1 && <DropdownMenuSeparator key={`separator-${index}`} />}
+    </React.Fragment>
+  ));
 
   return (
     <DropdownMenu modal={false}>
@@ -79,7 +89,13 @@ export default function ProductSort({ sortBy, setSortBy }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
-        <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
+        <DropdownMenuRadioGroup
+          value={`${sortBy}_${sortDirection}`}
+          onValueChange={(newValue) => {
+            const [newSortBy, newSortDirection] = newValue.split("_");
+            setSortBy(newSortBy);
+            setSortDirection(newSortDirection);
+          }}>
           {dropdownMenuItems}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

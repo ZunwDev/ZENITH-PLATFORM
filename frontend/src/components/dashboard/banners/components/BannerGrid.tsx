@@ -1,4 +1,4 @@
-import { Loading } from "@/components/global";
+import { FailedToLoad, Loading } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { PaginationControls, Thumbnail } from "@/components/util";
@@ -8,7 +8,7 @@ import { getStatus, goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
-export default function BannerGrid({ data }) {
+export default function BannerGrid({ data, pageError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
   const [thumbnail, setThumbnail] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
@@ -30,8 +30,12 @@ export default function BannerGrid({ data }) {
     fetchThumbnail();
   }, [data]);
 
+  if (pageError) {
+    return <FailedToLoad text="banners" />;
+  }
+
   if (loading) {
-    return <Loading text="banners" />;
+    return <Loading text="banner" />;
   }
 
   return (

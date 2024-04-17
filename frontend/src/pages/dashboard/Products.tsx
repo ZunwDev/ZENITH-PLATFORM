@@ -1,5 +1,5 @@
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
-import { Limit, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
+import { Limit, NoDataFound, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
 import {
   ProductExport,
   ProductFilter,
@@ -9,20 +9,17 @@ import {
 } from "@/components/dashboard/products/components";
 import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
-import { ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
-import { useAdminCheck } from "@/hooks";
-import { API_URL, fetchFilterData } from "@/lib/api";
+import { useAdminCheck, useApiData } from "@/hooks";
+import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
-import { AmountData, Brand, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
-import { buildQueryParams, newAbortSignal } from "@/lib/utils";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import axios from "axios";
+import { Brand, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
+import { buildQueryParams } from "@/lib/utils";
 import { PackagePlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
-import { Page } from "../../components/dashboard/products/interfaces";
 
 export default function Products() {
   const location = useLocation();
@@ -33,10 +30,9 @@ export default function Products() {
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
-  const [sortBy, setSortBy] = useState("createdAt_desc");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("desc");
   const [viewToggle, setViewToggle] = useState("list");
-  const [pageData, setPageData] = useState<Page>({} as Page);
-  const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterData, setFilterData] = useState({
     category: [] as Category[],
@@ -52,21 +48,27 @@ export default function Products() {
     const paramsObj = {
       limit,
       page: pageQueryParam - 1,
-      sortBy: sortBy.slice(0, sortBy.indexOf("_")),
-      sortDirection: sortBy.slice(sortBy.indexOf("_") + 1, sortBy.length),
+      sortBy,
+      sortDirection,
       searchQuery: dbcSearch || "",
       brand: checked.brand,
       category: checked.category,
       status: checked.status,
     };
 
-    const queryString = buildQueryParams(paramsObj);
-    return queryString;
-  }, [checked, limit, sortBy, dbcSearch, queryParams]);
+    return buildQueryParams(paramsObj);
+  }, [checked, limit, sortBy, sortDirection, dbcSearch, queryParams]);
 
   const handleResetFilters = useCallback(() => {
     setChecked(initialCheckedState);
   }, []);
+
+  const { data: pageData, loading: pageLoading, error: pageError } = useApiData("products", productAPIURL, [productAPIURL]);
+  const {
+    data: amountData,
+    loading: amountLoading,
+    error: amountError,
+  } = useApiData("products/amounts", productAPIURL, [productAPIURL]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,29 +81,8 @@ export default function Products() {
       }
     };
 
-    const fetchProducts = async () => {
-      try {
-        const productsResponse = await axios.get(`${API_URL}/products?${productAPIURL}`, {
-          signal: newAbortSignal(),
-        });
-        const amountsResponse = await axios.get(`${API_URL}/products/amounts?${productAPIURL}`);
-
-        setPageData(productsResponse.data);
-        setAmountData(amountsResponse.data);
-      } catch (error) {
-        console.error("Error fetching products:", error.response?.data?.message || error.message);
-        setPageData({} as Page);
-        setAmountData({} as AmountData);
-      }
-    };
-
     fetchData();
-    fetchProducts();
-
-    return () => {
-      // Clean up any resources if necessary
-    };
-  }, [limit, productAPIURL]);
+  }, [productAPIURL]);
 
   const handleChipRemove = useCallback(
     (key, idToRemove) => {
@@ -127,7 +108,7 @@ export default function Products() {
         </div>
         <main className="flex flex-1 flex-col gap-2 p-4 lg:gap-4 lg:p-6 pt-4">
           <div className="flex items-center justify-between px-4 md:px-0">
-            <PageHeader title={`Products (${pageData.totalElements > 0 ? pageData.totalElements : 0})`} />
+            <PageHeader title={`Products (${pageData?.totalElements > 0 ? pageData?.totalElements : 0})`} />
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
@@ -143,10 +124,15 @@ export default function Products() {
               </div>
               <div className="flex flex-row gap-1.5">
                 <Limit setLimit={setLimit} limit={limit} type="Products" />
-                <ProductSort sortBy={sortBy} setSortBy={setSortBy} />
-                <ProductExport data={pageData.content} />
+                <ProductSort
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                  sortDirection={sortDirection}
+                  setSortDirection={setSortDirection}
+                />
+                <ProductExport data={pageData?.content} />
                 <ProductViewToggle viewToggle={viewToggle} setViewToggle={setViewToggle} />
-                {pageData.totalElements > 0 && <NewButton path="products" icon={<PackagePlus />} type="Product" />}
+                {pageData?.totalElements > 0 && <NewButton path="products" icon={<PackagePlus />} type="Product" />}
               </div>
               <SearchBar setSearchQuery={setSearchQuery} type="products" className="md:hidden flex w-full" />
             </div>
@@ -179,16 +165,23 @@ export default function Products() {
               </ScrollArea>
             )}
           </div>
-          <div className="flex flex-1 items-start justify-center p-4 rounded-lg border border-dashed shadow-sm">
+          <div
+            className={`flex flex-1 ${
+              !pageData || Object.keys(pageData)?.length === 0 ? "items-center justify-center" : "items-start w-full"
+            } p-4 rounded-lg border border-dashed shadow-sm`}>
             <div className="flex flex-col items-center gap-2 text-center w-full">
-              {!pageData || Object.keys(pageData).length === 0 ? (
+              {!pageData || Object.keys(pageData)?.length === 0 ? (
                 <>
-                  <h3 className="text-2xl font-bold tracking-tight">You have no products</h3>
-                  <p className="text-sm text-muted-foreground">You can start selling as soon as you add a product.</p>
-                  <NewButton path="products" icon={<PackagePlus />} type="Product" className="mt-4" />
+                  <NoDataFound
+                    filterAmount={filterAmount}
+                    dbcSearch={dbcSearch}
+                    type="products"
+                    description="You can start selling as soon as you add a product."
+                  />
+                  <NewButton path="products" icon={<PackagePlus />} type="Product" className="mt-2" />
                 </>
               ) : (
-                <ProductTable data={pageData} viewToggle={viewToggle} />
+                <ProductTable data={pageData} viewToggle={viewToggle} pageError={pageError} amountError={amountError} />
               )}
             </div>
           </div>
