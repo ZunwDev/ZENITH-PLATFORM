@@ -15,6 +15,4 @@ public class Status {
     private Long statusId;
 
     private String name;
-
-    private Integer amount;
 }

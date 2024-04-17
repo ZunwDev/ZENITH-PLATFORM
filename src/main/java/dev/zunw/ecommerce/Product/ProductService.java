@@ -86,16 +86,8 @@ public class ProductService {
     }
 
     @Transactional
-    public Product saveProduct(Product product) {
-        Product savedProduct = productRepository.save(product);
-        updateCategoryAndBrandAmounts();
-        return savedProduct;
-    }
-
-    @Transactional
     public void deleteProduct(UUID productId) {
         productRepository.deleteById(productId);
-        updateCategoryAndBrandAmounts();
     }
 
     public Optional<Product> getProductById(UUID id) {
@@ -108,10 +100,5 @@ public class ProductService {
 
     public long getProductCountByBrandId(Long id) {
         return productRepository.countByBrandBrandId(id);
-    }
-
-    private void updateCategoryAndBrandAmounts() {
-        categoryRepository.updateCategoryAmount();
-        brandRepository.updateBrandAmount();
     }
 }

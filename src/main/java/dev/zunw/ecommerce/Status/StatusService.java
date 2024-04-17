@@ -9,31 +9,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
+
 @Service
 public class StatusService {
     private final StatusRepository statusRepository;
-    private final ProductRepository productRepository;
 
     @Autowired
-    public StatusService(StatusRepository statusRepository, ProductRepository productRepository) {
+    public StatusService(StatusRepository statusRepository) {
         this.statusRepository = statusRepository;
-        this.productRepository = productRepository;
     }
 
     public List<Status> getAllProductStatuses() {
-        List<Status> status = statusRepository.findAll();
-        List<Product> products = productRepository.findAll();
-
-        Map<Long, Integer> occurrences = new HashMap<>();
-        for (Product product : products) {
-            Long id = product.getStatus().getStatusId();
-            occurrences.put(id, occurrences.getOrDefault(id, 0) + 1);
-        }
-        for (Status statuses : status) {
-            Long statusId = statuses.getStatusId();
-            Integer occurrencesFinal = occurrences.getOrDefault(statusId, 0);
-            statuses.setAmount(occurrencesFinal);
-        }
-        return status;
+        return getAllRows(statusRepository);
     }
 }

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
+
 @Service
 public class BrandService {
     private final BrandRepository brandRepository;
@@ -22,26 +24,12 @@ public class BrandService {
     }
 
     public List<Brand> getAllProductBrands() {
-        List<Brand> brands = brandRepository.findAll();
-        List<Product> products = productRepository.findAll();
-
-        Map<Long, Integer> occurrences = new HashMap<>();
-        for (Product product : products) {
-            Long id = product.getBrand().getBrandId();
-            occurrences.put(id, occurrences.getOrDefault(id, 0) + 1);
-        }
-        for (Brand brand : brands) {
-            Long brandId = brand.getBrandId();
-            Integer occurrencesFinal = occurrences.getOrDefault(brandId, 0);
-            brand.setAmount(occurrencesFinal);
-        }
-
-        return brands;
+        return getAllRows(brandRepository);
     }
 
     public List<Brand> getAllProductBrandsWithAmountGreaterThanZero() {
-        List<Brand> brands = brandRepository.findAll();
-        List<Product> products = productRepository.findAll();
+        List<Brand> brands = getAllRows(brandRepository);
+        List<Product> products = getAllRows(productRepository);
 
         Map<Long, Integer> occurrences = new HashMap<>();
         for (Product product : products) {
@@ -55,7 +43,6 @@ public class BrandService {
             Long brandId = brand.getBrandId();
             Integer occurrencesFinal = occurrences.getOrDefault(brandId, 0);
             if (occurrencesFinal > 0) {
-                brand.setAmount(occurrencesFinal);
                 brandsWithAmountGreaterThanZero.add(brand);
             }
         }

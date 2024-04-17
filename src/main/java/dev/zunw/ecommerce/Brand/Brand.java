@@ -15,6 +15,4 @@ public class Brand {
     private Long brandId;
 
     private String name;
-
-    private Integer amount;
 }

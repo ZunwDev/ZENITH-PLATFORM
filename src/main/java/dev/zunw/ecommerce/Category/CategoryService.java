@@ -14,29 +14,13 @@ import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.productRepository = productRepository;
     }
 
     public List<Category> getAllProductCategories() {
-        List<Category> categories = getAllRows(categoryRepository);
-        List<Product> products = getAllRows(productRepository);
-
-        Map<Long, Integer> occurrences = new HashMap<>();
-        for (Product product : products) {
-            Long id = product.getCategory().getCategoryId();
-            occurrences.put(id, occurrences.getOrDefault(id, 0) + 1);
-        }
-        for (Category category : categories) {
-            Long brandId = category.getCategoryId();
-            Integer occurrencesFinal = occurrences.getOrDefault(brandId, 0);
-            category.setAmount(occurrencesFinal);
-        }
-
-        return categories;
+        return getAllRows(categoryRepository);
     }
 }

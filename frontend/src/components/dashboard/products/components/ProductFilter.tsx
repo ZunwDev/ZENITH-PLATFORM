@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,10 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchFilterData } from "@/lib/api";
+import { Brand, Category, Checked, Status } from "@/lib/interfaces";
 import { cn, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { ChevronDown, Filter } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
-import { Brand, Category, Checked, Status } from "../interfaces";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 interface ProductFilter {
   setFilterAmount: React.Dispatch<React.SetStateAction<number>>;
@@ -32,27 +31,77 @@ interface CheckboxItems {
   checked: Checked;
   handleFilterChange: (filterType: string, id: number) => void;
   filterType: string;
+  amountData: any;
 }
 
-const FilterCheckboxItems = React.memo(({ data, checked, handleFilterChange, filterType }: CheckboxItems) => {
-  const renderCheckboxItem = (amount: number, name: string, id: number) => {
-    return amount > 0 && data !== "No data found" ? (
-      <DropdownMenuCheckboxItem
-        key={name}
-        checked={checked[filterType].includes(id)}
-        onCheckedChange={() => handleFilterChange(filterType, id)}>
-        {`${name} (${amount})`}
-      </DropdownMenuCheckboxItem>
-    ) : (
-      <DropdownMenuCheckboxItem key={name + id}>No data found</DropdownMenuCheckboxItem>
-    );
-  };
+function FilterCheckboxItems({ data, checked, handleFilterChange, filterType, amountData }: CheckboxItems) {
+  const renderCheckboxItem = useCallback(
+    (amount, name, id) => {
+      return amount > 0 && data !== "No data found" ? (
+        <DropdownMenuCheckboxItem
+          key={name}
+          checked={checked[filterType].includes(id)}
+          onCheckedChange={() => handleFilterChange(filterType, id)}>
+          {`${name} (${amount})`}
+        </DropdownMenuCheckboxItem>
+      ) : (
+        <DropdownMenuCheckboxItem key={name + id} disabled>
+          No data found
+        </DropdownMenuCheckboxItem>
+      );
+    },
+    [data, checked, filterType, handleFilterChange]
+  );
 
-  return data.map((item) => {
-    const itemCount = !Object.keys(checked).some((key) => checked[key].length) ? item.amount : data.amount || item.amount;
-    return renderCheckboxItem(itemCount, item.name, item[`${filterType}Id`]);
-  });
-});
+  const renderCheckboxItems = useMemo(() => {
+    return (data as { amount?: number; name?: string }[]).map((item) => {
+      const itemCount = Object.keys(checked).some((key) => checked[key].length)
+        ? item.amount
+        : data.amount ||
+          item.amount ||
+          Object.values(amountData as { amount?: number }[])
+            .flatMap((data) => data)
+            .find((dataItem) => dataItem[`${filterType}Id`] === item[`${filterType}Id`])?.amount ||
+          item.amount;
+      return renderCheckboxItem(itemCount, item.name, item[`${filterType}Id`]);
+    });
+  }, [data, checked, filterType, renderCheckboxItem, amountData]);
+
+  return renderCheckboxItems;
+}
+
+function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, filterType, filteredData, data, amountData }) {
+  const filteredItems = useMemo(() => filteredData[filterType] || ["No data found"], [filteredData, filterType]);
+  const FilterCheckboxComponent = (
+    <FilterCheckboxItems
+      amountData={amountData}
+      data={filteredItems}
+      checked={checked}
+      filterType={filterType}
+      handleFilterChange={handleFilterChange}
+    />
+  );
+
+  const filterContent =
+    filterType === "brand" ? (
+      <ScrollArea className={`h-${data.brandsNonZero.length > 12 ? "96" : "fit"}`}>{FilterCheckboxComponent}</ScrollArea>
+    ) : (
+      FilterCheckboxComponent
+    );
+
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger>
+        <span>
+          {filterType.capitalize()} {getFilterAmountLabel(filterType)}
+        </span>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuPortal>
+        <DropdownMenuSubContent>{filterContent}</DropdownMenuSubContent>
+      </DropdownMenuPortal>
+    </DropdownMenuSub>
+  );
+}
 
 export default function ProductFilter({ setFilterAmount, filterAmount, checked, setChecked, amountData }: ProductFilter) {
   const [data, setData] = useState({
@@ -94,7 +143,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
       status: checked.category.length > 0 || checked.brand.length > 0 ? amountData.status : data.status,
     });
     setFilterAmount(getAmountOfValuesInObjectOfObjects(checked));
-  }, [checked, data, setFilterAmount, amountData]);
+  }, [checked, data, amountData]);
 
   const getFilterAmountLabel = (type: string) => {
     return checked[type].length > 0 && "(" + checked[type].length + ")";
@@ -125,6 +174,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
         <DropdownMenuLabel>Available filters</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <CategoryFilterSub
+          amountData={amountData}
           getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
@@ -133,6 +183,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
           data={data}
         />
         <CategoryFilterSub
+          amountData={amountData}
           getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
@@ -141,6 +192,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
           data={data}
         />
         <CategoryFilterSub
+          amountData={amountData}
           getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
@@ -150,39 +202,5 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
         />
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, filterType, filteredData, data }) {
-  return (
-    <DropdownMenuSub>
-      <DropdownMenuSubTrigger>
-        <span>
-          {filterType.capitalize()} {getFilterAmountLabel(filterType)}
-        </span>
-      </DropdownMenuSubTrigger>
-      <DropdownMenuPortal>
-        <DropdownMenuSubContent>
-          {filterType === "brand" && (
-            <ScrollArea className={data.brandsNonZero.length > 12 ? "h-96" : "h-fit"}>
-              <FilterCheckboxItems
-                data={filteredData[filterType] || ["No data found"]}
-                checked={checked}
-                filterType={filterType}
-                handleFilterChange={handleFilterChange}
-              />
-            </ScrollArea>
-          )}
-          {filterType !== "brand" && (
-            <FilterCheckboxItems
-              data={filteredData[filterType] || ["No data found"]}
-              checked={checked}
-              filterType={filterType}
-              handleFilterChange={handleFilterChange}
-            />
-          )}
-        </DropdownMenuSubContent>
-      </DropdownMenuPortal>
-    </DropdownMenuSub>
   );
 }
