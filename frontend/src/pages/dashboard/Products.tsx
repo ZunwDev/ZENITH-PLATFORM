@@ -168,7 +168,7 @@ export default function Products() {
           <div
             className={`flex flex-1 ${
               !pageData || Object.keys(pageData)?.length === 0 ? "items-center justify-center" : "items-start w-full"
-            } p-4 rounded-lg border border-dashed shadow-sm`}>
+            } p-4 rounded-lg border-2 border-dashed shadow-sm`}>
             <div className="flex flex-col items-center gap-2 text-center w-full">
               {!pageData || Object.keys(pageData)?.length === 0 ? (
                 <>
