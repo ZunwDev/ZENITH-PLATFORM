@@ -203,3 +203,7 @@ export function findId(array: any[], selectedValue: string, id: string): number 
   const foundData = array?.find((item) => item?.name?.toLowerCase() === selectedValue?.toLowerCase());
   return foundData ? foundData[id] : null;
 }
+
+export const getFilterAmountLabel = (checked, type: string) => {
+  return checked[type].length > 0 && "(" + checked[type].length + ")";
+};

@@ -69,7 +69,7 @@ export default function NewProductForm() {
       category: "",
       brand: "",
       type: "",
-      status: "",
+      status: "active",
     },
   });
 

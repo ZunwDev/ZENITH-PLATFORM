@@ -1,4 +1,4 @@
-import BannerGrid from "@/components/dashboard/banners/components/BannerGrid";
+import { BannerFilter, BannerGrid } from "@/components/dashboard/banners/components";
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
 import { Limit, NoDataFound, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
 import { User } from "@/components/header";
@@ -8,8 +8,8 @@ import { NewButton } from "@/components/util";
 import { useAdminCheck, useApiData } from "@/hooks";
 import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
-import { AmountData, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
-import { buildQueryParams } from "@/lib/utils";
+import { Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
+import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { BookPlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -22,14 +22,13 @@ export default function Banners() {
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [filterAmount, setFilterAmount] = useState(0);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
-  const [amountData, setAmountData] = useState<AmountData>({} as AmountData);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterData, setFilterData] = useState({
     category: [] as Category[],
     status: [] as Status[],
   });
+  const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
 
   // Debounced values
   const [dbcSearch] = useDebounce(searchQuery, 250);
@@ -52,6 +51,7 @@ export default function Banners() {
   }, []);
 
   const { data: pageData, loading: pageLoading, error: pageError } = useApiData("banners", APIURL, [APIURL]);
+  const { data: amountData, loading: amountLoading, error: amountError } = useApiData("banners/amounts", APIURL, [APIURL]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,13 +97,7 @@ export default function Banners() {
             <div className="flex flex-col gap-2">
               <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
                 <div className="flex flex-row gap-1.5">
-                  {/*                   <ProductFilter
-                    setFilterAmount={setFilterAmount}
-                    filterAmount={filterAmount}
-                    checked={checked}
-                    setChecked={setChecked}
-                    amountData={amountData}
-                  /> */}
+                  <BannerFilter filterAmount={filterAmount} checked={checked} setChecked={setChecked} amountData={amountData} />
                   <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:flex hidden" />
                 </div>
                 <div className="flex flex-row gap-1.5">
