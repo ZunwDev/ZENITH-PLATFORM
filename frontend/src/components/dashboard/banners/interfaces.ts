@@ -26,3 +26,17 @@ export interface Page {
   totalElements: number;
   totalPages: number;
 }
+
+export interface Checked {
+  category?: string[];
+  status?: string[];
+  aspectRatio?: string[];
+  position?: string[];
+}
+
+export const initialCheckedState: Checked = {
+  status: [],
+  category: [],
+  aspectRatio: [],
+  position: [],
+};

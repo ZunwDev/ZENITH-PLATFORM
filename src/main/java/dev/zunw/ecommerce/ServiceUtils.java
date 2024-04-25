@@ -49,7 +49,7 @@ public class ServiceUtils {
 
     @Transactional(readOnly = true)
     public static <T, ID> Optional<T> findRowById(ID id, JpaRepository<T, ID> repository) {
-        return repository.findById(id);
+        return id == null ? Optional.empty() : repository.findById(id);
     }
 
     public static <T> List<T> getAllRows(JpaRepository<T, ?> repository) {
@@ -60,5 +60,16 @@ public class ServiceUtils {
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method method = entity.getClass().getMethod(methodName, parameterType);
         method.invoke(entity, value);
+    }
+
+    public static String capitalizeIfNotCapitalized(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        char firstChar = value.charAt(0);
+        if (!Character.isUpperCase(firstChar)) {
+            return Character.toUpperCase(firstChar) + value.substring(1);
+        }
+        return value;
     }
 }

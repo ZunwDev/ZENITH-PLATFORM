@@ -11,6 +11,7 @@ const routes = {
   products: `${dashboard}/products`,
   banners: `${dashboard}/banners`,
   newBanner: `${dashboard}/banners/new`,
+  editBanner: `${dashboard}/banners/edit/:bannerId`,
   attributes: `${dashboard}/attributes`,
   newProduct: `${dashboard}/products/new`,
   editProduct: `${dashboard}/products/edit/:productId`,

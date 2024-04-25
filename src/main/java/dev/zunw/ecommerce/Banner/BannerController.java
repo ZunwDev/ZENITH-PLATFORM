@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static dev.zunw.ecommerce.ServiceUtils.saveEntity;
@@ -39,27 +40,49 @@ public class BannerController {
             Banner createdBanner = saveEntity(banner, bannerRepository);
             return ResponseUtils.createdResponse("Banner created successfully", "Banner Creation", Optional.of(createdBanner));
         } catch (Exception e) {
-            System.out.println(banner.getCategory());
             return ResponseUtils.serverErrorResponse("Failed to create a banner");
         }
     }
 
-    @GetMapping
+    @GetMapping("/filteredData")
     public ResponseEntity<Object> getAllBanners(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false) List<Long> category,
-            @RequestParam(required = false) List<Long> status,
+            @RequestParam(required = false) List<String> position,
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(required = false) List<String> status,
+            @RequestParam(required = false) List<String> aspectRatio,
             @RequestParam(required = false) String searchQuery
     ) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Banner> banners = bannerService.findByFilters(category, status, pageable,
-                searchQuery);
-
-        if (banners.isEmpty()) {
-            return ResponseUtils.notFoundResponse("No banners found");
+        Map<String, Object> filteredData = bannerService.filterData(
+                position, category, status, aspectRatio, pageable, searchQuery
+        );
+        if (filteredData.isEmpty()) {
+            return ResponseUtils.notFoundResponse("No banners found with the given filters");
         } else {
-            return ResponseUtils.successResponse(Optional.of(banners));
+            return ResponseUtils.successResponse(Optional.of(filteredData));
+        }
+    }
+
+    @GetMapping()
+    public ResponseEntity<Object> getFilteredBannerData(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) List<String> position,
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(required = false) List<String> status,
+            @RequestParam(required = false) List<String> aspectRatio,
+            @RequestParam(required = false) String searchQuery
+    ) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Banner> filteredData = bannerService.getFilteredBannerData(
+                position, category, status, aspectRatio, pageable, searchQuery
+        );
+        if (filteredData.isEmpty()) {
+            return ResponseUtils.notFoundResponse("No banners found with the given filters");
+        } else {
+            return ResponseUtils.successResponse(Optional.of(filteredData));
         }
     }
 }

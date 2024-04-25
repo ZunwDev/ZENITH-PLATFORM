@@ -204,6 +204,6 @@ export function findId(array: any[], selectedValue: string, id: string): number 
   return foundData ? foundData[id] : null;
 }
 
-export const getFilterAmountLabel = (checked, type: string) => {
-  return checked[type].length > 0 && "(" + checked[type].length + ")";
+export const getFilterAmountLabel = (checked: any, type: string) => {
+  return checked?.[type]?.length > 0 && "(" + checked?.[type]?.length + ")";
 };

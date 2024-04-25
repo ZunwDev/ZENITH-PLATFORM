@@ -57,7 +57,6 @@ public class ProductService {
                 filterInfo.put(filterType + "Id", filterId);
                 filterInfo.put("amount", amount);
                 filterInfo.put("name", name);
-
                 countsList.add(filterInfo);
             }
             filterCounts.put(filterType, countsList);

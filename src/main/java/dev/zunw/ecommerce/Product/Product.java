@@ -39,7 +39,6 @@ public class Product {
     @Transient
     private transient JsonNode parsedSpecifications;
     private String description;
-    private Float rating;
     private Float price;
     private String specifications;
     private Integer quantity;

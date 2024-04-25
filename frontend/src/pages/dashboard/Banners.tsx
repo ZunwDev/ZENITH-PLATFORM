@@ -1,4 +1,5 @@
 import { BannerFilter, BannerGrid } from "@/components/dashboard/banners/components";
+import { Checked, initialCheckedState } from "@/components/dashboard/banners/interfaces";
 import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
 import { Limit, NoDataFound, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
 import { User } from "@/components/header";
@@ -8,7 +9,6 @@ import { NewButton } from "@/components/util";
 import { useAdminCheck, useApiData } from "@/hooks";
 import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
-import { Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
 import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { BookPlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -24,10 +24,7 @@ export default function Banners() {
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterData, setFilterData] = useState({
-    category: [] as Category[],
-    status: [] as Status[],
-  });
+  const [filterData, setFilterData] = useState({});
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
 
   // Debounced values
@@ -41,6 +38,8 @@ export default function Banners() {
       searchQuery: dbcSearch || "",
       category: checked.category,
       status: checked.status,
+      aspectRatio: checked.aspectRatio,
+      position: checked.position,
     };
 
     return buildQueryParams(paramsObj);
@@ -51,7 +50,11 @@ export default function Banners() {
   }, []);
 
   const { data: pageData, loading: pageLoading, error: pageError } = useApiData("banners", APIURL, [APIURL]);
-  const { data: amountData, loading: amountLoading, error: amountError } = useApiData("banners/amounts", APIURL, [APIURL]);
+  const {
+    data: filterAmData,
+    loading: filterLoading,
+    error: filterError,
+  } = useApiData("banners/filteredData", APIURL, [APIURL]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,7 +100,12 @@ export default function Banners() {
             <div className="flex flex-col gap-2">
               <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
                 <div className="flex flex-row gap-1.5">
-                  <BannerFilter filterAmount={filterAmount} checked={checked} setChecked={setChecked} amountData={amountData} />
+                  <BannerFilter
+                    filterAmount={filterAmount}
+                    checked={checked}
+                    setChecked={setChecked}
+                    filteredData={filterAmData}
+                  />
                   <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:flex hidden" />
                 </div>
                 <div className="flex flex-row gap-1.5">
@@ -113,17 +121,24 @@ export default function Banners() {
                   {Object.entries(checked)
                     .reverse()
                     .map(([key, value], index) => {
+                      const filteredItems = filterAmData?.filters?.filter((filterObj) => {
+                        return filterObj.filterable.some((item: { id: string }) => item.id === key);
+                      });
+                      const filterName = filterAmData?.filters?.find((filterObj) => filterObj.filterId === key)?.filterName;
                       if (value.length > 0) {
                         return (
                           <ChipGroup key={index}>
-                            <ChipGroupTitle>{key.capitalize()}:</ChipGroupTitle>
+                            <ChipGroupTitle>{filterName}:</ChipGroupTitle>
                             <ChipGroupContent>
                               {value.map((item, index) => (
                                 <Chip key={index} onRemove={() => handleChipRemove(key, item)}>
-                                  {filterData &&
-                                    filterData[key]
-                                      .filter((filtered) => filtered[key + "Id"] === item)
-                                      .map((filteredItem) => filteredItem.name)}
+                                  {filteredItems.map((filteredItem) =>
+                                    filteredItem.filterable.map((filteredSubItem, subIndex) =>
+                                      filteredSubItem.id === key && filteredSubItem.name.toLowerCase() === item ? (
+                                        <span key={subIndex}>{filteredSubItem.name}</span>
+                                      ) : null
+                                    )
+                                  )}
                                 </Chip>
                               ))}
                             </ChipGroupContent>

@@ -14,12 +14,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchFilterData } from "@/lib/api";
 import { Brand, Category, Checked, Status } from "@/lib/interfaces";
-import { cn, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
+import { cn, getFilterAmountLabel } from "@/lib/utils";
 import { ChevronDown, Filter } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 interface ProductFilter {
-  setFilterAmount: React.Dispatch<React.SetStateAction<number>>;
   filterAmount: number;
   checked: Checked;
   setChecked: React.Dispatch<React.SetStateAction<Checked>>;
@@ -70,7 +69,7 @@ function FilterCheckboxItems({ data, checked, handleFilterChange, filterType, am
   return renderCheckboxItems;
 }
 
-function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, filterType, filteredData, data, amountData }) {
+function CategoryFilterSub({ checked, handleFilterChange, filterType, filteredData, amountData }) {
   const filteredItems = useMemo(() => filteredData[filterType] || ["No data found"], [filteredData, filterType]);
   const FilterCheckboxComponent = (
     <FilterCheckboxItems
@@ -82,18 +81,21 @@ function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, 
     />
   );
 
-  const filterContent =
-    filterType === "brand" ? (
-      <ScrollArea className={`h-${data.brandsNonZero.length > 12 ? "96" : "fit"}`}>{FilterCheckboxComponent}</ScrollArea>
-    ) : (
-      FilterCheckboxComponent
-    );
+  const filterContent = (
+    <>
+      {filteredItems.length > 12 ? (
+        <ScrollArea className={`h-96`}>{FilterCheckboxComponent}</ScrollArea>
+      ) : (
+        FilterCheckboxComponent
+      )}
+    </>
+  );
 
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
         <span>
-          {filterType.capitalize()} {getFilterAmountLabel(filterType)}
+          {filterType.capitalize()} {getFilterAmountLabel(checked, filterType)}
         </span>
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
@@ -103,7 +105,7 @@ function CategoryFilterSub({ getFilterAmountLabel, checked, handleFilterChange, 
   );
 }
 
-export default function ProductFilter({ setFilterAmount, filterAmount, checked, setChecked, amountData }: ProductFilter) {
+export default function ProductFilter({ filterAmount, checked, setChecked, amountData }: ProductFilter) {
   const [data, setData] = useState({
     category: [] as Category[],
     brandsNonZero: [] as Brand[],
@@ -142,12 +144,7 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
       brand: checked.category.length > 0 ? amountData.brand : data.brandsNonZero,
       status: checked.category.length > 0 || checked.brand.length > 0 ? amountData.status : data.status,
     });
-    setFilterAmount(getAmountOfValuesInObjectOfObjects(checked));
   }, [checked, data, amountData]);
-
-  const getFilterAmountLabel = (type: string) => {
-    return checked[type].length > 0 && "(" + checked[type].length + ")";
-  };
 
   return (
     <DropdownMenu modal={false}>
@@ -175,30 +172,24 @@ export default function ProductFilter({ setFilterAmount, filterAmount, checked, 
         <DropdownMenuSeparator />
         <CategoryFilterSub
           amountData={amountData}
-          getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
           filterType="brand"
           filteredData={filteredData}
-          data={data}
         />
         <CategoryFilterSub
           amountData={amountData}
-          getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
           filterType="category"
           filteredData={filteredData}
-          data={data}
         />
         <CategoryFilterSub
           amountData={amountData}
-          getFilterAmountLabel={getFilterAmountLabel}
           checked={checked}
           handleFilterChange={handleFilterChange}
           filterType="status"
           filteredData={filteredData}
-          data={data}
         />
       </DropdownMenuContent>
     </DropdownMenu>
