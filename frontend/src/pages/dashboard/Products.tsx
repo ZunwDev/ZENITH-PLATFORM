@@ -45,15 +45,18 @@ export default function Products() {
 
   const productAPIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
+    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : queryParams.get("q") || "";
+    const { brand, category, status } = checked;
+
     const paramsObj = {
       limit,
       page: pageQueryParam - 1,
       sortBy,
       sortDirection,
-      searchQuery: dbcSearch || "",
-      brand: checked.brand,
-      category: checked.category,
-      status: checked.status,
+      searchQuery,
+      brand,
+      category,
+      status,
     };
 
     return buildQueryParams(paramsObj);

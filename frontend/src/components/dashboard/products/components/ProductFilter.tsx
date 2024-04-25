@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FilterAmount } from "@/components/util";
 import { fetchFilterData } from "@/lib/api";
 import { Brand, Category, Checked, Status } from "@/lib/interfaces";
 import { cn, getFilterAmountLabel } from "@/lib/utils";
@@ -156,14 +157,7 @@ export default function ProductFilter({ filterAmount, checked, setChecked, amoun
           })}>
           <Filter className="size-4" />
           Filter By
-          {filterAmount > 0 && (
-            <div
-              className={cn("bg-primary size-4 rounded-full text-xs flex items-center justify-center text-accent", {
-                "px-4": filterAmount > 9,
-              })}>
-              {filterAmount > 99 ? "99+" : filterAmount}
-            </div>
-          )}
+          <FilterAmount filterAmount={filterAmount} />
           <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
         </Button>
       </DropdownMenuTrigger>

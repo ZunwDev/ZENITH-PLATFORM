@@ -12,17 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FilterAmount } from "@/components/util";
 import { cn, getFilterAmountLabel } from "@/lib/utils";
 import { ChevronDown, Filter } from "lucide-react";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { Checked } from "../interfaces";
-
-interface Filter {
-  filterAmount: number;
-  checked: Checked;
-  setChecked: React.Dispatch<React.SetStateAction<Checked>>;
-  filteredData: any;
-}
 
 interface CheckboxItems {
   checked: Checked;
@@ -44,15 +38,9 @@ const FilterCheckboxItems: React.FC<CheckboxItems> = ({ checked, handleFilterCha
     },
     [checked, handleFilterChange]
   );
-
-  const renderCheckboxItems = useMemo(() => {
-    return filteredData?.map((item) => {
-      return renderCheckboxItem(item.existingAmount, item.name, item.id);
-    });
-  }, [filteredData, checked, renderCheckboxItem]);
-
-  return <>{renderCheckboxItems}</>;
+  return <>{filteredData?.map((item) => renderCheckboxItem(item.existingAmount, item.name, item.id))}</>;
 };
+
 function CategoryFilterSub({ checked, handleFilterChange, filterType, filteredData }) {
   const FilterCheckboxComponent = (
     <FilterCheckboxItems filteredData={filteredData} checked={checked} handleFilterChange={handleFilterChange} />
@@ -82,6 +70,13 @@ function CategoryFilterSub({ checked, handleFilterChange, filterType, filteredDa
   );
 }
 
+interface Filter {
+  filterAmount: number;
+  checked: Checked;
+  setChecked: React.Dispatch<React.SetStateAction<Checked>>;
+  filteredData: any;
+}
+
 export default function BannerFilter({ filterAmount, checked, setChecked, filteredData }: Filter) {
   const handleFilterChange = useCallback(
     (id: any, name: string) => {
@@ -109,14 +104,7 @@ export default function BannerFilter({ filterAmount, checked, setChecked, filter
               })}>
               <Filter className="size-4" />
               Filter By
-              {filterAmount > 0 && (
-                <div
-                  className={cn("bg-primary size-4 rounded-full text-xs flex items-center justify-center text-accent", {
-                    "px-4": filterAmount > 9,
-                  })}>
-                  {filterAmount > 99 ? "99+" : filterAmount}
-                </div>
-              )}
+              <FilterAmount filterAmount={filterAmount} />
               <ChevronDown className="size-3 group-data-[state=open]:rotate-180 transition duration-200" />
             </Button>
           </DropdownMenuTrigger>

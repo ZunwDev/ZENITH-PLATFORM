@@ -24,7 +24,7 @@ public interface BannerRepository extends JpaRepository<Banner, UUID>,
             "AND (:categories IS NULL OR LOWER(c.name) IN (:categories)) " + // Use :categories instead of :categories
             "AND (:statuses IS NULL OR LOWER(s.name) IN :statuses) " +
             "AND (:aspectRatios IS NULL OR LOWER(b.aspect_ratio) IN :aspectRatios) " +
-            "AND (:searchQuery IS NULL OR b.name LIKE %:searchQuery%)",
+            "AND (:searchQuery IS NULL OR LOWER(b.name) LIKE LOWER(CONCAT('%', :searchQuery, '%')))",
             countQuery = "SELECT count(DISTINCT b.banner_id) FROM Banner b " +
                     "LEFT JOIN Status s ON b.status_id = s.status_id " +
                     "LEFT JOIN Category c ON b.category_id = c.category_id " +
@@ -32,7 +32,7 @@ public interface BannerRepository extends JpaRepository<Banner, UUID>,
                     "AND (:categories IS NULL OR LOWER(c.name) IN (:categories)) " + // Use :categories instead of :categories
                     "AND (:statuses IS NULL OR LOWER(s.name) IN :statuses) " +
                     "AND (:aspectRatios IS NULL OR LOWER(b.aspect_ratio) IN :aspectRatios) " +
-                    "AND (:searchQuery IS NULL OR b.name LIKE %:searchQuery%)",
+                    "AND (:searchQuery IS NULL OR LOWER(b.name) LIKE LOWER(CONCAT('%', :searchQuery, '%')))",
             nativeQuery = true)
     Page<Banner> findByFilters(
             @Param("positions") List<String> positions,

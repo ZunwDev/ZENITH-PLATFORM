@@ -47,18 +47,14 @@ public class BannerService {
                                               List<String> statuses, List<String> aspectRatios,
                                               Pageable pageable, String searchQuery) {
         try {
-            if (positions == null && categories == null && statuses == null && aspectRatios == null) {
-                return bannerRepository.findAll(pageable);
-            } else {
-                return bannerRepository.findByFilters(
-                        Optional.ofNullable(positions).orElse(Collections.emptyList()),
-                        Optional.ofNullable(categories).orElse(Collections.emptyList()),
-                        Optional.ofNullable(statuses).orElse(Collections.emptyList()),
-                        Optional.ofNullable(aspectRatios).orElse(Collections.emptyList()),
-                        searchQuery,
-                        pageable
-                );
-            }
+            return bannerRepository.findByFilters(
+                    Optional.ofNullable(positions).orElse(Collections.emptyList()),
+                    Optional.ofNullable(categories).orElse(Collections.emptyList()),
+                    Optional.ofNullable(statuses).orElse(Collections.emptyList()),
+                    Optional.ofNullable(aspectRatios).orElse(Collections.emptyList()),
+                    searchQuery,
+                    pageable
+            );
         } catch (DataAccessException e) {
             throw new RuntimeException("An error occurred while accessing the database.");
         } catch (Exception e) {

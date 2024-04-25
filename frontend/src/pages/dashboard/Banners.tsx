@@ -7,11 +7,10 @@ import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
 import { useAdminCheck, useApiData } from "@/hooks";
-import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { BookPlus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 
@@ -24,7 +23,6 @@ export default function Banners() {
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterData, setFilterData] = useState({});
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
 
   // Debounced values
@@ -32,14 +30,17 @@ export default function Banners() {
 
   const APIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
+    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : queryParams.get("q") || "";
+    const { category, status, aspectRatio, position } = checked;
+
     const paramsObj = {
       limit,
       page: pageQueryParam - 1,
-      searchQuery: dbcSearch || "",
-      category: checked.category,
-      status: checked.status,
-      aspectRatio: checked.aspectRatio,
-      position: checked.position,
+      searchQuery,
+      category,
+      status,
+      aspectRatio,
+      position,
     };
 
     return buildQueryParams(paramsObj);
@@ -50,25 +51,7 @@ export default function Banners() {
   }, []);
 
   const { data: pageData, loading: pageLoading, error: pageError } = useApiData("banners", APIURL, [APIURL]);
-  const {
-    data: filterAmData,
-    loading: filterLoading,
-    error: filterError,
-  } = useApiData("banners/filteredData", APIURL, [APIURL]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch filter data
-        const [categoryData, , , , statusData] = await fetchFilterData();
-        setFilterData({ category: categoryData, status: statusData });
-      } catch (error) {
-        console.error("Error fetching filter data:", error.response?.data?.message || error.message);
-      }
-    };
-
-    fetchData();
-  }, [APIURL]);
+  const { data: filterData, loading: filterLoading, error: filterError } = useApiData("banners/filteredData", APIURL, [APIURL]);
 
   const handleChipRemove = useCallback(
     (key, idToRemove) => {
@@ -104,7 +87,7 @@ export default function Banners() {
                     filterAmount={filterAmount}
                     checked={checked}
                     setChecked={setChecked}
-                    filteredData={filterAmData}
+                    filteredData={filterData}
                   />
                   <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:flex hidden" />
                 </div>
@@ -121,10 +104,10 @@ export default function Banners() {
                   {Object.entries(checked)
                     .reverse()
                     .map(([key, value], index) => {
-                      const filteredItems = filterAmData?.filters?.filter((filterObj) => {
+                      const filteredItems = filterData?.filters?.filter((filterObj) => {
                         return filterObj.filterable.some((item: { id: string }) => item.id === key);
                       });
-                      const filterName = filterAmData?.filters?.find((filterObj) => filterObj.filterId === key)?.filterName;
+                      const filterName = filterData?.filters?.find((filterObj) => filterObj.filterId === key)?.filterName;
                       if (value.length > 0) {
                         return (
                           <ChipGroup key={index}>
