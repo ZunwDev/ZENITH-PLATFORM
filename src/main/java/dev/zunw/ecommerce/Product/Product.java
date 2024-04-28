@@ -1,7 +1,5 @@
 package dev.zunw.ecommerce.Product;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Category.Category;
 import dev.zunw.ecommerce.Status.Status;
@@ -36,25 +34,16 @@ public class Product {
     @JoinColumn(name = "status_id")
     private Status status;
 
-    @Transient
-    private transient JsonNode parsedSpecifications;
     private String description;
     private Float price;
+
+    @Column(columnDefinition = "jsonb")
     private String specifications;
+
     private Integer quantity;
     private Integer discount;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @PostLoad
-    public void parseSpecifications() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            this.parsedSpecifications = mapper.readTree(specifications);
-        } catch (Exception e) {
-            this.parsedSpecifications = mapper.createObjectNode().put("message", "No specifications");
-        }
-    }
 }

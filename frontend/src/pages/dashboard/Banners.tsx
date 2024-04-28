@@ -6,7 +6,7 @@ import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
-import { useAdminCheck, useApiData } from "@/hooks";
+import { useAdminCheck, useApiData, useSearch } from "@/hooks";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { BookPlus } from "lucide-react";
@@ -17,20 +17,19 @@ import { useDebounce } from "use-debounce";
 export default function Banners() {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
   useAdminCheck();
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
-  const [searchQuery, setSearchQuery] = useState("");
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
-
-  // Debounced values
-  const [dbcSearch] = useDebounce(searchQuery, 250);
+  const [dbcSearch] = useDebounce(localSearchQuery, 250);
 
   const APIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
-    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : queryParams.get("q") || "";
+    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL() || "";
     const { category, status, aspectRatio, position } = checked;
 
     const paramsObj = {
@@ -44,7 +43,7 @@ export default function Banners() {
     };
 
     return buildQueryParams(paramsObj);
-  }, [checked, limit, dbcSearch, queryParams]);
+  }, [checked, limit, dbcSearch, queryParams.get("p")]);
 
   const handleResetFilters = useCallback(() => {
     setChecked(initialCheckedState);
@@ -89,7 +88,12 @@ export default function Banners() {
                     setChecked={setChecked}
                     filteredData={filterData}
                   />
-                  <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:flex hidden" />
+                  <SearchBar
+                    searchQuery={localSearchQuery}
+                    type="banners"
+                    className="md:flex hidden"
+                    handleSearch={handleSearch}
+                  />
                 </div>
                 <div className="flex flex-row gap-1.5">
                   <Limit setLimit={setLimit} limit={limit} type="Banners" />
@@ -97,7 +101,12 @@ export default function Banners() {
                     <NewButton path="banners" icon={<BookPlus />} type="Banner" className="ml-auto" />
                   )}
                 </div>
-                <SearchBar setSearchQuery={setSearchQuery} type="banners" className="md:hidden flex w-full" />
+                <SearchBar
+                  searchQuery={localSearchQuery}
+                  type="banners"
+                  className="md:hidden flex w-full"
+                  handleSearch={handleSearch}
+                />
               </div>
               {filterAmount > 0 && (
                 <ScrollArea className="w-full overflow-y-hidden whitespace-nowrap">

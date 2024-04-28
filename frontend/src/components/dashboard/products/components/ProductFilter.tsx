@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilterAmount } from "@/components/util";
 import { fetchFilterData } from "@/lib/api";
 import { Brand, Category, Checked, Status } from "@/lib/interfaces";
-import { cn, getFilterAmountLabel } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ChevronDown, Filter } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -95,9 +95,7 @@ function CategoryFilterSub({ checked, handleFilterChange, filterType, filteredDa
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
-        <span>
-          {filterType.capitalize()} {getFilterAmountLabel(checked, filterType)}
-        </span>
+        <span>{filterType.capitalize()}</span>
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent>{filterContent}</DropdownMenuSubContent>

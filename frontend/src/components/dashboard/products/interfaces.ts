@@ -6,9 +6,7 @@ export interface Product {
   category: Category;
   status: Status;
   description: string;
-  rating: number;
   price: number;
-  parsedSpecifications: string;
   quantity: number;
   discount: number;
   brand: Brand;

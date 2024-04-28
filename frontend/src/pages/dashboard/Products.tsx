@@ -11,7 +11,7 @@ import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
-import { useAdminCheck, useApiData } from "@/hooks";
+import { useAdminCheck, useApiData, useSearch } from "@/hooks";
 import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { Brand, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
@@ -24,6 +24,8 @@ import { useDebounce } from "use-debounce";
 export default function Products() {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
   useAdminCheck();
 
   // Filter related
@@ -32,20 +34,17 @@ export default function Products() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("desc");
   const [viewToggle, setViewToggle] = useState("list");
-  const [searchQuery, setSearchQuery] = useState("");
   const [filterData, setFilterData] = useState({
     category: [] as Category[],
     brand: [] as Brand[],
     status: [] as Status[],
   });
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
-
-  // Debounced values
-  const [dbcSearch] = useDebounce(searchQuery, 250);
+  const [dbcSearch] = useDebounce(localSearchQuery, 250);
 
   const productAPIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
-    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : queryParams.get("q") || "";
+    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL() || "";
     const { brand, category, status } = checked;
 
     const paramsObj = {
@@ -60,7 +59,7 @@ export default function Products() {
     };
 
     return buildQueryParams(paramsObj);
-  }, [checked, limit, sortBy, sortDirection, dbcSearch, queryParams]);
+  }, [checked, limit, sortBy, sortDirection, dbcSearch, queryParams.get("p")]);
 
   const handleResetFilters = useCallback(() => {
     setChecked(initialCheckedState);
@@ -117,7 +116,12 @@ export default function Products() {
             <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
               <div className="flex flex-row gap-1.5">
                 <ProductFilter filterAmount={filterAmount} checked={checked} setChecked={setChecked} amountData={amountData} />
-                <SearchBar setSearchQuery={setSearchQuery} type="products" className="md:flex hidden" />
+                <SearchBar
+                  searchQuery={localSearchQuery}
+                  type="products"
+                  className="md:flex hidden"
+                  handleSearch={handleSearch}
+                />
               </div>
               <div className="flex flex-row gap-1.5">
                 <Limit setLimit={setLimit} limit={limit} type="Products" />
@@ -131,7 +135,12 @@ export default function Products() {
                 <ProductViewToggle viewToggle={viewToggle} setViewToggle={setViewToggle} />
                 {pageData?.totalElements > 0 && <NewButton path="products" icon={<PackagePlus />} type="Product" />}
               </div>
-              <SearchBar setSearchQuery={setSearchQuery} type="products" className="md:hidden flex w-full" />
+              <SearchBar
+                searchQuery={localSearchQuery}
+                type="products"
+                className="md:hidden flex w-full"
+                handleSearch={handleSearch}
+              />
             </div>
             {filterAmount > 0 && (
               <ScrollArea className="w-full overflow-y-hidden whitespace-nowrap">

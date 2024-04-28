@@ -21,7 +21,7 @@ public interface BannerRepository extends JpaRepository<Banner, UUID>,
             "LEFT JOIN Status s ON b.status_id = s.status_id " +
             "LEFT JOIN Category c ON b.category_id = c.category_id " +
             "WHERE (:positions IS NULL OR LOWER(b.position) IN :positions) " +
-            "AND (:categories IS NULL OR LOWER(c.name) IN (:categories)) " + // Use :categories instead of :categories
+            "AND (:categories IS NULL OR LOWER(c.name) IN (:categories)) " +
             "AND (:statuses IS NULL OR LOWER(s.name) IN :statuses) " +
             "AND (:aspectRatios IS NULL OR LOWER(b.aspect_ratio) IN :aspectRatios) " +
             "AND (:searchQuery IS NULL OR LOWER(b.name) LIKE LOWER(CONCAT('%', :searchQuery, '%')))",
@@ -29,7 +29,7 @@ public interface BannerRepository extends JpaRepository<Banner, UUID>,
                     "LEFT JOIN Status s ON b.status_id = s.status_id " +
                     "LEFT JOIN Category c ON b.category_id = c.category_id " +
                     "WHERE (:positions IS NULL OR LOWER(b.position) IN :positions) " +
-                    "AND (:categories IS NULL OR LOWER(c.name) IN (:categories)) " + // Use :categories instead of :categories
+                    "AND (:categories IS NULL OR LOWER(c.name) IN (:categories)) " +
                     "AND (:statuses IS NULL OR LOWER(s.name) IN :statuses) " +
                     "AND (:aspectRatios IS NULL OR LOWER(b.aspect_ratio) IN :aspectRatios) " +
                     "AND (:searchQuery IS NULL OR LOWER(b.name) LIKE LOWER(CONCAT('%', :searchQuery, '%')))",

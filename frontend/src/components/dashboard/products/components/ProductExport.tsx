@@ -12,7 +12,7 @@ import { ChevronDown, Download } from "lucide-react";
 
 function adjustData(data) {
   return data.map((product) => {
-    const { specifications, parsedSpecifications, brand, category, status, ...productWithoutSpecs } = product;
+    const { specifications, brand, category, status, ...productWithoutSpecs } = product;
     const brandName = brand.name;
     const categoryName = category.name;
     const statusName = status.name;
