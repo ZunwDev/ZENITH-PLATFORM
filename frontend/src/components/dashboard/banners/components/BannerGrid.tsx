@@ -61,23 +61,23 @@ export default function BannerGrid({ data, pageError }) {
                     </div>
                   </div>
                   <div className="flex justify-between w-full mt-2">
-                    <span className="text-start text-sm">Position:</span>
+                    <span className="text-start text-sm italic">Position:</span>
                     <span className="text-sm">{item.position.capitalize()}</span>
                   </div>
                   <div className="flex justify-between w-full">
-                    <span className="text-start text-sm">Aspect Ratio:</span>
+                    <span className="text-start text-sm italic">Aspect Ratio:</span>
                     <span className="text-sm">{item.aspectRatio.capitalize()}</span>
                   </div>
                   <div className="flex justify-between w-full">
-                    <span className="text-start text-sm">Activation Date:</span>
+                    <span className="text-start text-sm italic">Activation Date:</span>
                     <span className="text-sm font-bold">{item.activationDate}</span>
                   </div>
                   <div className="flex justify-between w-full">
-                    <span className="text-start text-sm">Expiration Date:</span>
+                    <span className="text-start text-sm italic">Expiration Date:</span>
                     <span className="text-sm font-bold">{item.expirationDate}</span>
                   </div>
                   <div className="flex justify-between w-full">
-                    <span className="text-start text-sm">Includes Button?:</span>
+                    <span className="text-start text-sm italic">Includes Button?:</span>
                     <span className="text-sm">{item.includeButton.toString()}</span>
                   </div>
                 </div>

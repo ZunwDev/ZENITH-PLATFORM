@@ -77,6 +77,14 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
                   </TableCell>
                   <TableCell>
                     <div className={cn("font-bold flex flex-row md:gap-2 justify-center")}>
+                      {item.discount > 0 && (
+                        <div
+                          className={cn("font-bold md:block hidden text-end", {
+                            "font-normal text-muted-foreground": item.discount == 0,
+                          })}>
+                          ${applyDiscount(item.price, item.discount)}
+                        </div>
+                      )}
                       <span
                         className={item.discount > 0 ? "font-normal text-muted-foreground text-end" : ""}
                         style={{
@@ -87,14 +95,6 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
                         }}>
                         ${item.price}
                       </span>
-                      {item.discount > 0 && (
-                        <div
-                          className={cn("font-bold md:block hidden text-end", {
-                            "font-normal text-muted-foreground": item.discount == 0,
-                          })}>
-                          ${applyDiscount(item.price, item.discount)}
-                        </div>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>{item.quantity} pcs</TableCell>
@@ -146,11 +146,11 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
                         </div>
                       </div>
                       <div className="flex justify-between w-full mt-2">
-                        <span className="text-start text-sm">Category:</span>
+                        <span className="text-start text-sm italic">Category:</span>
                         <span className="text-sm">{item.category.name}</span>
                       </div>
                       <div className="flex justify-between w-full">
-                        <span className="text-start text-sm">Price:</span>
+                        <span className="text-start text-sm italic">Price:</span>
                         <div className="flex flex-row gap-2 items-center">
                           <div className="font-bold text-sm">
                             ${item.discount > 0 ? applyDiscount(item.price, item.discount) : item.price ? item.price : NaN}
@@ -171,15 +171,15 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
                         </div>
                       </div>
                       <div className="flex justify-between w-full">
-                        <span className="text-start text-sm">Stock:</span>
+                        <span className="text-start text-sm italic">Stock:</span>
                         <span className="text-sm">{item.quantity} pcs</span>
                       </div>
                       <div className="flex justify-between w-full">
-                        <span className="text-start text-sm">Created At:</span>
+                        <span className="text-start text-sm italic">Created At:</span>
                         <span className="text-sm">{formatDateWithTime(item.createdAt)}</span>
                       </div>
                       <div className="flex justify-between w-full">
-                        <span className="text-start text-sm">Rating:</span>
+                        <span className="text-start text-sm italic">Rating:</span>
                         <RatingStars rating={5} />
                       </div>
                     </div>
