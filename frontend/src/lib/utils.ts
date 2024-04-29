@@ -25,8 +25,6 @@ export function formatDate(dateString: string): string {
 
 export function formatDateWithTime(dateString: string): string {
   const date = new Date(dateString);
-  const currentDate = new Date();
-
   const optionsDate: Intl.DateTimeFormatOptions = {
     month: "numeric",
     day: "2-digit",
@@ -83,18 +81,6 @@ export function newAbortSignal() {
   return abortController.signal;
 }
 
-export function debounce(fn, delay) {
-  let timeoutId;
-  return function (...args) {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(() => {
-      fn.apply(this, args);
-    }, delay);
-  };
-}
-
 declare global {
   interface String {
     capitalize(): string;
@@ -139,12 +125,6 @@ export function shortenText(str: string) {
 
 export function includesAny(value, arr) {
   return arr.some((category) => value == category);
-}
-
-export function makeEndBy99(num: number) {
-  if (num) {
-    return !num?.toFixed(2).endsWith(".99") ? (num + 0.99).toFixed(2) : num?.toFixed(2);
-  }
 }
 
 export function removeLeadingZeroes(number) {
@@ -203,7 +183,3 @@ export function findId(array: any[], selectedValue: string, id: string): number 
   const foundData = array?.find((item) => item?.name?.toLowerCase() === selectedValue?.toLowerCase());
   return foundData ? foundData[id] : null;
 }
-
-export const getFilterAmountLabel = (checked: any, type: string) => {
-  return checked?.[type]?.length > 0 && "(" + checked?.[type]?.length + ")";
-};
