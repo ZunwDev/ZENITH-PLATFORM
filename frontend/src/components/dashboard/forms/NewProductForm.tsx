@@ -11,7 +11,7 @@ import {
   SelectFormItem,
   TextareaFormItem,
 } from "@/components/util";
-import ProductListing from "@/components/view/ProductListing";
+import ProductPreview from "@/components/view/previews/ProductPreview";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchAttributeDataWithCategoryId, fetchFilterData } from "@/lib/api";
 import {
@@ -215,16 +215,7 @@ export default function NewProductForm() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ProductListing
-                    previewData={{
-                      imageThumbnail: imageThumbnail,
-                      description: form.getValues("description"),
-                      price: form.getValues("price"),
-                      discount: form.getValues("discount"),
-                      quantity: form.getValues("quantity"),
-                      name: form.getValues("name"),
-                    }}
-                  />
+                  <ProductPreview imageThumbnail={imageThumbnail} form={form} />
                 </CardContent>
               </Card>
             </div>

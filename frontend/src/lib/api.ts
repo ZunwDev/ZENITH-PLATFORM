@@ -51,6 +51,15 @@ export async function fetchProductDataById(id: string) {
   }
 }
 
+export async function fetchBannerDataById(id: string) {
+  try {
+    const response = await axios.get(`${API_URL}/banners/${id}`, { signal: newAbortSignal() });
+    return response;
+  } catch (error) {
+    console.error(`Error fetching banner data with id ${id}`, error.response?.data?.message || error.message);
+  }
+}
+
 export async function fetchAttributeData(attributeTypeId: number) {
   try {
     const response = await axios.get(`${API_URL}/attributes/${attributeTypeId}`, { signal: newAbortSignal() });

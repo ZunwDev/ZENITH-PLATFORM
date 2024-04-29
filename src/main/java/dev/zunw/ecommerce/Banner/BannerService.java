@@ -19,6 +19,10 @@ public class BannerService {
         this.bannerRepository = bannerRepository;
     }
 
+    public Optional<Banner> getBannerById(UUID id) {
+        return bannerRepository.findById(id);
+    }
+
     public Map<String, Object> filterData(List<String> positions, List<String> categories,
                                           List<String> statuses, List<String> aspectRatios,
                                           Pageable pageable, String searchQuery) {

@@ -6,16 +6,16 @@ import {
   BackArrow,
   CheckboxFormItem,
   DateRangeFormItem,
-  InformationDescription,
   InputFormItem,
   NoValidationInputFile,
   SelectFormItem,
 } from "@/components/util";
+import BannerPreview from "@/components/view/previews/BannerPreview";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchFilterData } from "@/lib/api";
 import { NO_IMAGE_PROVIDED_MESSAGE } from "@/lib/constants";
 import { uploadImageToFirebase } from "@/lib/firebase";
-import { cn, findId, getStatusId, newAbortSignal } from "@/lib/utils";
+import { findId, getStatusId, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { addDays } from "date-fns";
@@ -41,6 +41,15 @@ export default function NewBannerForm() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("draft");
   const [selectedAspectRatio, setSelectedAspectRatio] = useState("horizontal");
+
+  const setSelectedPositionAndUpdateCategory = (position: string) => {
+    if (position === "homepage") {
+      // If the selected position is "Homepage", reset the selected category to ""
+      setSelectedCategory("");
+    }
+    // Update the selected position
+    setSelectedPosition(position);
+  };
 
   const currentDate = new Date();
   const initialDateRange: DateRange = {
@@ -176,7 +185,7 @@ export default function NewBannerForm() {
                         form={form}
                         data={["Homepage", "Category"]}
                         selectedValue={selectedPosition}
-                        setSelectedValue={setSelectedPosition}
+                        setSelectedValue={setSelectedPositionAndUpdateCategory}
                       />
                       {selectedPosition === "category" && (
                         <SelectFormItem
@@ -248,44 +257,7 @@ export default function NewBannerForm() {
                 </Form>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Banner Preview</CardTitle>
-                <CardDescription>
-                  This is a real-time preview of the banner. Depending on the aspect ratio selected:
-                  <InformationDescription>Horizontal aspect ratio size = 1200px x 200px.</InformationDescription>
-                  <InformationDescription>Vertical aspect ratio size = 200px x 600px.</InformationDescription>
-                </CardDescription>
-                <CardContent className="flex justify-center items-center bg-muted/40 p-32 rounded-lg">
-                  {image ? (
-                    <div
-                      title={form.getValues("name")}
-                      className={cn(
-                        "",
-                        { "h-[200px] w-[1200px] relative": selectedAspectRatio === "horizontal" },
-                        { "h-[600px] w-[200px] relative": selectedAspectRatio === "vertical" }
-                      )}>
-                      <a
-                        href={form.getValues("link") && !form.getValues("include_button") ? form.getValues("link") : undefined}>
-                        <img src={image} className="w-full h-full rounded-lg" alt="Preview" />
-                      </a>
-                      {form.getValues("include_button") && (
-                        <Button className="absolute bottom-8 left-8" variant="outline" asChild>
-                          <a href={form.getValues("link") ? form.getValues("link") : undefined}>More information</a>
-                        </Button>
-                      )}
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-lg text-center">No banner uploaded yet.</p>
-                      <p className="text-sm text-accent-foreground/50 text-center">
-                        Once you upload banner, it will appear here.
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </CardHeader>
-            </Card>
+            <BannerPreview image={image} form={form} />
           </div>
         </div>
       </div>

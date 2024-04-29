@@ -85,8 +85,8 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
   );
 }
 
-export function CheckboxFormItem({ id, label, description, form, ...rest }) {
-  const [isChecked, setIsChecked] = useState(false);
+export function CheckboxFormItem({ id, label, description, form, checked = false, ...rest }) {
+  const [isChecked, setIsChecked] = useState(checked || false);
 
   const handleCheckboxChange = (e) => {
     setIsChecked(e);

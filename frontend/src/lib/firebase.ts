@@ -52,6 +52,39 @@ export async function uploadImageToFirebase(path: string, blob: string) {
   }
 }
 
+export async function updateImageInFirebase(path: string, id: string, imageUrl: string) {
+  try {
+    const storage = initializeFirebase();
+    const storageRef = ref(storage, `${path}/${id}`);
+    const blob = await fetch(imageUrl).then((response) => response.blob());
+    await uploadBytes(storageRef, blob);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error updating image in Firebase Storage:", error);
+    throw error;
+  }
+}
+
+export async function getImageFromFirebase(path: string, id: string) {
+  try {
+    const storage = initializeFirebase();
+    const storageRef = ref(storage, `${path}/${id}`);
+
+    const items = await listAll(storageRef);
+    if (items.items.length > 0) {
+      const firstItem = items.items[0];
+      const downloadURL = await getDownloadURL(firstItem);
+      return downloadURL;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error retrieving images from Firebase Storage:", error);
+    throw error;
+  }
+}
+
 export async function getImagesFromFirebase(path: string, id: string) {
   try {
     const storage = initializeFirebase();

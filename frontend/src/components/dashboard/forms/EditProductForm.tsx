@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { BackArrow, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
-import ProductListing from "@/components/view/ProductListing";
+import ProductPreview from "@/components/view/previews/ProductPreview";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchFilterData, fetchProductDataById } from "@/lib/api";
 import {
@@ -31,7 +31,7 @@ import { FilterData, Product } from "../products/interfaces";
 
 export default function EditProductForm() {
   useAdminCheck();
-  const { stage, isSubmitting, updateStage, setSubmittingState, resetFormStatus } = useFormStatus("Save changes");
+  const { stage, isSubmitting, updateStage, setSubmittingState } = useFormStatus("Save changes");
   const { productId } = useParams();
   const showErrorToast = useErrorToast();
   const showSuccessToast = useSuccessToast();
@@ -143,10 +143,7 @@ export default function EditProductForm() {
       await updateProductImages(response.data.product.productId, images, imageThumbnail);
       showSuccessToast("Product Update", `Product "${values.name}" successfully updated.`);
       setTimeout(() => {
-        form.reset();
-        resetFormStatus();
-        setImageThumbnail("");
-        setImages([]);
+        window.location.reload();
       }, 2000);
     } catch (error) {
       updateStage("Save changes");
@@ -202,16 +199,7 @@ export default function EditProductForm() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ProductListing
-                  previewData={{
-                    imageThumbnail: imageThumbnail,
-                    description: form.getValues("description"),
-                    price: form.getValues("price"),
-                    discount: form.getValues("discount"),
-                    quantity: form.getValues("quantity"),
-                    name: form.getValues("name"),
-                  }}
-                />
+                <ProductPreview imageThumbnail={imageThumbnail} form={form} />
               </CardContent>
             </Card>
           </div>

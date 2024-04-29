@@ -1,4 +1,4 @@
-import { EditProductForm, NewProductForm } from "@/components/dashboard/forms";
+import { EditBannerForm, EditProductForm, NewProductForm } from "@/components/dashboard/forms";
 import NewBannerForm from "@/components/dashboard/forms/NewBannerForm";
 import { Attributes, Banners, Orders, Overview, Products } from "@/pages/dashboard";
 import { Settings } from "lucide-react";
@@ -53,5 +53,9 @@ export const DashboardRoutes = [
   {
     path: routes.editProduct,
     element: <EditProductForm />,
+  },
+  {
+    path: routes.editBanner,
+    element: <EditBannerForm />,
   },
 ];
