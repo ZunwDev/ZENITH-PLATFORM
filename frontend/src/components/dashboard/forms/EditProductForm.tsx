@@ -82,12 +82,12 @@ export default function EditProductForm() {
       setFilterData({ categories: categoryData, brands: brandData, productTypes: [] });
       setProductData(productData.data);
 
-      setCategoriesSelectedValue(productData.data.category.name);
-      setBrandsSelectedValue(productData.data.brand.name);
-      setStatusSelectedValue(productData.data.status.name);
-      setJsonData(productData.data.specifications);
+      const { name, description, price, discount, quantity, status, category, brand, specifications } = productData.data;
+      setCategoriesSelectedValue(category.name);
+      setBrandsSelectedValue(brand.name);
+      setStatusSelectedValue(status.name);
+      setJsonData(specifications);
 
-      const { name, description, price, discount, quantity, status, category, brand } = productData.data;
       form.setValue("name", name);
       form.setValue("description", description);
       form.setValue("price", price);

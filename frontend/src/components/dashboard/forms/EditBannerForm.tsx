@@ -60,7 +60,6 @@ export default function EditBannerForm() {
   const [image, setImage] = useState("");
   const [filterData, setFilterData] = useState<FilterData>({ categories: [] });
   const [bannerData, setBannerData] = useState<Banner>();
-
   const [date, setDate] = useState<DateRange | undefined>();
 
   useEffect(() => {
@@ -68,18 +67,19 @@ export default function EditBannerForm() {
       const [categoryData, , , ,] = await fetchFilterData();
       const bannerData = await fetchBannerDataById(bannerId);
       const image = await getImageFromFirebase("banners", bannerId);
+
       setImage(image);
       setFilterData({ categories: categoryData });
       setBannerData(bannerData.data);
-
-      setSelectedCategory(bannerData.data?.category?.name || "");
-      setSelectedStatus(bannerData.data.status.name);
-      setSelectedAspectRatio(bannerData.data.aspectRatio);
-      setSelectedPosition(bannerData.data.position);
-      setDate({ from: bannerData.data.activationDate, to: bannerData.data.expirationDate });
-
       const { name, position, aspectRatio, link, status, category, activationDate, expirationDate, includeButton } =
         bannerData.data;
+
+      setSelectedCategory(category?.name || "");
+      setSelectedStatus(status.name);
+      setSelectedAspectRatio(aspectRatio);
+      setSelectedPosition(position);
+      setDate({ from: activationDate, to: expirationDate });
+
       form.setValue("name", name);
       form.setValue("position", position);
       form.setValue("aspect_ratio", aspectRatio);
@@ -87,8 +87,8 @@ export default function EditBannerForm() {
       form.setValue("category", category?.name || "");
       form.setValue("status", status.name);
       form.setValue("date_range", {
-        from: new Date(bannerData.data.activationDate),
-        to: new Date(bannerData.data.expirationDate),
+        from: new Date(activationDate),
+        to: new Date(expirationDate),
       });
       form.setValue("include_button", includeButton);
     };
