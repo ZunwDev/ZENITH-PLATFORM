@@ -122,7 +122,7 @@ export default function EditBannerForm() {
       });
 
       updateStage("Uploading images...");
-      await updateImageInFirebase(response.data.data.bannerId, "banners", image);
+      await updateImageInFirebase("banners", response.data.data.bannerId, image);
       showSuccessToast("Banner Update", `Banner "${values.name}" successfully updated.`);
       setTimeout(() => {
         window.location.reload();

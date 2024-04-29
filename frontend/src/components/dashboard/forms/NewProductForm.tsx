@@ -30,7 +30,7 @@ import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FormSchema, SpecsGeneratorForm } from ".";
+import { ProductSchema, SpecsGeneratorForm } from ".";
 import { FullSidebar, SheetSidebar } from "../components";
 import { PageHeader } from "../global";
 import { CodeEditor, ProductImageManager } from "../products/components";
@@ -57,9 +57,9 @@ export default function NewProductForm() {
   const [statusSelectedValue, setStatusSelectedValue] = useState("active");
   const [addFormSchemaData, setAddFormSchemaData] = useState([]);
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<z.infer<typeof ProductSchema>>({
     mode: "onChange",
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(ProductSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -104,9 +104,9 @@ export default function NewProductForm() {
     setAddFormSchemaData(FormFields[typesSelectedValue] || []);
   }, [typesSelectedValue]);
 
-  const handleFormSubmit = async (values: z.infer<typeof FormSchema>) => {
+  const handleFormSubmit = async (values: z.infer<typeof ProductSchema>) => {
     try {
-      await FormSchema.parseAsync(values);
+      await ProductSchema.parseAsync(values);
       const action = "Product Creation";
       if (images.length === 0) return showErrorToast(action, NO_IMAGE_PROVIDED_MESSAGE);
       if (!jsonData) return showErrorToast(action, NO_SPECS_PROVIDED_MESSAGE);

@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
-import { FormSchema } from ".";
+import { ProductSchema } from ".";
 import { FullSidebar, SheetSidebar } from "../components";
 import { PageHeader } from "../global";
 import { CodeEditor, ProductImageManager } from "../products/components";
@@ -54,9 +54,9 @@ export default function EditProductForm() {
   const [formattedJSON, setFormattedJSON] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<z.infer<typeof ProductSchema>>({
     mode: "onChange",
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(ProductSchema),
   });
 
   useEffect(() => {
@@ -111,9 +111,9 @@ export default function EditProductForm() {
     }, 1000);
   };
 
-  const handleFormSubmit = async (values: z.infer<typeof FormSchema>) => {
+  const handleFormSubmit = async (values: z.infer<typeof ProductSchema>) => {
     try {
-      await FormSchema.parseAsync(values);
+      await ProductSchema.parseAsync(values);
       if (images.length === 0) return showErrorToast("Product Creation", NO_IMAGE_PROVIDED_MESSAGE);
       if (!jsonData) return showErrorToast("Product Creation", NO_SPECS_PROVIDED_MESSAGE);
       if (parseError) return showErrorToast("Product Creation", IS_PARSE_ERROR_MESSAGE);

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const FormSchema = z.object({
+export const ProductSchema = z.object({
   name: z.string().min(1).max(64),
   description: z.string().min(1).max(512),
   price: z.coerce.number().min(1),
