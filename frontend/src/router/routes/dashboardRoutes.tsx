@@ -1,6 +1,6 @@
-import { EditBannerForm, EditProductForm, NewProductForm } from "@/components/dashboard/forms";
-import NewBannerForm from "@/components/dashboard/forms/NewBannerForm";
 import { Attributes, Banners, Orders, Overview, Products } from "@/pages/dashboard";
+import { EditBannerForm, EditProductForm } from "@/pages/dashboard/edit";
+import { NewBannerForm, NewProductForm } from "@/pages/dashboard/new";
 import { Settings } from "lucide-react";
 
 const dashboard = "/:userId/dashboard";

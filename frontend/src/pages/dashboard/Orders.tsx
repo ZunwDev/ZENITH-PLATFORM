@@ -1,4 +1,4 @@
-import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
+import { FullSidebar, SheetSidebar } from "@/components/dashboard/global";
 import { User } from "@/components/header";
 
 export default function Orders() {

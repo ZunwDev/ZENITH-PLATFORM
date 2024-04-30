@@ -1,7 +1,14 @@
 import { BannerFilter, BannerGrid } from "@/components/dashboard/banners/components";
 import { Checked, initialCheckedState } from "@/components/dashboard/banners/interfaces";
-import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
-import { Limit, NoDataFound, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
+import {
+  FullSidebar,
+  Limit,
+  NoDataFound,
+  PageHeader,
+  ResetFilter,
+  SearchBar,
+  SheetSidebar,
+} from "@/components/dashboard/global";
 import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";

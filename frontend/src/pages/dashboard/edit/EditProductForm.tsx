@@ -23,11 +23,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
-import { ProductSchema } from ".";
-import { FullSidebar, SheetSidebar } from "../components";
-import { PageHeader } from "../global";
-import { CodeEditor, ProductImageManager } from "../products/components";
-import { FilterData, Product } from "../products/interfaces";
+import { ProductSchema } from "../../../components/dashboard/forms";
+import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
+import { CodeEditor, ProductImageManager } from "../../../components/dashboard/products/components";
+import { FilterData, Product } from "../../../components/dashboard/products/interfaces";
 
 export default function EditProductForm() {
   useAdminCheck();

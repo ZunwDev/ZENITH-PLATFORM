@@ -24,10 +24,9 @@ import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FullSidebar, SheetSidebar } from "../components";
-import { PageHeader } from "../global";
-import { FilterData } from "../products/interfaces";
-import { BannerSchema } from "./schema";
+import { BannerSchema } from "../../../components/dashboard/forms/schema";
+import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
+import { FilterData } from "../../../components/dashboard/products/interfaces";
 
 export default function NewBannerForm() {
   useAdminCheck();

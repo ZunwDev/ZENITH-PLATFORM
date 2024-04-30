@@ -1,6 +1,5 @@
 import { Attribute, AttributeType } from "@/components/dashboard/attributes/interface";
-import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
-import { PageHeader } from "@/components/dashboard/global";
+import { FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
 import { FilterData } from "@/components/dashboard/products/interfaces";
 import { ActionDialog } from "@/components/global";
 import { User } from "@/components/header";

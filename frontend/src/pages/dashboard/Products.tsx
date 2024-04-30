@@ -1,5 +1,12 @@
-import { FullSidebar, SheetSidebar } from "@/components/dashboard/components";
-import { Limit, NoDataFound, PageHeader, ResetFilter, SearchBar } from "@/components/dashboard/global";
+import {
+  FullSidebar,
+  Limit,
+  NoDataFound,
+  PageHeader,
+  ResetFilter,
+  SearchBar,
+  SheetSidebar,
+} from "@/components/dashboard/global";
 import {
   ProductExport,
   ProductFilter,

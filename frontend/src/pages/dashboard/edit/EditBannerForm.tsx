@@ -24,11 +24,10 @@ import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
-import { BannerSchema } from ".";
-import { Banner } from "../banners/interfaces";
-import { FullSidebar, SheetSidebar } from "../components";
-import { PageHeader } from "../global";
-import { FilterData } from "../products/interfaces";
+import { Banner } from "../../../components/dashboard/banners/interfaces";
+import { BannerSchema } from "../../../components/dashboard/forms";
+import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
+import { FilterData } from "../../../components/dashboard/products/interfaces";
 
 export default function EditBannerForm() {
   useAdminCheck();

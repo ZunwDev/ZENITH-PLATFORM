@@ -30,11 +30,10 @@ import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ProductSchema, SpecsGeneratorForm } from ".";
-import { FullSidebar, SheetSidebar } from "../components";
-import { PageHeader } from "../global";
-import { CodeEditor, ProductImageManager } from "../products/components";
-import { FilterData } from "../products/interfaces";
+import { ProductSchema, SpecsGeneratorForm } from "../../../components/dashboard/forms";
+import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
+import { CodeEditor, ProductImageManager } from "../../../components/dashboard/products/components";
+import { FilterData } from "../../../components/dashboard/products/interfaces";
 
 export default function NewProductForm() {
   useAdminCheck();
