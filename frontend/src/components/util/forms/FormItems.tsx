@@ -195,13 +195,13 @@ export function SelectFormItem({
             <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className={cn({ "h-96": data.length > 10 })}>
+        <PopoverContent className={cn({ "h-96": data?.length > 10 })}>
           <Command>
             <CommandInput placeholder={placeholder} />
-            <ScrollArea className={cn({ "h-96": data.length > 10 })}>
+            <ScrollArea className={cn({ "h-96": data?.length > 10 })}>
               <CommandEmpty>No {id} found.</CommandEmpty>
               <CommandGroup>
-                {data.map((item, index) => (
+                {data?.map((item, index) => (
                   <CommandItem
                     key={item.name + "/" + index}
                     id={id}

@@ -14,7 +14,7 @@ export const ProductSchema = z.object({
 
 export const ActionDialogSchema = z.object({
   name: z.string().min(1).max(64),
-  categoryId: z.coerce.number().optional(),
+  categoryId: z.coerce.number().optional().nullable(),
   attributeTypeId: z.coerce.number().optional(),
 });
 

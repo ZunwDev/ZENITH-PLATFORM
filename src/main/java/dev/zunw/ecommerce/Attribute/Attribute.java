@@ -14,9 +14,6 @@ public class Attribute {
     @Column(name = "attribute_id")
     private Long attributeId;
 
-    @Column(name = "category_id")
-    private Long categoryId;
-
     @Column(name = "attribute_type_id")
     private Long attributeTypeId;
 

@@ -72,5 +72,4 @@ public class BrandController {
                 deleteFunction, "Brand"
         );
     }
-
 }

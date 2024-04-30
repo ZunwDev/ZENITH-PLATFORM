@@ -40,7 +40,7 @@ interface ActionDialogTypes {
   title: string;
   item?: AttributeType | Attribute | any;
   actionType?: "edit" | "add" | "delete";
-  endpoint?: "categories" | "brands" | "attributes" | "attribute_types";
+  endpoint?: "categories" | "brands" | "attributes" | "attribute_types" | "product_types";
   attributeId: string;
 }
 
@@ -61,7 +61,7 @@ export default function ActionDialog({
     defaultValues: {
       name: actionType === "edit" ? item.name : "",
       attributeTypeId: item.attributeTypeId,
-      categoryId: item.categoryId,
+      categoryId: item.categoryId || null,
     },
   });
 
@@ -117,6 +117,7 @@ export default function ActionDialog({
 
   const handleClose = useCallback(() => {
     form.handleSubmit(handleSubmit)();
+    form.reset();
   }, [form, handleSubmit]);
 
   return (
@@ -184,6 +185,21 @@ export default function ActionDialog({
                     type="number"
                     {...form.register("categoryId")}
                     placeholder="Set the ID only if it's required"
+                  />
+                </>
+              )}
+
+              {endpoint === "product_types" && (
+                <>
+                  <Label htmlFor="catid" className="text-right">
+                    Category ID:
+                  </Label>
+                  <Input
+                    id="catid"
+                    defaultValue={item.categoryId}
+                    className="col-span-3 border rounded-md"
+                    type="number"
+                    {...form.register("categoryId")}
                   />
                 </>
               )}

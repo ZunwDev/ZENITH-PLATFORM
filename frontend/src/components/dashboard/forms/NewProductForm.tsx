@@ -13,7 +13,7 @@ import {
 } from "@/components/util";
 import ProductPreview from "@/components/view/previews/ProductPreview";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchAttributeDataWithCategoryId, fetchFilterData } from "@/lib/api";
+import { API_URL, fetchFilterData, fetchProductTypeDataByCategoryId } from "@/lib/api";
 import {
   IS_PARSE_ERROR_MESSAGE,
   NO_IMAGE_PROVIDED_MESSAGE,
@@ -90,9 +90,14 @@ export default function NewProductForm() {
   useEffect(() => {
     const fetchData = async () => {
       const [categoryData, brandData] = await fetchFilterData();
-      const productTypesData = categoryId ? await fetchAttributeDataWithCategoryId(categoryId, 1) : []; //1 are product types id
-      setFilterData({ categories: categoryData, brands: brandData, productTypes: productTypesData });
+      let productTypesData = [];
+      if (categoryId) {
+        const response = await fetchProductTypeDataByCategoryId(categoryId);
+        productTypesData = response.data;
+      }
+      setFilterData((prev) => ({ ...prev, categories: categoryData, brands: brandData, productTypes: productTypesData }));
     };
+
     fetchData();
   }, [categoryId]);
 
@@ -349,7 +354,7 @@ export default function NewProductForm() {
                   <SpecsGeneratorForm
                     addFormSchemaData={addFormSchemaData}
                     setJsonData={setJsonData}
-                    typesSelectedValue={filterData.productTypes.find(
+                    typesSelectedValue={filterData.productTypes?.find(
                       (item) => item.toLowerCase() === typesSelectedValue.toLowerCase()
                     )}
                   />

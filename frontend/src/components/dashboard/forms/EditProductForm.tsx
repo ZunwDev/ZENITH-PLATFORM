@@ -37,7 +37,7 @@ export default function EditProductForm() {
   const showSuccessToast = useSuccessToast();
 
   //Data
-  const [filterData, setFilterData] = useState<FilterData>({ categories: [], brands: [], productTypes: [] });
+  const [filterData, setFilterData] = useState<FilterData>({ categories: [], brands: [] });
   const [productData, setProductData] = useState<Product>();
 
   //Select stuff
@@ -79,7 +79,7 @@ export default function EditProductForm() {
       const productData = await fetchProductDataById(productId);
       const imagesFromFB = await getImagesFromFirebase("images", productId);
       setImages(imagesFromFB);
-      setFilterData({ categories: categoryData, brands: brandData, productTypes: [] });
+      setFilterData({ categories: categoryData, brands: brandData });
       setProductData(productData.data);
 
       const { name, description, price, discount, quantity, status, category, brand, specifications } = productData.data;

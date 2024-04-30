@@ -26,7 +26,7 @@ export default function Attributes() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [categoryData, brandData] = await fetchFilterData();
+      const [categoryData, brandData, , , productTypesData] = await fetchFilterData();
       const [typeData, attributeData] = await Promise.all([fetchAttributeTypes(), fetchAttributes()]);
 
       setData((prevData) => ({
@@ -36,7 +36,7 @@ export default function Attributes() {
         filterData: {
           categories: sortByIds(categoryData, "categoryId"),
           brands: sortByIds(brandData, "brandId"),
-          productTypes: [],
+          productTypes: sortByIds(productTypesData, "productTypeId"),
         },
       }));
     } catch (error) {
@@ -138,6 +138,32 @@ export default function Attributes() {
                       item={item}
                       endpoint="categories"
                       attributeId="categoryId"
+                    />
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Card>
+                <div className="flex items-center p-4 border-b">
+                  <h1 className="text-lg font-semibold">Product Types ({data.filterData.productTypes.length})</h1>
+                  <ActionDialog
+                    fetchData={fetchData}
+                    title="Product Type"
+                    endpoint="product_types"
+                    attributeId="productTypeId"
+                    actionType="add"
+                  />
+                </div>
+                <CardContent className="flex flex-wrap gap-3 py-4">
+                  {data.filterData.productTypes.map((item, index) => (
+                    <ActionDialog
+                      fetchData={fetchData}
+                      key={index}
+                      title="Product Type"
+                      item={item}
+                      endpoint="product_types"
+                      attributeId="productTypeId"
                     />
                   ))}
                 </CardContent>

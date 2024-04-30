@@ -32,12 +32,6 @@ public class AttributeController {
         return ResponseEntity.ok(attributeService.getByAttributeTypeId(attributeTypeId));
     }
 
-    @GetMapping("/{attributeTypeId}/{categoryId}")
-    public ResponseEntity<Object> getAttributesByCategoryIdAndAttributeTypeId(
-            @PathVariable Long attributeTypeId, @PathVariable Long categoryId) {
-        return ResponseEntity.ok(attributeService.getByCategoryIdAndAttributeTypeId(categoryId, attributeTypeId));
-    }
-
     @GetMapping
     public ResponseEntity<Object> getAttributes() {
         return ResponseEntity.ok(getAllRows(attributeRepository));

@@ -10,7 +10,7 @@ export default function Header() {
   return (
     <>
       {!urlContainsDashboard && !urlContainsAuth && (
-        <header className="h-16 border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] bg-primary text-accent">
+        <header className="h-14 lg:h-[60px] border-b px-8 w-full shadow-xl z-[999] fixed md:min-w-[1200px] min-w-[360px] bg-primary text-accent">
           <nav
             className={cn("flex items-center h-full flex-row", {
               "justify-between": !urlContainsDashboard && !urlContainsAuth,

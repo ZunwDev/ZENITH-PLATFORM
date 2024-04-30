@@ -19,23 +19,27 @@ export async function fetchSessionData(sessionToken) {
 
 export async function fetchFilterData() {
   try {
-    const [categoriesResponse, brandsResponse, brandsNonZeroResponse, statusResponse] = await Promise.all([
-      axios.get(`${API_URL}/categories`, {
-        signal: newAbortSignal(),
-      }),
-      axios.get(`${API_URL}/brands`, {
-        signal: newAbortSignal(),
-      }),
-      axios.get(`${API_URL}/brands/nonzero`, {
-        signal: newAbortSignal(),
-      }),
-      axios.get(`${API_URL}/status`),
-    ]);
+    const [categoriesResponse, brandsResponse, brandsNonZeroResponse, statusResponse, productTypesResponse] = await Promise.all(
+      [
+        axios.get(`${API_URL}/categories`, {
+          signal: newAbortSignal(),
+        }),
+        axios.get(`${API_URL}/brands`, {
+          signal: newAbortSignal(),
+        }),
+        axios.get(`${API_URL}/brands/nonzero`, {
+          signal: newAbortSignal(),
+        }),
+        axios.get(`${API_URL}/status`),
+        axios.get(`${API_URL}/product_types`),
+      ]
+    );
     const categories = categoriesResponse.data;
     const brands = brandsResponse.data;
     const brandsNonZero = brandsNonZeroResponse.data;
     const status = statusResponse.data;
-    return [categories, brands, brandsNonZero, status];
+    const productTypes = productTypesResponse.data;
+    return [categories, brands, brandsNonZero, status, productTypes];
   } catch (error) {
     console.error("Error fetching filters:", error.response?.data?.message || error.message);
     return [[], []];
@@ -48,6 +52,15 @@ export async function fetchProductDataById(id: string) {
     return response;
   } catch (error) {
     console.error(`Error fetching product data with id ${id}`, error.response?.data?.message || error.message);
+  }
+}
+
+export async function fetchProductTypeDataByCategoryId(id: number) {
+  try {
+    const response = await axios.get(`${API_URL}/product_types/${id}`, { signal: newAbortSignal() });
+    return response;
+  } catch (error) {
+    console.error(`Error fetching product types data with id ${id}`, error.response?.data?.message || error.message);
   }
 }
 
@@ -67,17 +80,6 @@ export async function fetchAttributeData(attributeTypeId: number) {
   } catch (error) {
     console.error(
       `Error fetching attribute data with attribute type id ${attributeTypeId}`,
-      error.response?.data?.message || error.message
-    );
-  }
-}
-export async function fetchAttributeDataWithCategoryId(categoryId: number, attributeTypeId: number) {
-  try {
-    const response = await axios.get(`${API_URL}/attributes/${attributeTypeId}/${categoryId}`, { signal: newAbortSignal() });
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error fetching attribute data with category id ${categoryId} and attribute type id ${attributeTypeId}`,
       error.response?.data?.message || error.message
     );
   }

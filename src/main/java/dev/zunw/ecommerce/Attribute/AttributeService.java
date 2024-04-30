@@ -21,11 +21,4 @@ public class AttributeService {
                 .map(Attribute::getName)
                 .collect(Collectors.toList());
     }
-
-    public List<String> getByCategoryIdAndAttributeTypeId(Long categoryId, Long attributeTypeId) {
-        List<Attribute> attributes = attributeRepository.findByCategoryIdAndAttributeTypeIdOrderByAttributeId(categoryId, attributeTypeId);
-        return attributes.stream()
-                .map(Attribute::getName)
-                .collect(Collectors.toList());
-    }
 }
