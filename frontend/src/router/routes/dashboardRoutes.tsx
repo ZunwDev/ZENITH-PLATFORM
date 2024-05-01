@@ -4,58 +4,15 @@ import { NewBannerForm, NewProductForm } from "@/pages/dashboard/new";
 import { Settings } from "lucide-react";
 
 const dashboard = "/:userId/dashboard";
-const routes = {
-  orders: `${dashboard}/orders`,
-  settings: `${dashboard}/settings`,
-  overview: `${dashboard}/overview`,
-  products: `${dashboard}/products`,
-  banners: `${dashboard}/banners`,
-  newBanner: `${dashboard}/banners/new`,
-  editBanner: `${dashboard}/banners/edit/:bannerId`,
-  attributes: `${dashboard}/attributes`,
-  newProduct: `${dashboard}/products/new`,
-  editProduct: `${dashboard}/products/edit/:productId`,
-};
-
 export const DashboardRoutes = [
-  {
-    path: routes.orders,
-    element: <Orders />,
-  },
-  {
-    path: routes.settings,
-    element: <Settings />,
-  },
-  {
-    path: routes.overview,
-    element: <Overview />,
-  },
-  {
-    path: routes.products,
-    element: <Products />,
-  },
-  {
-    path: routes.banners,
-    element: <Banners />,
-  },
-  {
-    path: routes.newBanner,
-    element: <NewBannerForm />,
-  },
-  {
-    path: routes.attributes,
-    element: <Attributes />,
-  },
-  {
-    path: routes.newProduct,
-    element: <NewProductForm />,
-  },
-  {
-    path: routes.editProduct,
-    element: <EditProductForm />,
-  },
-  {
-    path: routes.editBanner,
-    element: <EditBannerForm />,
-  },
+  { path: `${dashboard}/orders`, element: <Orders /> },
+  { path: `${dashboard}/settings`, element: <Settings /> },
+  { path: `${dashboard}/overview`, element: <Overview /> },
+  { path: `${dashboard}/products`, element: <Products /> },
+  { path: `${dashboard}/banners`, element: <Banners /> },
+  { path: `${dashboard}/banners/new`, element: <NewBannerForm /> },
+  { path: `${dashboard}/banners/edit/:bannerId`, element: <EditBannerForm /> },
+  { path: `${dashboard}/products/new`, element: <NewProductForm /> },
+  { path: `${dashboard}/products/edit/:productId`, element: <EditProductForm /> },
+  { path: `${dashboard}/attributes`, element: <Attributes /> },
 ];
