@@ -120,8 +120,8 @@ export default function NewBannerForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData] = await fetchFilterData();
-      setFilterData({ categories: categoryData });
+      const { categories } = await fetchFilterData();
+      setFilterData({ categories });
     };
     fetchData();
   }, [categoryId]);

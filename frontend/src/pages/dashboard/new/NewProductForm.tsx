@@ -88,13 +88,13 @@ export default function NewProductForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, brandData] = await fetchFilterData();
+      const { categories, brands } = await fetchFilterData();
       let productTypesData = [];
       if (categoryId) {
         const response = await fetchProductTypeDataByCategoryId(categoryId);
         productTypesData = response.data;
       }
-      setFilterData((prev) => ({ ...prev, categories: categoryData, brands: brandData, productTypes: productTypesData }));
+      setFilterData((prev) => ({ ...prev, categories, brands, productTypes: productTypesData }));
     };
 
     fetchData();

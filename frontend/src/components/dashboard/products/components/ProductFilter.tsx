@@ -128,8 +128,8 @@ export default function ProductFilter({ filterAmount, checked, setChecked, amoun
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, , brandNonZero, statusData] = await fetchFilterData();
-      setData({ category: categoryData, brandsNonZero: brandNonZero, status: statusData });
+      const { categories, brandsNonZero, status } = await fetchFilterData();
+      setData({ category: categories, brandsNonZero, status: status });
     };
 
     fetchData();

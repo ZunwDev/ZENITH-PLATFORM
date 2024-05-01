@@ -21,7 +21,7 @@ import { NewButton } from "@/components/util";
 import { useAdminCheck, useApiData, useSearch } from "@/hooks";
 import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
-import { Brand, Category, Checked, Status, initialCheckedState } from "@/lib/interfaces";
+import { Checked, initialCheckedState } from "@/lib/interfaces";
 import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { PackagePlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -42,9 +42,9 @@ export default function Products() {
   const [sortDirection, setSortDirection] = useState("desc");
   const [viewToggle, setViewToggle] = useState("list");
   const [filterData, setFilterData] = useState({
-    category: [] as Category[],
-    brand: [] as Brand[],
-    status: [] as Status[],
+    category: [],
+    brand: [],
+    status: [],
   });
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
   const [dbcSearch] = useDebounce(localSearchQuery, 250);
@@ -83,8 +83,8 @@ export default function Products() {
     const fetchData = async () => {
       try {
         // Fetch filter data
-        const [categoryData, brandData, , statusData] = await fetchFilterData();
-        setFilterData({ category: categoryData, brand: brandData, status: statusData });
+        const { categories, brands, status } = await fetchFilterData();
+        setFilterData({ category: categories, brand: brands, status });
       } catch (error) {
         console.error("Error fetching filter data:", error.response?.data?.message || error.message);
       }

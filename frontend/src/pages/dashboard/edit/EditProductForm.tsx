@@ -74,14 +74,14 @@ export default function EditProductForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, brandData, , ,] = await fetchFilterData();
+      const { categories, brands } = await fetchFilterData();
       const productData = await fetchProductDataById(productId);
       const imagesFromFB = await getImagesFromFirebase("images", productId);
       setImages(imagesFromFB);
-      setFilterData({ categories: categoryData, brands: brandData });
-      setProductData(productData.data);
+      setFilterData({ categories, brands });
+      setProductData(productData);
 
-      const { name, description, price, discount, quantity, status, category, brand, specifications } = productData.data;
+      const { name, description, price, discount, quantity, status, category, brand, specifications } = productData;
       setCategoriesSelectedValue(category.name);
       setBrandsSelectedValue(brand.name);
       setStatusSelectedValue(status.name);

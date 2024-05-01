@@ -3,102 +3,67 @@ import { newAbortSignal } from "./utils";
 
 export const API_URL = "http://localhost:8080/api";
 
-export async function fetchSessionData(sessionToken) {
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  signal: newAbortSignal(),
+});
+
+async function handleRequest(request) {
   try {
-    if (sessionToken) {
-      const response = await axios.get(`${API_URL}/users/session/${sessionToken}`, {
-        signal: newAbortSignal(),
-      });
-      return response.data;
-    }
+    const response = await request;
+    return response.data;
   } catch (error) {
-    console.error("Error fetching session data:", error.response?.data?.message || error.message);
-    return [];
+    console.error("Error:", error.response?.data?.message || error.message);
+    throw error;
   }
+}
+
+export async function fetchSessionData(sessionToken) {
+  if (!sessionToken) return [];
+  return handleRequest(axiosInstance.get(`/users/session/${sessionToken}`));
 }
 
 export async function fetchFilterData() {
-  try {
-    const [categoriesResponse, brandsResponse, brandsNonZeroResponse, statusResponse, productTypesResponse] = await Promise.all(
-      [
-        axios.get(`${API_URL}/categories`, {
-          signal: newAbortSignal(),
-        }),
-        axios.get(`${API_URL}/brands`, {
-          signal: newAbortSignal(),
-        }),
-        axios.get(`${API_URL}/brands/nonzero`, {
-          signal: newAbortSignal(),
-        }),
-        axios.get(`${API_URL}/status`),
-        axios.get(`${API_URL}/product_types`),
-      ]
-    );
-    const categories = categoriesResponse.data;
-    const brands = brandsResponse.data;
-    const brandsNonZero = brandsNonZeroResponse.data;
-    const status = statusResponse.data;
-    const productTypes = productTypesResponse.data;
-    return [categories, brands, brandsNonZero, status, productTypes];
-  } catch (error) {
-    console.error("Error fetching filters:", error.response?.data?.message || error.message);
-    return [[], []];
-  }
+  const requests = {
+    categories: axiosInstance.get("/categories"),
+    brands: axiosInstance.get("/brands"),
+    brandsNonZero: axiosInstance.get("/brands/nonzero"),
+    status: axiosInstance.get("/status"),
+    productTypes: axiosInstance.get("/product_types"),
+  };
+
+  const responses = await Promise.all(Object.values(requests));
+  const responseData = Object.values(responses).map((response) => response.data);
+
+  return {
+    categories: responseData[0],
+    brands: responseData[1],
+    brandsNonZero: responseData[2],
+    status: responseData[3],
+    productTypes: responseData[4],
+  };
 }
 
-export async function fetchProductDataById(id: string) {
-  try {
-    const response = await axios.get(`${API_URL}/products/${id}`, { signal: newAbortSignal() });
-    return response;
-  } catch (error) {
-    console.error(`Error fetching product data with id ${id}`, error.response?.data?.message || error.message);
-  }
+export async function fetchProductDataById(id) {
+  return handleRequest(axiosInstance.get(`/products/${id}`));
 }
 
-export async function fetchProductTypeDataByCategoryId(id: number) {
-  try {
-    const response = await axios.get(`${API_URL}/product_types/${id}`, { signal: newAbortSignal() });
-    return response;
-  } catch (error) {
-    console.error(`Error fetching product types data with id ${id}`, error.response?.data?.message || error.message);
-  }
+export async function fetchProductTypeDataByCategoryId(id) {
+  return handleRequest(axiosInstance.get(`/product_types/${id}`));
 }
 
-export async function fetchBannerDataById(id: string) {
-  try {
-    const response = await axios.get(`${API_URL}/banners/${id}`, { signal: newAbortSignal() });
-    return response;
-  } catch (error) {
-    console.error(`Error fetching banner data with id ${id}`, error.response?.data?.message || error.message);
-  }
+export async function fetchBannerDataById(id) {
+  return handleRequest(axiosInstance.get(`/banners/${id}`));
 }
 
-export async function fetchAttributeData(attributeTypeId: number) {
-  try {
-    const response = await axios.get(`${API_URL}/attributes/${attributeTypeId}`, { signal: newAbortSignal() });
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error fetching attribute data with attribute type id ${attributeTypeId}`,
-      error.response?.data?.message || error.message
-    );
-  }
+export async function fetchAttributeData(attributeTypeId) {
+  return handleRequest(axiosInstance.get(`/attributes/${attributeTypeId}`));
 }
 
 export async function fetchAttributeTypes() {
-  try {
-    const response = await axios.get(`${API_URL}/attribute_types`, { signal: newAbortSignal() });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching attribute types`, error.response?.data?.message || error.message);
-  }
+  return handleRequest(axiosInstance.get("/attribute_types"));
 }
 
 export async function fetchAttributes() {
-  try {
-    const response = await axios.get(`${API_URL}/attributes`, { signal: newAbortSignal() });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching attributes`, error.response?.data?.message || error.message);
-  }
+  return handleRequest(axiosInstance.get("/attributes"));
 }

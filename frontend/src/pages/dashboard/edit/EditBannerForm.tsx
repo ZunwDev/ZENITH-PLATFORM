@@ -63,15 +63,14 @@ export default function EditBannerForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoryData, , , ,] = await fetchFilterData();
+      const { categories } = await fetchFilterData();
       const bannerData = await fetchBannerDataById(bannerId);
       const image = await getImageFromFirebase("banners", bannerId);
 
       setImage(image);
-      setFilterData({ categories: categoryData });
-      setBannerData(bannerData.data);
-      const { name, position, aspectRatio, link, status, category, activationDate, expirationDate, includeButton } =
-        bannerData.data;
+      setFilterData({ categories });
+      setBannerData(bannerData);
+      const { name, position, aspectRatio, link, status, category, activationDate, expirationDate, includeButton } = bannerData;
 
       setSelectedCategory(category?.name || "");
       setSelectedStatus(status.name);

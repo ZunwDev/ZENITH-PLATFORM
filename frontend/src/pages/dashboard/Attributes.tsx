@@ -25,7 +25,7 @@ export default function Attributes() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [categoryData, brandData, , , productTypesData] = await fetchFilterData();
+      const { categories, brands, productTypes } = await fetchFilterData();
       const [typeData, attributeData] = await Promise.all([fetchAttributeTypes(), fetchAttributes()]);
 
       setData((prevData) => ({
@@ -33,9 +33,9 @@ export default function Attributes() {
         attributeTypes: sortByIds(typeData, "attributeTypeId"),
         attributes: sortByIds(attributeData, "attributeId"),
         filterData: {
-          categories: sortByIds(categoryData, "categoryId"),
-          brands: sortByIds(brandData, "brandId"),
-          productTypes: sortByIds(productTypesData, "productTypeId"),
+          categories: sortByIds(categories, "categoryId"),
+          brands: sortByIds(brands, "brandId"),
+          productTypes: sortByIds(productTypes, "productTypeId"),
         },
       }));
     } catch (error) {

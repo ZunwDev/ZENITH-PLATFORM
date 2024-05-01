@@ -31,5 +31,6 @@ export interface Page {
 export interface FilterData {
   categories?: Category[];
   brands?: Brand[];
+  status?: Status[];
   productTypes?: string[];
 }
