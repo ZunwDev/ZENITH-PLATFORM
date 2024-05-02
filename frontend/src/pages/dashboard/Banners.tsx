@@ -56,8 +56,8 @@ export default function Banners() {
     setChecked(initialCheckedState);
   }, []);
 
-  const { data: pageData, loading: pageLoading, error: pageError } = useApiData("banners", APIURL, [APIURL]);
-  const { data: filterData, loading: filterLoading, error: filterError } = useApiData("banners/filteredData", APIURL, [APIURL]);
+  const { data: pageData, error: pageError } = useApiData("banners", APIURL, [APIURL]);
+  const { data: filterData, error: filterError } = useApiData("banners/filteredData", APIURL, [APIURL]);
 
   const handleChipRemove = useCallback(
     (key, idToRemove) => {
