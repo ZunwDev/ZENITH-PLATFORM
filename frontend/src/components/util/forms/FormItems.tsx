@@ -1,18 +1,18 @@
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import ScaleLoader from "react-spinners/ScaleLoader";
-import { Button } from "../../ui/button";
-import { Checkbox } from "../../ui/checkbox";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../../ui/command";
-import { FormDescription, FormItem, FormLabel, FormMessage } from "../../ui/form";
-import { Input } from "../../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
-import { ScrollArea } from "../../ui/scroll-area";
-import { Textarea } from "../../ui/textarea";
 
 const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
   (e.target as HTMLInputElement).blur();
@@ -80,7 +80,7 @@ export function TextareaFormItem({ id, label, placeholder, description, form, re
       </FormLabel>
       <Textarea id={id} name={id} placeholder={placeholder} {...form.register(id)} className="h-44" {...rest} />
       {description && <FormDescription>{description}</FormDescription>}
-      <FormMessage>{form.formState.errors[id]?.message}</FormMessage>
+      <FormMessage>{form?.formState?.errors?.[id]?.message}</FormMessage>
     </FormItem>
   );
 }
@@ -158,19 +158,11 @@ export function DateRangeFormItem({ id, label, description, form, required = fal
   );
 }
 
-export function SelectFormItem({
-  id,
-  label,
-  placeholder,
-  description,
-  form,
-  required = false,
-  data,
-  selectedValue,
-  setSelectedValue,
-  ...rest
-}) {
+export function SelectFormItem({ id, label, placeholder, description, form, required = false, data, ...rest }) {
   const [open, setOpen] = useState(false);
+  const selectedValue = form.getValues(id)?.toLowerCase();
+  const selectedItem = data.find((item) => item?.toLowerCase() === selectedValue);
+  const buttonText = selectedItem ?? `Select ${id || "default"}...`;
 
   return (
     <FormItem className="flex flex-col space-y-2">
@@ -179,21 +171,17 @@ export function SelectFormItem({
       </FormLabel>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" name={`${id}Select`} aria-expanded={open}>
-            {selectedValue && data
-              ? (() => {
-                  const selectedItem = data?.find((item) => {
-                    if (typeof item === "object") {
-                      return item.name?.toLowerCase() === selectedValue?.toLowerCase();
-                    } else {
-                      return item?.toLowerCase() === selectedValue?.toLowerCase();
-                    }
-                  });
-                  return selectedItem ? selectedItem.name || selectedItem : `Select ${id || "default"}...`;
-                })()
-              : `Select ${id || "default"}...`}
-            <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
-          </Button>
+          <FormControl>
+            <Button
+              variant="outline"
+              role="combobox"
+              name={`${id}Select`}
+              aria-expanded={open}
+              className={cn({ "text-muted-foreground": !form.getValues(id) })}>
+              {buttonText}
+              <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
+            </Button>
+          </FormControl>
         </PopoverTrigger>
         <PopoverContent className={cn({ "h-96": data?.length > 10 })}>
           <Command>
@@ -203,18 +191,15 @@ export function SelectFormItem({
               <CommandGroup>
                 {data?.map((item, index) => (
                   <CommandItem
-                    key={item.name + "/" + index}
+                    key={`${item}${index}`}
                     id={id}
-                    name={id}
-                    value={item.name || item}
-                    {...form.register(id)}
+                    value={item}
                     onSelect={(currentValue) => {
-                      setSelectedValue(currentValue);
                       form.setValue(id, currentValue);
                       setOpen(false);
                     }}
                     {...rest}>
-                    {item.name || item}
+                    {item}
                   </CommandItem>
                 ))}
               </CommandGroup>

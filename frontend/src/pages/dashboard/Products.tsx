@@ -49,7 +49,7 @@ export default function Products() {
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
   const [dbcSearch] = useDebounce(localSearchQuery, 250);
 
-  const productAPIURL = useMemo(() => {
+  const APIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
     const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL() || "";
     const { brand, category, status } = checked;
@@ -72,12 +72,8 @@ export default function Products() {
     setChecked(initialCheckedState);
   }, []);
 
-  const { data: pageData, loading: pageLoading, error: pageError } = useApiData("products", productAPIURL, [productAPIURL]);
-  const {
-    data: amountData,
-    loading: amountLoading,
-    error: amountError,
-  } = useApiData("products/amounts", productAPIURL, [productAPIURL]);
+  const { data: pageData, error: pageError } = useApiData("products", APIURL, [APIURL]);
+  const { data: amountData, error: amountError } = useApiData("products/amounts", APIURL, [APIURL]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +87,7 @@ export default function Products() {
     };
 
     fetchData();
-  }, [productAPIURL]);
+  }, [APIURL]);
 
   const handleChipRemove = useCallback(
     (key, idToRemove) => {

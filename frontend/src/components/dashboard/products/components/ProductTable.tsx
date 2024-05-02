@@ -1,3 +1,4 @@
+import { InfoRow } from "@/components/dashboard/global";
 import { FailedToLoad, Loading } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -8,7 +9,6 @@ import { getThumbnailFromFirebase } from "@/lib/firebase";
 import { applyDiscount, cn, formatDateWithTime, goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { InfoRow } from "../../global";
 
 export default function ProductTable({ data, viewToggle, pageError, amountError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);

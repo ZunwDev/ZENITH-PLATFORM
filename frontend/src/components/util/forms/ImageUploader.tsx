@@ -1,5 +1,5 @@
+import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
-import { Label } from "../../ui/label";
 
 interface ImageUploaderProps {
   setImages: React.Dispatch<React.SetStateAction<string[]>>;

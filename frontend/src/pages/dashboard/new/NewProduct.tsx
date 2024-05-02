@@ -1,16 +1,12 @@
+import { NewProductForm, ProductSchema, SpecsGeneratorForm } from "@/components/dashboard/forms";
+import { FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { CodeEditor, ProductImageManager } from "@/components/dashboard/products/components";
+import { FilterData } from "@/components/dashboard/products/interfaces";
 import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import {
-  AlertInCardDescription,
-  BackArrow,
-  InformationDescription,
-  InputFormItem,
-  SelectFormItem,
-  TextareaFormItem,
-} from "@/components/util";
+import { AlertInCardDescription, BackArrow, InformationDescription } from "@/components/util";
 import { ProductPreview, SpecsPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import {
@@ -30,7 +26,6 @@ import {
 } from "@/lib/constants";
 import { FormFields } from "@/lib/enum/schemas";
 import { uploadImagesToFirebase } from "@/lib/firebase";
-import { includesAny } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import parse from "html-react-parser";
@@ -38,12 +33,8 @@ import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ProductSchema, SpecsGeneratorForm } from "../../../components/dashboard/forms";
-import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
-import { CodeEditor, ProductImageManager } from "../../../components/dashboard/products/components";
-import { FilterData } from "../../../components/dashboard/products/interfaces";
 
-export default function NewProductForm() {
+export default function NewProduct() {
   useAdminCheck();
   const showErrorToast = useErrorToast();
   const showSuccessToast = useSuccessToast();
@@ -59,10 +50,6 @@ export default function NewProductForm() {
   const [categoryId, setCategoryId] = useState<number>();
   const [brandId, setBrandId] = useState<number>();
   const [statusId, setStatusId] = useState<number>();
-  const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
-  const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
-  const [typesSelectedValue, setTypesSelectedValue] = useState("");
-  const [statusSelectedValue, setStatusSelectedValue] = useState("active");
   const [addFormSchemaData, setAddFormSchemaData] = useState([]);
 
   const form = useForm<z.infer<typeof ProductSchema>>({
@@ -115,8 +102,8 @@ export default function NewProductForm() {
   }, [images]);
 
   useEffect(() => {
-    setAddFormSchemaData(FormFields[typesSelectedValue] || []);
-  }, [typesSelectedValue]);
+    setAddFormSchemaData(FormFields[form.getValues("type")] || []);
+  }, [form.getValues("type")]);
 
   const handleFormSubmit = async (values: z.infer<typeof ProductSchema>) => {
     try {
@@ -168,15 +155,16 @@ export default function NewProductForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const categoryId = categoriesSelectedValue && (await fetchCategoryIdByName(encodeURIComponent(categoriesSelectedValue)));
-      const brandId = brandsSelectedValue && (await fetchBrandIdByName(encodeURIComponent(brandsSelectedValue)));
-      const statusId = statusSelectedValue && (await fetchStatusIdByName(encodeURIComponent(statusSelectedValue)));
+      const categoryId =
+        form.getValues("category") && (await fetchCategoryIdByName(encodeURIComponent(form.getValues("category"))));
+      const brandId = form.getValues("brand") && (await fetchBrandIdByName(encodeURIComponent(form.getValues("brand"))));
+      const statusId = form.getValues("status") && (await fetchStatusIdByName(encodeURIComponent(form.getValues("status"))));
       setCategoryId(categoryId);
       setBrandId(brandId);
       setStatusId(statusId);
     };
     fetchData();
-  }, [brandsSelectedValue, categoriesSelectedValue, statusSelectedValue]);
+  }, [form.getValues("category"), form.getValues("brand"), form.getValues("status")]);
 
   useEffect(() => {}, [form.watch()]);
 
@@ -211,7 +199,7 @@ export default function NewProductForm() {
                 setImages={setImages}
               />
               <SpecsPreview
-                typesSelectedValue={typesSelectedValue}
+                typesSelectedValue={form.getValues("type")}
                 jsonData={jsonData}
                 parseError={parseError}
                 formattedJSON={formattedJSON}
@@ -219,117 +207,8 @@ export default function NewProductForm() {
               />
               <ProductPreview imageThumbnail={imageThumbnail} form={form} />
             </div>
-
             <div className="flex flex-col gap-8 w-full">
-              <Card className="w-full border h-fit rounded-md">
-                <CardHeader>
-                  <CardTitle>Product Information</CardTitle>
-                  <CardDescription>Enter key product details for comprehensive information.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Form {...form}>
-                    <form className="flex xl:flex-row xl:gap-20 gap-4 flex-wrap">
-                      <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                        <InputFormItem
-                          label="Product Name"
-                          id="name"
-                          placeholder="HP EliteBook 650 G10"
-                          form={form}
-                          required
-                          description="Enter the name of the product."
-                        />
-                        <TextareaFormItem
-                          label="Product Description"
-                          id="description"
-                          form={form}
-                          required
-                          description="Briefly describe the product and its main features."
-                          placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'
-                        />
-                      </div>
-                      <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                        <InputFormItem
-                          label="Price"
-                          id="price"
-                          type="number"
-                          placeholder="49.99"
-                          required
-                          description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
-                          form={form}
-                          prefix="$"
-                        />
-                        <InputFormItem
-                          label="Discount"
-                          id="discount"
-                          type="number"
-                          placeholder="20"
-                          description="Set the discount percentage for the product (e.g., 20 for 20% off)."
-                          form={form}
-                          suffix="%"
-                        />
-                        <InputFormItem
-                          label="Quantity"
-                          id="quantity"
-                          type="number"
-                          placeholder="100"
-                          required
-                          description="Enter the quantity of the product in stock."
-                          form={form}
-                        />
-                      </div>
-                      <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                        <SelectFormItem
-                          label="Category"
-                          id="category"
-                          placeholder="Search categories..."
-                          description="Select corresponding category to the product."
-                          required
-                          form={form}
-                          data={filterData.categories}
-                          selectedValue={categoriesSelectedValue}
-                          setSelectedValue={setCategoriesSelectedValue}
-                        />
-                        {includesAny(categoryId, [1, 6]) && (
-                          <SelectFormItem
-                            label="Product Type"
-                            id="type"
-                            placeholder="Search types..."
-                            description="Select corresponding type to the product."
-                            required
-                            form={form}
-                            data={filterData.productTypes}
-                            selectedValue={typesSelectedValue}
-                            setSelectedValue={setTypesSelectedValue}
-                          />
-                        )}
-                        <SelectFormItem
-                          label="Brand"
-                          id="brand"
-                          placeholder="Search brands..."
-                          description="Select corresponding brand to the product."
-                          required
-                          form={form}
-                          data={filterData.brands}
-                          selectedValue={brandsSelectedValue}
-                          setSelectedValue={setBrandsSelectedValue}
-                        />
-                        <SelectFormItem
-                          label="Status"
-                          id="status"
-                          placeholder="Search statuses..."
-                          description="Select corresponding status to the product."
-                          required
-                          form={form}
-                          data={["Active", "Draft", "Archived"]}
-                          selectedValue={statusSelectedValue}
-                          setSelectedValue={setStatusSelectedValue}
-                        />
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-
+              <NewProductForm form={form} categoryId={categoryId} filterData={filterData} />
               <Card>
                 <CardHeader>
                   <CardTitle>Additional Product Information</CardTitle>
@@ -350,12 +229,11 @@ export default function NewProductForm() {
                     addFormSchemaData={addFormSchemaData}
                     setJsonData={setJsonData}
                     typesSelectedValue={filterData.productTypes?.find(
-                      (item) => item.toLowerCase() === typesSelectedValue.toLowerCase()
+                      (item) => item.toLowerCase() === form.getValues("type").toLowerCase()
                     )}
                   />
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Product Specs</CardTitle>

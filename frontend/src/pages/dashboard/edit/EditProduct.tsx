@@ -1,9 +1,12 @@
+import { EditProductForm, ProductSchema } from "@/components/dashboard/forms";
+import { DiscardButton, FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { CodeEditor, ProductImageManager } from "@/components/dashboard/products/components";
+import { FilterData, Product } from "@/components/dashboard/products/interfaces";
 import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import { BackArrow, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
+import { BackArrow } from "@/components/util";
 import { ProductPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchFilterData, fetchProductDataById, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
@@ -22,12 +25,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
-import { ProductSchema } from "../../../components/dashboard/forms";
-import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
-import { CodeEditor, ProductImageManager } from "../../../components/dashboard/products/components";
-import { FilterData, Product } from "../../../components/dashboard/products/interfaces";
 
-export default function EditProductForm() {
+export default function EditProduct() {
   useAdminCheck();
   const { stage, isSubmitting, updateStage, setSubmittingState } = useFormStatus("Save changes");
   const { productId } = useParams();
@@ -37,12 +36,6 @@ export default function EditProductForm() {
   //Data
   const [filterData, setFilterData] = useState<FilterData>({ categories: [], brands: [] });
   const [productData, setProductData] = useState<Product>();
-
-  //Select stuff
-  const [selectedValue, setSelectedValue] = useState({ categoryValue: "", brandValue: "", statusValue: "" });
-  const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
-  const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
-  const [statusSelectedValue, setStatusSelectedValue] = useState("");
 
   //Images
   const [images, setImages] = useState([]);
@@ -82,9 +75,6 @@ export default function EditProductForm() {
       setProductData(productData);
 
       const { name, description, price, discount, quantity, status, category, brand, specifications } = productData;
-      setCategoriesSelectedValue(category.name);
-      setBrandsSelectedValue(brand.name);
-      setStatusSelectedValue(status.name);
       setJsonData(specifications);
 
       form.setValue("name", name);
@@ -103,13 +93,6 @@ export default function EditProductForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDiscardEdit = () => {
-    showSuccessToast("Discard Successful", "The changes to the product have been successfully discarded.");
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
-
   const handleFormSubmit = async (values: z.infer<typeof ProductSchema>) => {
     try {
       await ProductSchema.parseAsync(values);
@@ -120,7 +103,7 @@ export default function EditProductForm() {
 
       setSubmittingState(true);
       updateStage("Updating...");
-      const statusId = await fetchStatusIdByName(encodeURIComponent(statusSelectedValue));
+      const statusId = await fetchStatusIdByName(encodeURIComponent(form.getValues("status")));
 
       const response = await axios.put(`${API_URL}/products/${productId}`, {
         signal: newAbortSignal(),
@@ -174,9 +157,7 @@ export default function EditProductForm() {
             <BackArrow link="../../products" />
             <PageHeader title="Edit Product" />
             <div className="ml-auto flex gap-2 md:flex-row flex-col">
-              <Button variant="outline" onClick={handleDiscardEdit}>
-                Discard
-              </Button>
+              <DiscardButton typeOfDiscard="product" />
               <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isSubmitting}>
                 {stage}
               </Button>
@@ -195,96 +176,7 @@ export default function EditProductForm() {
           </div>
 
           <div className="flex flex-col gap-8 w-full">
-            <Card className="w-full border h-fit rounded-md">
-              <CardHeader>
-                <CardTitle>Product Information</CardTitle>
-                <CardDescription>Update key product details for comprehensive information.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {productData && (
-                  <Form {...form}>
-                    <form className="flex xl:flex-row xl:gap-20 gap-4 flex-col">
-                      <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                        <InputFormItem
-                          label="Product Name"
-                          id="name"
-                          placeholder="HP EliteBook 650 G10"
-                          form={form}
-                          required
-                          description="Enter the name of the product."></InputFormItem>
-                        <TextareaFormItem
-                          label="Product Description"
-                          id="description"
-                          form={form}
-                          required
-                          description="Briefly describe the product and its main features."
-                          placeholder='Notebook - Intel Core i5 1345U Raptor Lake, 15.6" IPS anti-glare 1920×1080, RAM 16GB DDR4, Intel Iris Xe Graphics, SSD 512GB, numeric keypad, backlit keypad, webcam, USB 3.2 Gen 1, USB-C, fingerprint reader, WiFi 6E, WiFi, Weight 1.78 kg, Windows 11 Pro'></TextareaFormItem>
-                      </div>
-                      <div className="flex flex-col md:w-1/4 w-full gap-4">
-                        <InputFormItem
-                          label="Price"
-                          id="price"
-                          type="number"
-                          placeholder="49.99"
-                          required
-                          description="Specify the price of the product. Always end the price with 9 (e.g., 49.99)."
-                          form={form}
-                          prefix="$"></InputFormItem>
-                        <InputFormItem
-                          label="Discount"
-                          id="discount"
-                          type="number"
-                          placeholder="20"
-                          description="Set the discount percentage for the product (e.g., 20 for 20% off)."
-                          form={form}
-                          suffix="%"></InputFormItem>
-                        <InputFormItem
-                          label="Quantity"
-                          id="quantity"
-                          type="number"
-                          placeholder="100"
-                          required
-                          description="Enter the quantity of the product in stock."
-                          form={form}></InputFormItem>
-                      </div>
-                      <div className="flex flex-col md:w-1/4 w-full gap-4">
-                        <SelectFormItem
-                          label="Category"
-                          id="category"
-                          placeholder="Search categories..."
-                          description="Select corresponding category to the product."
-                          required
-                          form={form}
-                          data={filterData.categories}
-                          selectedValue={categoriesSelectedValue}
-                          setSelectedValue={setCategoriesSelectedValue}></SelectFormItem>
-                        <SelectFormItem
-                          label="Brand"
-                          id="brand"
-                          placeholder="Search brands..."
-                          description="Select corresponding brand to the product."
-                          required
-                          form={form}
-                          data={filterData.brands}
-                          selectedValue={brandsSelectedValue}
-                          setSelectedValue={setBrandsSelectedValue}></SelectFormItem>
-                        <SelectFormItem
-                          label="Status"
-                          id="status"
-                          placeholder="Search statuses..."
-                          description="Select corresponding status to the product."
-                          required
-                          form={form}
-                          data={["Active", "Draft", "Archived"]}
-                          selectedValue={statusSelectedValue}
-                          setSelectedValue={setStatusSelectedValue}
-                        />
-                      </div>
-                    </form>
-                  </Form>
-                )}
-              </CardContent>
-            </Card>
+            <EditProductForm productData={productData} form={form} filterData={filterData} />
             <Card>
               <CardHeader>
                 <CardTitle>Product Specs</CardTitle>

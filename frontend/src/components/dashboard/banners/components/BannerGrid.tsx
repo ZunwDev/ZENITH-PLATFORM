@@ -7,7 +7,7 @@ import { getImagesFromFirebase } from "@/lib/firebase";
 import { goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { InfoRow } from "../../global";
+import { InfoRow } from "@/components/dashboard/global";
 
 export default function BannerGrid({ data, pageError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);

@@ -1,15 +1,10 @@
+import { NewBannerForm } from "@/components/dashboard/forms";
+import { BannerSchema } from "@/components/dashboard/forms/schema";
+import { FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { FilterData } from "@/components/dashboard/products/interfaces";
 import { User } from "@/components/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import {
-  BackArrow,
-  CheckboxFormItem,
-  DateRangeFormItem,
-  InputFormItem,
-  NoValidationInputFile,
-  SelectFormItem,
-} from "@/components/util";
+import { BackArrow } from "@/components/util";
 import { BannerPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchCategoryIdByName, fetchFilterData, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
@@ -23,11 +18,8 @@ import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { BannerSchema } from "../../../components/dashboard/forms/schema";
-import { FullSidebar, PageHeader, SheetSidebar } from "../../../components/dashboard/global";
-import { FilterData } from "../../../components/dashboard/products/interfaces";
 
-export default function NewBannerForm() {
+export default function NewBanner() {
   useAdminCheck();
   const showErrorToast = useErrorToast();
   const showSuccessToast = useSuccessToast();
@@ -35,19 +27,6 @@ export default function NewBannerForm() {
 
   const [filterData, setFilterData] = useState<FilterData>({ categories: [] });
   const [image, setImage] = useState("");
-  const [selectedPosition, setSelectedPosition] = useState("homepage");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("draft");
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState("horizontal");
-
-  const setSelectedPositionAndUpdateCategory = (position: string) => {
-    if (position === "homepage") {
-      // If the selected position is "Homepage", reset the selected category to ""
-      setSelectedCategory("");
-    }
-    // Update the selected position
-    setSelectedPosition(position);
-  };
 
   const currentDate = new Date();
   const initialDateRange: DateRange = {
@@ -80,8 +59,7 @@ export default function NewBannerForm() {
 
       setSubmittingState(true);
       updateStage("Storing in database...");
-
-      const statusId = await fetchStatusIdByName(encodeURIComponent(selectedStatus));
+      const statusId = await fetchStatusIdByName(encodeURIComponent(form.getValues("status")));
 
       const response = await axios.post(`${API_URL}/banners/create`, {
         signal: newAbortSignal(),
@@ -129,11 +107,12 @@ export default function NewBannerForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const categoryId = selectedCategory && (await fetchCategoryIdByName(encodeURIComponent(selectedCategory)));
+      const categoryId =
+        form.getValues("category") && (await fetchCategoryIdByName(encodeURIComponent(form.getValues("category"))));
       setCategoryId(categoryId);
     };
     fetchData();
-  }, [selectedCategory, filterData]);
+  }, [form.getValues("category"), filterData]);
 
   useEffect(() => {}, [form.watch()]);
 
@@ -160,105 +139,7 @@ export default function NewBannerForm() {
             </div>
           </div>
           <div className="flex gap-8 flex-col lg:p-6 p-4">
-            <Card className="w-full border h-fit rounded-md">
-              <CardHeader>
-                <CardTitle>Banner Information</CardTitle>
-                <CardDescription>Enter key banner details for comprehensive information.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form className="flex xl:flex-row xl:gap-20 gap-4 flex-wrap">
-                    <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                      <NoValidationInputFile label="Banner Image" id="banner_image" setImage={setImage} />
-                      <InputFormItem
-                        label="Banner Name"
-                        id="name"
-                        placeholder="All products eligible for discount with a promotional code."
-                        form={form}
-                        required
-                        description="Enter the name of the banner. Will be used as banner title."
-                      />
-                      <SelectFormItem
-                        label="Position"
-                        id="position"
-                        placeholder="Search positions..."
-                        description="Select corresponding position to the banner."
-                        required
-                        form={form}
-                        data={["Homepage", "Category"]}
-                        selectedValue={selectedPosition}
-                        setSelectedValue={setSelectedPositionAndUpdateCategory}
-                      />
-                      {selectedPosition === "category" && (
-                        <SelectFormItem
-                          label="Category"
-                          id="category"
-                          placeholder="Search categories..."
-                          description="Select corresponding category to the banner."
-                          required
-                          form={form}
-                          data={filterData.categories}
-                          selectedValue={selectedCategory}
-                          setSelectedValue={setSelectedCategory}
-                        />
-                      )}
-                    </div>
-                    <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                      <SelectFormItem
-                        label="Aspect Ratio"
-                        id="aspect_ratio"
-                        placeholder="Search aspect ratios..."
-                        description="Select corresponding aspect ratio to the banner."
-                        required
-                        form={form}
-                        data={["Horizontal", "Vertical"]}
-                        selectedValue={selectedAspectRatio}
-                        setSelectedValue={setSelectedAspectRatio}
-                      />
-                      <SelectFormItem
-                        label="Status"
-                        id="status"
-                        placeholder="Search statuses..."
-                        description="Select corresponding status to the banner."
-                        required
-                        form={form}
-                        data={["Active", "Draft", "Archived"]}
-                        selectedValue={selectedStatus}
-                        setSelectedValue={setSelectedStatus}
-                      />
-                      <DateRangeFormItem
-                        label="Date (7 days default)"
-                        id="date_range"
-                        description="Choose the date range for displaying the banner. The banner will automatically switch to active status when the specified time arrives."
-                        required
-                        form={form}
-                        date={date}
-                        setDate={setDate}
-                      />
-                    </div>
-                    <div className="flex flex-col xl:w-1/4 w-full gap-4">
-                      <InputFormItem
-                        label="Redirect Link"
-                        id="link"
-                        type="url"
-                        pattern="https://.*"
-                        placeholder="Enter the URL for redirection on click"
-                        description="Specify the URL where users will be redirected upon clicking the banner."
-                        form={form}
-                      />
-                      {form.getValues("link").length > 0 && (
-                        <CheckboxFormItem
-                          label="Include URL Button"
-                          id="include_button"
-                          description="If checked, a button appears in the banner's bottom left corner. Clicking this button redirects the user, but the banner itself remains non-clickable."
-                          form={form}
-                        />
-                      )}
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+            <NewBannerForm form={form} setImage={setImage} date={date} setDate={setDate} filterData={filterData} />
             <BannerPreview image={image} form={form} />
           </div>
         </div>
