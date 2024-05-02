@@ -11,9 +11,17 @@ import {
   SelectFormItem,
   TextareaFormItem,
 } from "@/components/util";
-import ProductPreview from "@/components/view/previews/ProductPreview";
+import { ProductPreview, SpecsPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchFilterData, fetchProductTypeDataByCategoryId } from "@/lib/api";
+import {
+  API_URL,
+  fetchBrandIdByName,
+  fetchCategoryIdByName,
+  fetchFilterData,
+  fetchProductTypeDataByCategoryId,
+  fetchStatusIdByName,
+  newAbortSignal,
+} from "@/lib/api";
 import {
   IS_PARSE_ERROR_MESSAGE,
   NO_IMAGE_PROVIDED_MESSAGE,
@@ -22,7 +30,7 @@ import {
 } from "@/lib/constants";
 import { FormFields } from "@/lib/enum/schemas";
 import { uploadImagesToFirebase } from "@/lib/firebase";
-import { cn, findId, getStatusId, includesAny, newAbortSignal } from "@/lib/utils";
+import { includesAny } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import parse from "html-react-parser";
@@ -50,6 +58,7 @@ export default function NewProductForm() {
   const [parseError, setParseError] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<number>();
   const [brandId, setBrandId] = useState<number>();
+  const [statusId, setStatusId] = useState<number>();
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
   const [typesSelectedValue, setTypesSelectedValue] = useState("");
@@ -88,13 +97,14 @@ export default function NewProductForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { categories, brands } = await fetchFilterData();
-      let productTypesData = [];
-      if (categoryId) {
-        const response = await fetchProductTypeDataByCategoryId(categoryId);
-        productTypesData = response.data;
+      try {
+        const { categories, brands } = await fetchFilterData();
+        let productTypesData = categoryId ? await fetchProductTypeDataByCategoryId(categoryId) : [];
+        setFilterData((prev) => ({ ...prev, categories, brands, productTypes: productTypesData }));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Handle error, perhaps set a default state or display an error message
       }
-      setFilterData((prev) => ({ ...prev, categories, brands, productTypes: productTypesData }));
     };
 
     fetchData();
@@ -129,9 +139,9 @@ export default function NewProductForm() {
           specifications: formattedJSON,
           quantity: values.quantity,
           discount: values.discount,
-          brand: filterData.brands.find((brand) => brand.brandId === brandId),
-          category: filterData.categories.find((category) => category.categoryId === categoryId),
-          status: { statusId: getStatusId(values) },
+          brand: brandId,
+          category: categoryId,
+          status: { statusId },
         },
       });
 
@@ -157,12 +167,16 @@ export default function NewProductForm() {
   };
 
   useEffect(() => {
-    const categoryId = findId(filterData.categories, categoriesSelectedValue, "categoryId");
-    const brandId = findId(filterData.brands, brandsSelectedValue, "brandId");
-
-    setCategoryId(categoryId);
-    setBrandId(brandId);
-  }, [brandsSelectedValue, categoriesSelectedValue, filterData]);
+    const fetchData = async () => {
+      const categoryId = categoriesSelectedValue && (await fetchCategoryIdByName(encodeURIComponent(categoriesSelectedValue)));
+      const brandId = brandsSelectedValue && (await fetchBrandIdByName(encodeURIComponent(brandsSelectedValue)));
+      const statusId = statusSelectedValue && (await fetchStatusIdByName(encodeURIComponent(statusSelectedValue)));
+      setCategoryId(categoryId);
+      setBrandId(brandId);
+      setStatusId(statusId);
+    };
+    fetchData();
+  }, [brandsSelectedValue, categoriesSelectedValue, statusSelectedValue]);
 
   useEffect(() => {}, [form.watch()]);
 
@@ -196,32 +210,14 @@ export default function NewProductForm() {
                 setImageThumbnail={setImageThumbnail}
                 setImages={setImages}
               />
-              <Card className={cn("hidden", { block: categoriesSelectedValue || typesSelectedValue })}>
-                <CardHeader>
-                  <CardTitle>Product Specs</CardTitle>
-                  <CardDescription>These specs are only read-only for easier lookup. The editor is below.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {jsonData !== "" && parseError && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="size-5" />
-                      <AlertDescription>{parseError}</AlertDescription>
-                    </Alert>
-                  )}
-                  <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} isReadOnly={true} />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Product Preview</CardTitle>
-                  <CardDescription>
-                    The preview may not fully act or display all details available on the real product listing.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ProductPreview imageThumbnail={imageThumbnail} form={form} />
-                </CardContent>
-              </Card>
+              <SpecsPreview
+                typesSelectedValue={typesSelectedValue}
+                jsonData={jsonData}
+                parseError={parseError}
+                formattedJSON={formattedJSON}
+                setJsonData={setJsonData}
+              />
+              <ProductPreview imageThumbnail={imageThumbnail} form={form} />
             </div>
 
             <div className="flex flex-col gap-8 w-full">

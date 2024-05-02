@@ -15,4 +15,6 @@ public class Status {
     private Long statusId;
 
     private String name;
+
+    private String color;
 }

@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { BackArrow, InputFormItem, SelectFormItem, TextareaFormItem } from "@/components/util";
-import ProductPreview from "@/components/view/previews/ProductPreview";
+import { ProductPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchFilterData, fetchProductDataById } from "@/lib/api";
+import { API_URL, fetchFilterData, fetchProductDataById, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
 import {
   IS_PARSE_ERROR_MESSAGE,
   NO_IMAGE_PROVIDED_MESSAGE,
@@ -14,7 +14,6 @@ import {
   NO_THUMBNAIL_IMAGE_PROVIDED_MESSAGE,
 } from "@/lib/constants";
 import { getImagesFromFirebase, getThumbnailFromFirebase, updateProductImages } from "@/lib/firebase";
-import { getStatusId, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import parse from "html-react-parser";
@@ -120,6 +119,7 @@ export default function EditProductForm() {
 
       setSubmittingState(true);
       updateStage("Updating...");
+      const statusId = await fetchStatusIdByName(encodeURIComponent(statusSelectedValue));
 
       const response = await axios.put(`${API_URL}/products/${productId}`, {
         signal: newAbortSignal(),
@@ -133,7 +133,7 @@ export default function EditProductForm() {
           brand: filterData.brands.find((brand) => brand.name.toLowerCase() === values.brand.toLowerCase()),
           category: filterData.categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()),
           status: {
-            status: { statusId: getStatusId(values) },
+            status: { statusId },
           },
         },
       });
@@ -190,17 +190,7 @@ export default function EditProductForm() {
               setImageThumbnail={setImageThumbnail}
               setImages={setImages}
             />
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Preview</CardTitle>
-                <CardDescription>
-                  The preview may not fully act or display all details available on the real product listing.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ProductPreview imageThumbnail={imageThumbnail} form={form} />
-              </CardContent>
-            </Card>
+            <ProductPreview imageThumbnail={imageThumbnail} form={form} />
           </div>
 
           <div className="flex flex-col gap-8 w-full">

@@ -27,6 +27,8 @@ public class BrandService {
         return getAllRows(brandRepository);
     }
 
+    public long getBrandIdByName(String name) {return brandRepository.findIdByLowerName(name);}
+
     public List<Brand> getAllProductBrandsWithAmountGreaterThanZero() {
         List<Brand> brands = getAllRows(brandRepository);
         List<Product> products = getAllRows(productRepository);

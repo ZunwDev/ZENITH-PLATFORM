@@ -1,5 +1,4 @@
-import { API_URL } from "@/lib/api";
-import { newAbortSignal } from "@/lib/utils";
+import { API_URL, newAbortSignal } from "@/lib/api";
 import axios from "axios";
 import { useEffect, useState } from "react";
 

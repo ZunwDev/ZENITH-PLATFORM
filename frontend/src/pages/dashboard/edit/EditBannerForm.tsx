@@ -10,12 +10,11 @@ import {
   NoValidationInputFile,
   SelectFormItem,
 } from "@/components/util";
-import BannerPreview from "@/components/view/previews/BannerPreview";
+import { BannerPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchBannerDataById, fetchFilterData } from "@/lib/api";
+import { API_URL, fetchBannerDataById, fetchFilterData, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
 import { NO_IMAGE_PROVIDED_MESSAGE } from "@/lib/constants";
 import { getImageFromFirebase, updateImageInFirebase } from "@/lib/firebase";
-import { getStatusId, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import parse from "html-react-parser";
@@ -103,6 +102,8 @@ export default function EditBannerForm() {
       setSubmittingState(true);
       updateStage("Updating...");
 
+      const statusId = await fetchStatusIdByName(encodeURIComponent(selectedStatus));
+
       const response = await axios.put(`${API_URL}/banners/${bannerId}`, {
         signal: newAbortSignal(),
         data: {
@@ -111,7 +112,7 @@ export default function EditBannerForm() {
           aspectRatio: values.aspect_ratio,
           category:
             filterData.categories.find((category) => category.name.toLowerCase() === values.category.toLowerCase()) || null,
-          status: getStatusId(values),
+          status: statusId,
           link: values.link,
           activationDate: values.date_range.from,
           expirationDate: values.date_range.to,

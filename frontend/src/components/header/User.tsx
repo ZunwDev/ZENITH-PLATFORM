@@ -1,7 +1,7 @@
 import { useGetSessionData } from "@/hooks";
-import { API_URL } from "@/lib/api";
+import { API_URL, newAbortSignal } from "@/lib/api";
 import { BASE_URL } from "@/lib/constants";
-import { newAbortSignal, removeAllCookies } from "@/lib/utils";
+import { removeAllCookies } from "@/lib/utils";
 import axios from "axios";
 import {
   ChevronDown,

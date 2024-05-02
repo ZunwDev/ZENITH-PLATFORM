@@ -19,4 +19,6 @@ public class StatusService {
     public List<Status> getAllProductStatuses() {
         return getAllRows(statusRepository);
     }
+
+    public long getStatusIdByName(String name) {return statusRepository.findIdByLowerName(name);}
 }

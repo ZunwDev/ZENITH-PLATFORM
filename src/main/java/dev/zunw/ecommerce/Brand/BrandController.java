@@ -35,6 +35,11 @@ public class BrandController {
         return ResponseEntity.ok(brandService.getAllProductBrands());
     }
 
+    @GetMapping("/{name}")
+    public long getBrandIdByName(@PathVariable String name) {
+        return brandService.getBrandIdByName(name);
+    }
+
     @GetMapping("/nonzero")
     public ResponseEntity<Object> getProductBrandsNonZero() {
         return ResponseEntity.ok(brandService.getAllProductBrandsWithAmountGreaterThanZero());

@@ -10,12 +10,11 @@ import {
   NoValidationInputFile,
   SelectFormItem,
 } from "@/components/util";
-import BannerPreview from "@/components/view/previews/BannerPreview";
+import { BannerPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchFilterData } from "@/lib/api";
+import { API_URL, fetchCategoryIdByName, fetchFilterData, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
 import { NO_IMAGE_PROVIDED_MESSAGE } from "@/lib/constants";
 import { uploadImageToFirebase } from "@/lib/firebase";
-import { findId, getStatusId, newAbortSignal } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { addDays } from "date-fns";
@@ -82,6 +81,8 @@ export default function NewBannerForm() {
       setSubmittingState(true);
       updateStage("Storing in database...");
 
+      const statusId = await fetchStatusIdByName(encodeURIComponent(selectedStatus));
+
       const response = await axios.post(`${API_URL}/banners/create`, {
         signal: newAbortSignal(),
         data: {
@@ -89,7 +90,7 @@ export default function NewBannerForm() {
           position: values.position,
           aspectRatio: values.aspect_ratio,
           category: filterData.categories.find((category) => category.categoryId === categoryId) || null,
-          status: getStatusId(values),
+          status: statusId,
           link: values.link,
           activationDate: values.date_range.from,
           expirationDate: values.date_range.to,
@@ -127,9 +128,11 @@ export default function NewBannerForm() {
   }, [categoryId]);
 
   useEffect(() => {
-    const categoryId = findId(filterData.categories, selectedCategory, "categoryId");
-
-    setCategoryId(categoryId);
+    const fetchData = async () => {
+      const categoryId = selectedCategory && (await fetchCategoryIdByName(encodeURIComponent(selectedCategory)));
+      setCategoryId(categoryId);
+    };
+    fetchData();
   }, [selectedCategory, filterData]);
 
   useEffect(() => {}, [form.watch()]);

@@ -12,8 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useErrorToast, useSuccessToast } from "@/hooks";
-import { API_URL } from "@/lib/api";
-import { newAbortSignal } from "@/lib/utils";
+import { API_URL, newAbortSignal } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosRequestConfig } from "axios";
 import parse from "html-react-parser";

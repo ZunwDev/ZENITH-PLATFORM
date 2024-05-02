@@ -4,9 +4,10 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { PaginationControls, Thumbnail } from "@/components/util";
 import { usePageControls } from "@/hooks";
 import { getImagesFromFirebase } from "@/lib/firebase";
-import { getStatus, goto } from "@/lib/utils";
+import { goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import { InfoRow } from "../../global";
 
 export default function BannerGrid({ data, pageError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
@@ -54,32 +55,17 @@ export default function BannerGrid({ data, pageError }) {
               </CardContent>
               <CardFooter className="mt-16 md:mt-0">
                 <div className="flex flex-col gap-1 w-full">
-                  <div className="flex justify-between w-full">
+                  <div className="flex justify-between w-full mb-2">
                     <span className="font-semibold text-start w-56 truncate">{item.name}</span>
                     <div className="flex-shrink-0">
-                      <Badge variant={getStatus(item).color}>{getStatus(item).status}</Badge>
+                      <Badge variant={item.status.color}>{item.status.name}</Badge>
                     </div>
                   </div>
-                  <div className="flex justify-between w-full mt-2">
-                    <span className="text-start text-sm italic">Position:</span>
-                    <span className="text-sm">{item.position.capitalize()}</span>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="text-start text-sm italic">Aspect Ratio:</span>
-                    <span className="text-sm">{item.aspectRatio.capitalize()}</span>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="text-start text-sm italic">Activation Date:</span>
-                    <span className="text-sm font-bold">{item.activationDate}</span>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="text-start text-sm italic">Expiration Date:</span>
-                    <span className="text-sm font-bold">{item.expirationDate}</span>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="text-start text-sm italic">Includes Button?:</span>
-                    <span className="text-sm">{item.includeButton.toString()}</span>
-                  </div>
+                  <InfoRow label="Position" value={item.position.capitalize()} />
+                  <InfoRow label="Aspect Ratio" value={item.aspectRatio.capitalize()} />
+                  <InfoRow label="Activation Date" value={item.activationDate} isBold />
+                  <InfoRow label="Expiration Date" value={item.expirationDate} isBold />
+                  <InfoRow label="Includes Button?" value={item.includeButton.toString()} />
                 </div>
               </CardFooter>
             </Card>

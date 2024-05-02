@@ -106,14 +106,8 @@ const SpecsGeneratorForm = ({ addFormSchemaData, setJsonData, typesSelectedValue
   }, [typesSelectedValue]);
 
   const getAttributeData = async (attributeTypeId) => {
-    try {
-      if (attributeTypeId) {
-        const res = await fetchAttributeData(attributeTypeId);
-        return res;
-      }
-    } catch (error) {
-      console.error("Error fetching attribute data:", error);
-    }
+    const res = attributeTypeId && (await fetchAttributeData(attributeTypeId));
+    return res;
   };
 
   return (

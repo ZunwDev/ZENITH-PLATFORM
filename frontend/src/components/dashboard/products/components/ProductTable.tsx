@@ -5,9 +5,10 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { PaginationControls, RatingStars, Thumbnail } from "@/components/util";
 import { usePageControls } from "@/hooks";
 import { getThumbnailFromFirebase } from "@/lib/firebase";
-import { applyDiscount, cn, formatDateWithTime, getStatus, goto } from "@/lib/utils";
+import { applyDiscount, cn, formatDateWithTime, goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import { InfoRow } from "../../global";
 
 export default function ProductTable({ data, viewToggle, pageError, amountError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
@@ -38,6 +39,29 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
   if (loading) {
     return <Loading text="product" />;
   }
+
+  const renderPrice = (item) => {
+    const discountedPrice = applyDiscount(item.price, item.discount);
+    const priceDisplay = item.price ? item.price : NaN;
+
+    return (
+      <div className="flex flex-row gap-2 items-center">
+        <div className="font-bold text-sm">${discountedPrice ? discountedPrice : priceDisplay}</div>
+        {item.discount > 0 && (
+          <span
+            className="font-normal text-sm text-muted-foreground"
+            style={{
+              backgroundImage:
+                item.discount > 0
+                  ? "linear-gradient(to top right, transparent calc(50% - 1px), gray 50%, transparent calc(50% + 1px))"
+                  : "none",
+            }}>
+            ${priceDisplay}
+          </span>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -100,7 +124,7 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
                   <TableCell>{item.quantity} pcs</TableCell>
                   <TableCell className="lg:table-cell hidden">{formatDateWithTime(item.createdAt)}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatus(item).color}>{getStatus(item).status}</Badge>
+                    <Badge variant={item.status.color}>{item.status.name}</Badge>
                   </TableCell>
                 </TableRow>
               ))}
@@ -139,49 +163,17 @@ export default function ProductTable({ data, viewToggle, pageError, amountError 
                   </CardContent>
                   <CardFooter className="mt-16 md:mt-0">
                     <div className="flex flex-col gap-1 w-full">
-                      <div className="flex justify-between w-full">
+                      <div className="flex justify-between w-full mb-2">
                         <span className="font-semibold text-start w-56 truncate">{item.name}</span>
                         <div className="flex-shrink-0">
-                          <Badge variant={getStatus(item).color}>{getStatus(item).status}</Badge>
+                          <Badge variant={item.status.color}>{item.status.name}</Badge>
                         </div>
                       </div>
-                      <div className="flex justify-between w-full mt-2">
-                        <span className="text-start text-sm italic">Category:</span>
-                        <span className="text-sm">{item.category.name}</span>
-                      </div>
-                      <div className="flex justify-between w-full">
-                        <span className="text-start text-sm italic">Price:</span>
-                        <div className="flex flex-row gap-2 items-center">
-                          <div className="font-bold text-sm">
-                            ${item.discount > 0 ? applyDiscount(item.price, item.discount) : item.price ? item.price : NaN}
-                          </div>
-
-                          {item.discount > 0 && (
-                            <span
-                              className={item.discount > 0 ? "font-normal text-sm text-muted-foreground" : ""}
-                              style={{
-                                backgroundImage:
-                                  item.discount > 0
-                                    ? "linear-gradient(to top right, transparent calc(50% - 1px), gray 50%, transparent calc(50% + 1px))"
-                                    : "none",
-                              }}>
-                              ${item.price ? item.price : NaN}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex justify-between w-full">
-                        <span className="text-start text-sm italic">Stock:</span>
-                        <span className="text-sm">{item.quantity} pcs</span>
-                      </div>
-                      <div className="flex justify-between w-full">
-                        <span className="text-start text-sm italic">Created At:</span>
-                        <span className="text-sm">{formatDateWithTime(item.createdAt)}</span>
-                      </div>
-                      <div className="flex justify-between w-full">
-                        <span className="text-start text-sm italic">Rating:</span>
-                        <RatingStars rating={5} />
-                      </div>
+                      <InfoRow label="Category" value={item.category.name} />
+                      <InfoRow label="Price" value={renderPrice(item)} />
+                      <InfoRow label="Stock" value={`${item.quantity} pcs`} />
+                      <InfoRow label="Created At" value={formatDateWithTime(item.createdAt)} />
+                      <InfoRow label="Rating" value={<RatingStars rating={5} />} />
                     </div>
                   </CardFooter>
                 </Card>

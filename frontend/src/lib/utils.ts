@@ -75,12 +75,6 @@ export function setStateDelayed(setState: void, time: number) {
   }, time);
 }
 
-export function newAbortSignal() {
-  const abortController = new AbortController();
-  setTimeout(() => abortController.abort(), 5000 || 0);
-  return abortController.signal;
-}
-
 declare global {
   interface String {
     capitalize(): string;
@@ -133,53 +127,6 @@ export function removeLeadingZeroes(number) {
   return isNaN(result) ? 0 : result;
 }
 
-export function getStatus(item) {
-  let status;
-  let color;
-
-  switch (item.status.statusId) {
-    case 1:
-      status = "Archived";
-      color = "secondary";
-      break;
-    case 2:
-      status = "Draft";
-      color = "draft";
-      break;
-    case 3:
-      status = "Active";
-      color = "outline";
-      break;
-    default:
-      break;
-  }
-  return { status, color };
-}
-
-export function getStatusId(values) {
-  let statusId;
-
-  switch (values.status.toLowerCase()) {
-    case "archived":
-      statusId = 1;
-      break;
-    case "draft":
-      statusId = 2;
-      break;
-    case "active":
-      statusId = 3;
-      break;
-    default:
-      break;
-  }
-  return { statusId };
-}
-
 export function sortByIds(array: [], id: string) {
   return array.slice().sort((a, b) => a[id] - b[id]);
-}
-
-export function findId(array: any[], selectedValue: string, id: string): number | null {
-  const foundData = array?.find((item) => item?.name?.toLowerCase() === selectedValue?.toLowerCase());
-  return foundData ? foundData[id] : null;
 }

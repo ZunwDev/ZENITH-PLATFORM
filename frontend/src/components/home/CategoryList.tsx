@@ -1,5 +1,4 @@
-import { API_URL } from "@/lib/api";
-import { newAbortSignal } from "@/lib/utils";
+import { API_URL, newAbortSignal } from "@/lib/api";
 import axios from "axios";
 import { Battery, Cable, Camera, ChevronDown, Gamepad, Headphones, Laptop, Printer, Smartphone, Watch } from "lucide-react";
 import React, { useEffect, useState } from "react";

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
 
@@ -19,4 +20,6 @@ public class CategoryService {
     public List<Category> getAllProductCategories() {
         return getAllRows(categoryRepository);
     }
+
+    public long getCategoryIdByName(String name) {return categoryRepository.findIdByLowerName(name);}
 }
