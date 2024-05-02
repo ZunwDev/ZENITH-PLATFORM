@@ -1,6 +1,6 @@
 import { Attributes, Banners, Orders, Overview, Products } from "@/pages/dashboard";
-import { EditBannerForm, EditProductForm } from "@/pages/dashboard/edit";
-import { NewBannerForm, NewProductForm } from "@/pages/dashboard/new";
+import { EditBanner, EditProduct } from "@/pages/dashboard/edit";
+import { NewBanner, NewProduct } from "@/pages/dashboard/new";
 import { Settings } from "lucide-react";
 
 const dashboard = "/:userId/dashboard";
@@ -10,9 +10,9 @@ export const DashboardRoutes = [
   { path: `${dashboard}/overview`, element: <Overview /> },
   { path: `${dashboard}/products`, element: <Products /> },
   { path: `${dashboard}/banners`, element: <Banners /> },
-  { path: `${dashboard}/banners/new`, element: <NewBannerForm /> },
-  { path: `${dashboard}/banners/edit/:bannerId`, element: <EditBannerForm /> },
-  { path: `${dashboard}/products/new`, element: <NewProductForm /> },
-  { path: `${dashboard}/products/edit/:productId`, element: <EditProductForm /> },
+  { path: `${dashboard}/banners/new`, element: <NewBanner /> },
+  { path: `${dashboard}/banners/edit/:bannerId`, element: <EditBanner /> },
+  { path: `${dashboard}/products/new`, element: <NewProduct /> },
+  { path: `${dashboard}/products/edit/:productId`, element: <EditProduct /> },
   { path: `${dashboard}/attributes`, element: <Attributes /> },
 ];

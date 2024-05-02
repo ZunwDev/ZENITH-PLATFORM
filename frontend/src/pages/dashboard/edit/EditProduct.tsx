@@ -39,6 +39,7 @@ export default function EditProductForm() {
   const [productData, setProductData] = useState<Product>();
 
   //Select stuff
+  const [selectedValue, setSelectedValue] = useState({ categoryValue: "", brandValue: "", statusValue: "" });
   const [categoriesSelectedValue, setCategoriesSelectedValue] = useState("");
   const [brandsSelectedValue, setBrandsSelectedValue] = useState("");
   const [statusSelectedValue, setStatusSelectedValue] = useState("");

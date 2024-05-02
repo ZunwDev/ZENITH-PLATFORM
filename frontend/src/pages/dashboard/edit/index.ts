@@ -1,2 +1,2 @@
-export { default as EditBannerForm } from "./EditBannerForm";
-export { default as EditProductForm } from "./EditProductForm";
+export { default as EditBanner } from "./EditBanner";
+export { default as EditProduct } from "./EditProduct";
