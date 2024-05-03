@@ -1,8 +1,7 @@
 import { NewBannerForm } from "@/components/dashboard/forms";
 import { BannerSchema } from "@/components/dashboard/forms/schema";
-import { FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { DashboardPageLayout, PageHeader } from "@/components/dashboard/global";
 import { FilterData } from "@/components/dashboard/products/interfaces";
-import { User } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { BackArrow } from "@/components/util";
 import { BannerPreview } from "@/components/view/previews";
@@ -117,33 +116,22 @@ export default function NewBanner() {
   useEffect(() => {}, [form.watch()]);
 
   return (
-    <>
-      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-        <FullSidebar />
-        <div className="flex flex-col">
-          <div className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-            <SheetSidebar />
-            <div className="ml-auto">
-              <User />
-            </div>
-          </div>
-          <div className="flex flex-col gap-8 py-4 w-full border-b min-w-[360px]">
-            <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row md:mx-6 mx-4">
-              <BackArrow link="../banners" />
-              <PageHeader title="New Banner" />
-              <div className="ml-auto space-x-2">
-                <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isSubmitting}>
-                  {stage}
-                </Button>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-8 flex-col lg:p-6 p-4">
-            <NewBannerForm form={form} setImage={setImage} date={date} setDate={setDate} filterData={filterData} />
-            <BannerPreview image={image} form={form} />
+    <DashboardPageLayout>
+      <div className="flex flex-col gap-8 py-4 w-full border-b min-w-[360px]">
+        <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row md:mx-6 mx-4">
+          <BackArrow link="../banners" />
+          <PageHeader title="New Banner" />
+          <div className="ml-auto space-x-2">
+            <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isSubmitting}>
+              {stage}
+            </Button>
           </div>
         </div>
       </div>
-    </>
+      <div className="flex gap-8 flex-col lg:p-6 p-4">
+        <NewBannerForm form={form} setImage={setImage} date={date} setDate={setDate} filterData={filterData} />
+        <BannerPreview image={image} form={form} />
+      </div>
+    </DashboardPageLayout>
   );
 }

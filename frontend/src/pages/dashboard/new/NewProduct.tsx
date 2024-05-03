@@ -1,8 +1,7 @@
 import { NewProductForm, ProductSchema, SpecsGeneratorForm } from "@/components/dashboard/forms";
-import { FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { DashboardPageLayout, PageHeader } from "@/components/dashboard/global";
 import { CodeEditor, ProductImageManager } from "@/components/dashboard/products/components";
 import { FilterData } from "@/components/dashboard/products/interfaces";
-import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,95 +168,82 @@ export default function NewProduct() {
   useEffect(() => {}, [form.watch()]);
 
   return (
-    <>
-      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-        <FullSidebar />
-        <div className="flex flex-col">
-          <div className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-            <SheetSidebar />
-            <div className="ml-auto">
-              <User />
-            </div>
-          </div>
-          <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
-            <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
-              <BackArrow link="../products" />
-              <PageHeader title="New Product" />
-              <div className="ml-auto space-x-2">
-                <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isSubmitting}>
-                  {stage}
-                </Button>
-              </div>
-            </div>
-          </div>
-          <div className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
-            <div className="flex flex-col md:w-96 w-full h-full gap-8">
-              <ProductImageManager
-                images={images}
-                imageThumbnail={imageThumbnail}
-                setImageThumbnail={setImageThumbnail}
-                setImages={setImages}
-              />
-              <SpecsPreview
-                typesSelectedValue={form.getValues("type")}
-                jsonData={jsonData}
-                parseError={parseError}
-                formattedJSON={formattedJSON}
-                setJsonData={setJsonData}
-              />
-              <ProductPreview imageThumbnail={imageThumbnail} form={form} />
-            </div>
-            <div className="flex flex-col gap-8 w-full">
-              <NewProductForm form={form} categoryId={categoryId} filterData={filterData} />
-              <Card>
-                <CardHeader>
-                  <CardTitle>Additional Product Information</CardTitle>
-                  <CardDescription>
-                    This section is primarily used for generating specs that can be seen below this form. Please ensure
-                    consistency across all products.
-                    <InformationDescription>
-                      Note that changes made directly in the code editor <strong>will not</strong> be reflected in the form.
-                    </InformationDescription>
-                    <AlertInCardDescription>
-                      <strong>Key Information</strong> is automatically generated based on the product schema defined for any
-                      product type.
-                    </AlertInCardDescription>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <SpecsGeneratorForm
-                    addFormSchemaData={addFormSchemaData}
-                    setJsonData={setJsonData}
-                    typesSelectedValue={filterData.productTypes?.find(
-                      (item) => item.toLowerCase() === form.getValues("type").toLowerCase()
-                    )}
-                  />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Product Specs</CardTitle>
-                  <CardDescription>
-                    Specify product specifications here. Ensure consistency across all products in the category.
-                    <InformationDescription>
-                      You can directly edit here or use the form to make work easier.
-                    </InformationDescription>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {jsonData !== "" && parseError && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="size-5" />
-                      <AlertDescription>{parseError}</AlertDescription>
-                    </Alert>
-                  )}
-                  <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
-                </CardContent>
-              </Card>
-            </div>
+    <DashboardPageLayout>
+      <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
+        <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
+          <BackArrow link="../products" />
+          <PageHeader title="New Product" />
+          <div className="ml-auto space-x-2">
+            <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} className="w-full" disabled={isSubmitting}>
+              {stage}
+            </Button>
           </div>
         </div>
       </div>
-    </>
+      <div className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
+        <div className="flex flex-col md:w-96 w-full h-full gap-8">
+          <ProductImageManager
+            images={images}
+            imageThumbnail={imageThumbnail}
+            setImageThumbnail={setImageThumbnail}
+            setImages={setImages}
+          />
+          <SpecsPreview
+            typesSelectedValue={form.getValues("type")}
+            jsonData={jsonData}
+            parseError={parseError}
+            formattedJSON={formattedJSON}
+            setJsonData={setJsonData}
+          />
+          <ProductPreview imageThumbnail={imageThumbnail} form={form} />
+        </div>
+        <div className="flex flex-col gap-8 w-full">
+          <NewProductForm form={form} categoryId={categoryId} filterData={filterData} />
+          <Card>
+            <CardHeader>
+              <CardTitle>Additional Product Information</CardTitle>
+              <CardDescription>
+                This section is primarily used for generating specs that can be seen below this form. Please ensure consistency
+                across all products.
+                <InformationDescription>
+                  Note that changes made directly in the code editor <strong>will not</strong> be reflected in the form.
+                </InformationDescription>
+                <AlertInCardDescription>
+                  <strong>Key Information</strong> is automatically generated based on the product schema defined for any
+                  product type.
+                </AlertInCardDescription>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SpecsGeneratorForm
+                addFormSchemaData={addFormSchemaData}
+                setJsonData={setJsonData}
+                typesSelectedValue={filterData.productTypes?.find(
+                  (item) => item.toLowerCase() === form.getValues("type").toLowerCase()
+                )}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Specs</CardTitle>
+              <CardDescription>
+                Specify product specifications here. Ensure consistency across all products in the category.
+                <InformationDescription>You can directly edit here or use the form to make work easier.</InformationDescription>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {jsonData !== "" && parseError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="size-5" />
+                  <AlertDescription>{parseError}</AlertDescription>
+                </Alert>
+              )}
+              <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </DashboardPageLayout>
   );
 }

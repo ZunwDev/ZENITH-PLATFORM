@@ -1,3 +1,4 @@
+export { default as DashboardPageLayout } from "./DashboardPageLayout";
 export { default as DiscardButton } from "./DiscardButton";
 export { default as FullSidebar } from "./FullSidebar";
 export { default as InfoRow } from "./InfoRow";

@@ -1,8 +1,7 @@
 import { EditProductForm, ProductSchema } from "@/components/dashboard/forms";
-import { DiscardButton, FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { DashboardPageLayout, DiscardButton, PageHeader } from "@/components/dashboard/global";
 import { CodeEditor, ProductImageManager } from "@/components/dashboard/products/components";
 import { FilterData, Product } from "@/components/dashboard/products/interfaces";
-import { User } from "@/components/header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -143,61 +142,52 @@ export default function EditProduct() {
   useEffect(() => {}, [form.watch()]);
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <FullSidebar />
-      <div className="flex flex-col">
-        <div className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          <SheetSidebar />
-          <div className="ml-auto">
-            <User />
-          </div>
-        </div>
-        <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
-          <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
-            <BackArrow link="../../products" />
-            <PageHeader title="Edit Product" />
-            <div className="ml-auto flex gap-2 md:flex-row flex-col">
-              <DiscardButton typeOfDiscard="product" />
-              <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isSubmitting}>
-                {stage}
-              </Button>
-            </div>
-          </div>
-        </div>
-        <div className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
-          <div className="flex flex-col md:w-96 w-full h-full gap-8">
-            <ProductImageManager
-              images={images}
-              imageThumbnail={imageThumbnail}
-              setImageThumbnail={setImageThumbnail}
-              setImages={setImages}
-            />
-            <ProductPreview imageThumbnail={imageThumbnail} form={form} />
-          </div>
-
-          <div className="flex flex-col gap-8 w-full">
-            <EditProductForm productData={productData} form={form} filterData={filterData} />
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Specs</CardTitle>
-                <CardDescription>
-                  Update product specifications here. Ensure consistency across all products. These templates demonstrate the
-                  content each category can include.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {jsonData !== "" && parseError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="size-5" />
-                    <AlertDescription>{parseError}</AlertDescription>
-                  </Alert>
-                )}
-                <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
-              </CardContent>
-            </Card>
+    <DashboardPageLayout>
+      <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
+        <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
+          <BackArrow link="../../products" />
+          <PageHeader title="Edit Product" />
+          <div className="ml-auto flex gap-2 md:flex-row flex-col">
+            <DiscardButton typeOfDiscard="product" />
+            <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isSubmitting}>
+              {stage}
+            </Button>
           </div>
         </div>
       </div>
-    </div>
+      <div className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
+        <div className="flex flex-col md:w-96 w-full h-full gap-8">
+          <ProductImageManager
+            images={images}
+            imageThumbnail={imageThumbnail}
+            setImageThumbnail={setImageThumbnail}
+            setImages={setImages}
+          />
+          <ProductPreview imageThumbnail={imageThumbnail} form={form} />
+        </div>
+
+        <div className="flex flex-col gap-8 w-full">
+          <EditProductForm productData={productData} form={form} filterData={filterData} />
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Specs</CardTitle>
+              <CardDescription>
+                Update product specifications here. Ensure consistency across all products. These templates demonstrate the
+                content each category can include.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {jsonData !== "" && parseError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="size-5" />
+                  <AlertDescription>{parseError}</AlertDescription>
+                </Alert>
+              )}
+              <CodeEditor formattedJSON={formattedJSON} setJsonData={setJsonData} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </DashboardPageLayout>
   );
 }

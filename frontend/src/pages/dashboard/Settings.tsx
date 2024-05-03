@@ -1,3 +1,7 @@
+import { DashboardPageLayout } from "@/components/dashboard/global";
+
 export default function Settings() {
-  return <div></div>;
+  <DashboardPageLayout>
+    <main></main>
+  </DashboardPageLayout>;
 }

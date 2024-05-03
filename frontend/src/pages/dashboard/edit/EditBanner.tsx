@@ -1,8 +1,7 @@
 import { Banner } from "@/components/dashboard/banners/interfaces";
 import { BannerSchema, EditBannerForm } from "@/components/dashboard/forms";
-import { DiscardButton, FullSidebar, PageHeader, SheetSidebar } from "@/components/dashboard/global";
+import { DashboardPageLayout, DiscardButton, PageHeader } from "@/components/dashboard/global";
 import { FilterData } from "@/components/dashboard/products/interfaces";
-import { User } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { BackArrow } from "@/components/util";
 import { BannerPreview } from "@/components/view/previews";
@@ -110,41 +109,32 @@ export default function EditBanner() {
   useEffect(() => {}, [form.watch()]);
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <FullSidebar />
-      <div className="flex flex-col">
-        <div className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          <SheetSidebar />
-          <div className="ml-auto">
-            <User />
+    <DashboardPageLayout>
+      <main className="flex flex-col py-4 w-full min-w-[360px] border-b">
+        <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
+          <BackArrow link="../../banners" />
+          <PageHeader title="Edit Banner" />
+          <div className="ml-auto flex gap-2 md:flex-row flex-col">
+            <DiscardButton typeOfDiscard="banner" />
+            <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isSubmitting}>
+              {stage}
+            </Button>
           </div>
         </div>
-        <div className="flex flex-col py-4 w-full min-w-[360px] border-b">
-          <div className="md:px-0 flex justify-start gap-4 xs:items-start sm:items-center flex-row lg:mx-6 mx-4">
-            <BackArrow link="../../banners" />
-            <PageHeader title="Edit Banner" />
-            <div className="ml-auto flex gap-2 md:flex-row flex-col">
-              <DiscardButton typeOfDiscard="banner" />
-              <Button type="button" onClick={form.handleSubmit(handleFormSubmit)} disabled={isSubmitting}>
-                {stage}
-              </Button>
-            </div>
-          </div>
+      </main>
+      <main className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
+        <div className="flex flex-col gap-8 w-full">
+          <EditBannerForm
+            bannerData={bannerData}
+            form={form}
+            setImage={setImage}
+            date={date}
+            setDate={setDate}
+            filterData={filterData}
+          />
+          <BannerPreview image={image} form={form} />
         </div>
-        <div className="flex md:flex-row md:gap-8 gap-32 flex-col lg:p-6 p-4">
-          <div className="flex flex-col gap-8 w-full">
-            <EditBannerForm
-              bannerData={bannerData}
-              form={form}
-              setImage={setImage}
-              date={date}
-              setDate={setDate}
-              filterData={filterData}
-            />
-            <BannerPreview image={image} form={form} />
-          </div>
-        </div>
-      </div>
-    </div>
+      </main>
+    </DashboardPageLayout>
   );
 }
