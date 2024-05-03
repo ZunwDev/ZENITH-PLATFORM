@@ -52,7 +52,7 @@ export default function Products() {
 
   const APIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
-    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL() || "";
+    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL || "";
     const { brand, category, status } = checked;
 
     const paramsObj = {
@@ -105,7 +105,7 @@ export default function Products() {
               <div className="flex flex-row gap-1.5">
                 <ProductFilter filterAmount={filterAmount} checked={checked} setChecked={setChecked} amountData={amountData} />
                 <SearchBar
-                  searchQuery={localSearchQuery}
+                  searchQuery={localSearchQuery || getSearchQueryFromURL}
                   type="products"
                   className="md:flex hidden"
                   handleSearch={handleSearch}
@@ -124,7 +124,7 @@ export default function Products() {
                 {pageData?.totalElements > 0 && <NewButton path="products" icon={<PackagePlus />} type="Product" />}
               </div>
               <SearchBar
-                searchQuery={localSearchQuery}
+                searchQuery={localSearchQuery || getSearchQueryFromURL}
                 type="products"
                 className="md:hidden flex w-full"
                 handleSearch={handleSearch}

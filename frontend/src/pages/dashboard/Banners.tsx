@@ -37,7 +37,7 @@ export default function Banners() {
 
   const APIURL = useMemo(() => {
     const pageQueryParam = parseInt(queryParams.get("p")) || 1;
-    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL() || "";
+    const searchQuery = dbcSearch !== null && dbcSearch !== "" ? dbcSearch : getSearchQueryFromURL || "";
     const { category, status, aspectRatio, position } = checked;
 
     const paramsObj = {
@@ -81,7 +81,7 @@ export default function Banners() {
                     filteredData={filterData}
                   />
                   <SearchBar
-                    searchQuery={localSearchQuery}
+                    searchQuery={localSearchQuery || getSearchQueryFromURL}
                     type="banners"
                     className="md:flex hidden"
                     handleSearch={handleSearch}
@@ -94,7 +94,7 @@ export default function Banners() {
                   )}
                 </div>
                 <SearchBar
-                  searchQuery={localSearchQuery}
+                  searchQuery={localSearchQuery || getSearchQueryFromURL}
                   type="banners"
                   className="md:hidden flex w-full"
                   handleSearch={handleSearch}

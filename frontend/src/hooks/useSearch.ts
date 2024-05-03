@@ -13,9 +13,7 @@ export const useSearch = (setSearchQueryCallback) => {
     navigate(`${location.pathname}?${queryParams.toString()}`);
   };
 
-  const getSearchQueryFromURL = () => {
-    return queryParams.get("q");
-  };
+  const getSearchQueryFromURL = queryParams.get("q");
 
   return { handleSearch, getSearchQueryFromURL };
 };
