@@ -13,24 +13,25 @@ import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
-import { useAdminCheck, useApiData, useSearch } from "@/hooks";
+import { useAdminCheck, useApiData, useChip, useSearch } from "@/hooks";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { BookPlus } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 
 export default function Banners() {
+  useAdminCheck();
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
-  useAdminCheck();
+  const [checked, setChecked] = useState<Checked>(initialCheckedState);
+  const { handleChipRemove, handleResetFilters } = useChip(initialCheckedState, setChecked);
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const filterAmount = useMemo(() => getAmountOfValuesInObjectOfObjects(checked), [checked]);
   const [dbcSearch] = useDebounce(localSearchQuery, 250);
 
@@ -52,24 +53,8 @@ export default function Banners() {
     return buildQueryParams(paramsObj);
   }, [checked, limit, dbcSearch, queryParams.get("p")]);
 
-  const handleResetFilters = useCallback(() => {
-    setChecked(initialCheckedState);
-  }, []);
-
   const { data: pageData, error: pageError } = useApiData("banners", APIURL, [APIURL]);
-  const { data: filterData, error: filterError } = useApiData("banners/filteredData", APIURL, [APIURL]);
-
-  const handleChipRemove = useCallback(
-    (key, idToRemove) => {
-      // Update the checked state
-      setChecked((prevChecked) => {
-        const updatedChecked = { ...prevChecked };
-        updatedChecked[key] = updatedChecked[key].filter((id) => id !== idToRemove);
-        return updatedChecked;
-      });
-    },
-    [setChecked]
-  );
+  const { data: filterData } = useApiData("banners/filteredData", APIURL, [APIURL]);
 
   return (
     <>

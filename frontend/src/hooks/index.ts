@@ -1,5 +1,6 @@
 export { useAdminCheck } from "./useAdminCheck";
 export { useApiData } from "./useApiData";
+export { useChip } from "./useChip";
 export { useErrorToast } from "./useErrorToast";
 export { useFormStatus } from "./useFormStatus";
 export { useGetSessionData } from "./useGetSessionData";

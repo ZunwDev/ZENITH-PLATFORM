@@ -18,26 +18,27 @@ import { User } from "@/components/header";
 import { Chip, ChipGroup, ChipGroupContent, ChipGroupTitle } from "@/components/ui/chip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NewButton } from "@/components/util";
-import { useAdminCheck, useApiData, useSearch } from "@/hooks";
+import { useAdminCheck, useApiData, useChip, useSearch } from "@/hooks";
 import { fetchFilterData } from "@/lib/api";
 import { DEFAULT_LIMIT } from "@/lib/constants";
 import { Checked, initialCheckedState } from "@/lib/interfaces";
 import { buildQueryParams, getAmountOfValuesInObjectOfObjects } from "@/lib/utils";
 import { PackagePlus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 
 export default function Products() {
+  useAdminCheck();
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
-  useAdminCheck();
+  const [checked, setChecked] = useState<Checked>(initialCheckedState);
+  const { handleChipRemove, handleResetFilters } = useChip(initialCheckedState, setChecked);
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [checked, setChecked] = useState<Checked>(initialCheckedState);
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("desc");
   const [viewToggle, setViewToggle] = useState("list");
@@ -68,10 +69,6 @@ export default function Products() {
     return buildQueryParams(paramsObj);
   }, [checked, limit, sortBy, sortDirection, dbcSearch, queryParams.get("p")]);
 
-  const handleResetFilters = useCallback(() => {
-    setChecked(initialCheckedState);
-  }, []);
-
   const { data: pageData, error: pageError } = useApiData("products", APIURL, [APIURL]);
   const { data: amountData, error: amountError } = useApiData("products/amounts", APIURL, [APIURL]);
 
@@ -88,18 +85,6 @@ export default function Products() {
 
     fetchData();
   }, [APIURL]);
-
-  const handleChipRemove = useCallback(
-    (key, idToRemove) => {
-      // Update the checked state
-      setChecked((prevChecked) => {
-        const updatedChecked = { ...prevChecked };
-        updatedChecked[key] = updatedChecked[key].filter((id) => id !== idToRemove);
-        return updatedChecked;
-      });
-    },
-    [setChecked]
-  );
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
