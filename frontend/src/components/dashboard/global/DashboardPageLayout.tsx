@@ -1,4 +1,4 @@
-import { User } from "lucide-react";
+import { User } from "@/components/header";
 import { FullSidebar, SheetSidebar } from ".";
 
 export default function DashboardPageLayout({ children }) {
