@@ -26,7 +26,7 @@ export default function Products() {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
-  const { handleChipRemove, handleResetFilters } = useChip(initialCheckedState, setChecked);
+  const { handleChipRemove, handleResetFilters } = useChip(initialCheckedState, setChecked, checked);
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);

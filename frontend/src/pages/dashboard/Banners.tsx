@@ -19,7 +19,7 @@ export default function Banners() {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
   const [checked, setChecked] = useState<Checked>(initialCheckedState);
-  const { handleChipRemove, handleResetFilters } = useChip(initialCheckedState, setChecked);
+  const { handleChipRemove, handleResetFilters } = useChip(initialCheckedState, setChecked, checked);
 
   // Filter related
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
@@ -51,7 +51,7 @@ export default function Banners() {
     <DashboardPageLayout>
       <main className="flex flex-1 flex-col gap-2 p-4 lg:gap-4 lg:p-6 pt-4">
         <div className="flex items-center justify-between px-4 md:px-0">
-          <PageHeader title="Banner Manager" />
+          <PageHeader title={`Banner Manager (${pageData?.totalElements > 0 ? pageData?.totalElements : 0})`} />
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
