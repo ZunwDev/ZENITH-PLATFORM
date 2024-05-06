@@ -5,14 +5,14 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
 export const useAdminCheck = () => {
-  const [isAdmin, setIsAdmin] = useState(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchAdminStatus = async () => {
       const sessionToken = Cookies.get("sessionToken");
       try {
         const data = await fetchSessionData(sessionToken);
-        setIsAdmin(data.isAdmin);
+        setData(data);
       } catch (error) {
         goto(BASE_URL);
       }
@@ -22,10 +22,8 @@ export const useAdminCheck = () => {
   }, []);
 
   useEffect(() => {
-    if (isAdmin === false || isAdmin === null || isAdmin === undefined) {
+    if (data && !data.isAdmin) {
       goto(BASE_URL);
     }
-  }, [isAdmin]);
-
-  return isAdmin;
+  }, [data]);
 };
