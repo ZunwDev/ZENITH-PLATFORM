@@ -20,8 +20,13 @@ public class StatusController {
         return ResponseEntity.ok(statusService.getAllProductStatuses());
     }
 
+//    @GetMapping("/{name}")
+//    public long getStatusIdByName(@PathVariable String name) {
+//        return statusService.getStatusIdByName(name);
+//    }
+
     @GetMapping("/{name}")
-    public long getStatusIdByName(@PathVariable String name) {
-        return statusService.getStatusIdByName(name);
+    public ResponseEntity<Object> getStatusById(@PathVariable String name) {
+        return ResponseEntity.ok(statusService.getStatusIdByName(name));
     }
 }

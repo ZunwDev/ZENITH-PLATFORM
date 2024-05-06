@@ -1,11 +1,16 @@
 package dev.zunw.ecommerce.Product;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.zunw.ecommerce.Brand.Brand;
 import dev.zunw.ecommerce.Brand.BrandRepository;
 import dev.zunw.ecommerce.Category.Category;
 import dev.zunw.ecommerce.Category.CategoryRepository;
 import dev.zunw.ecommerce.Status.Status;
 import dev.zunw.ecommerce.Status.StatusRepository;
+import dev.zunw.ecommerce.dto.ProductTypeCount;
+import org.json.JSONException;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +20,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static dev.zunw.ecommerce.ServiceUtils.findRowById;
 
@@ -82,6 +89,51 @@ public class ProductService {
             }
             default -> null;
         };
+    }
+
+    private String getProductTypeFromSpecs(String specs) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(specs);
+            return rootNode.get("PRODUCT TYPE").asText();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Map<String, List<ProductTypeCount>> getProductTypeCountsByCategory() {
+        List<Product> products = productRepository.findAll();
+
+        // Group products by category
+        Map<Category, List<Product>> productsByCategory = products.stream()
+                .collect(Collectors.groupingBy(Product::getCategory));
+
+        // Initialize result map
+        Map<String, List<ProductTypeCount>> result = new HashMap<>();
+
+        // Count occurrences of each product type for each category
+        for (Map.Entry<Category, List<Product>> entry : productsByCategory.entrySet()) {
+            Category category = entry.getKey();
+            List<Product> categoryProducts = entry.getValue();
+
+            Map<String, Integer> typeOccurrences = new HashMap<>();
+            for (Product product : categoryProducts) {
+                String productType = getProductTypeFromSpecs(product.getSpecifications());
+                typeOccurrences.put(productType, typeOccurrences.getOrDefault(productType, 0) + 1);
+            }
+
+            // Create objects representing product types and their counts for the category
+            List<ProductTypeCount> typeCounts = new ArrayList<>();
+            for (Map.Entry<String, Integer> typeEntry : typeOccurrences.entrySet()) {
+                typeCounts.add(new ProductTypeCount(typeEntry.getKey(), typeEntry.getValue()));
+            }
+
+            // Add to the result map
+            result.put(category.getName(), typeCounts);
+        }
+
+        return result;
     }
 
     @Transactional

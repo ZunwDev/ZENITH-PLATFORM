@@ -59,7 +59,7 @@ public class BannerController {
             Banner product = bannerOptional.get();
             return ResponseUtils.successResponse(Optional.of(product));
         } else {
-            return ResponseUtils.notFoundResponse("Product not found");
+            return ResponseUtils.notFoundResponse("Banner not found");
         }
     }
 

@@ -14,7 +14,7 @@ import {
   fetchCategoryIdByName,
   fetchFilterData,
   fetchProductTypeDataByCategoryId,
-  fetchStatusIdByName,
+  fetchStatusByName,
   newAbortSignal,
 } from "@/lib/api";
 import {
@@ -157,7 +157,7 @@ export default function NewProduct() {
       const categoryId =
         form.getValues("category") && (await fetchCategoryIdByName(encodeURIComponent(form.getValues("category"))));
       const brandId = form.getValues("brand") && (await fetchBrandIdByName(encodeURIComponent(form.getValues("brand"))));
-      const statusId = form.getValues("status") && (await fetchStatusIdByName(encodeURIComponent(form.getValues("status"))));
+      const statusId = form.getValues("status") && (await fetchStatusByName(encodeURIComponent(form.getValues("status"))));
       setCategoryId(categoryId);
       setBrandId(brandId);
       setStatusId(statusId);

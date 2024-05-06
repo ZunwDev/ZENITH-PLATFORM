@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BackArrow } from "@/components/util";
 import { BannerPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchCategoryIdByName, fetchFilterData, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
+import { API_URL, fetchCategoryIdByName, fetchFilterData, fetchStatusByName, newAbortSignal } from "@/lib/api";
 import { NO_IMAGE_PROVIDED_MESSAGE } from "@/lib/constants";
 import { uploadImageToFirebase } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,7 +58,7 @@ export default function NewBanner() {
 
       setSubmittingState(true);
       updateStage("Storing in database...");
-      const statusId = await fetchStatusIdByName(encodeURIComponent(form.getValues("status")));
+      const status = await fetchStatusByName(encodeURIComponent(form.getValues("status")));
 
       const response = await axios.post(`${API_URL}/banners/create`, {
         signal: newAbortSignal(),
@@ -67,7 +67,7 @@ export default function NewBanner() {
           position: values.position,
           aspectRatio: values.aspect_ratio,
           category: filterData.categories.find((category) => category.categoryId === categoryId) || null,
-          status: statusId,
+          status,
           link: values.link,
           activationDate: values.date_range.from,
           expirationDate: values.date_range.to,

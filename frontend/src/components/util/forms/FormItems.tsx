@@ -22,12 +22,13 @@ export function InputFormItem({
   id,
   label,
   placeholder = "",
-  description,
+  description = "",
   form,
   type = "text",
   suffix = "",
   prefix = "",
   required = false,
+  className = "",
   ...rest
 }) {
   return (
@@ -51,10 +52,14 @@ export function InputFormItem({
           onWheel={handleWheel}
           placeholder={placeholder}
           {...form.register(id)}
-          className={cn("border rounded-md p-2", {
-            "rounded-tl-none rounded-bl-none border-l-0": prefix,
-            "rounded-tr-none rounded-br-none border-r-0": suffix,
-          })}
+          className={cn(
+            "border rounded-md p-2",
+            {
+              "rounded-tl-none rounded-bl-none border-l-0": prefix,
+              "rounded-tr-none rounded-br-none border-r-0": suffix,
+            },
+            className
+          )}
           {...rest}
         />
         {suffix && (
@@ -216,8 +221,8 @@ export function SelectFormItem({ id, label, placeholder, description, form, requ
 export function NoValidationInputFormItem({
   id,
   label,
-  placeholder,
-  description,
+  placeholder = "",
+  description = "",
   disabled,
   inputType = "text",
   suffix = "",
@@ -389,12 +394,8 @@ export function NoValidationInputFile({ id, label, setImage }) {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const blob = URL.createObjectURL(file);
-        setImage(blob);
-      };
-      reader.readAsArrayBuffer(file);
+      const imageUrl = URL.createObjectURL(file);
+      setImage(imageUrl); // Store the blob URL instead of the file object
     }
   };
 

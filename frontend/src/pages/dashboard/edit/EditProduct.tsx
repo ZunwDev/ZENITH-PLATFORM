@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BackArrow } from "@/components/util";
 import { ProductPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchFilterData, fetchProductDataById, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
+import { API_URL, fetchFilterData, fetchProductDataById, fetchStatusByName, newAbortSignal } from "@/lib/api";
 import {
   IS_PARSE_ERROR_MESSAGE,
   NO_IMAGE_PROVIDED_MESSAGE,
@@ -102,7 +102,7 @@ export default function EditProduct() {
 
       setSubmittingState(true);
       updateStage("Updating...");
-      const statusId = await fetchStatusIdByName(encodeURIComponent(form.getValues("status")));
+      const statusId = await fetchStatusByName(encodeURIComponent(form.getValues("status")));
 
       const response = await axios.put(`${API_URL}/products/${productId}`, {
         signal: newAbortSignal(),

@@ -52,16 +52,21 @@ export async function uploadImageToFirebase(path: string, blob: string) {
   }
 }
 
-export async function updateImageInFirebase(path: string, id: string, imageUrl: string) {
+export async function updateImageInFirebase(path: string, id: string | number, imageUrl: string) {
   try {
     const storage = initializeFirebase();
     const storageRef = ref(storage, `${path}/${id}`);
     const blob = await fetch(imageUrl).then((response) => response.blob());
-    await uploadBytes(storageRef, blob);
-    const downloadURL = await getDownloadURL(storageRef);
-    return downloadURL;
+
+    // Check if an image already exists at the storageRef path
+    const existingItems = await listAll(storageRef);
+    const imageRef = existingItems.items.length > 0 ? existingItems.items[0] : ref(storage, `${path}/${id}/image_${uuidv4()}`);
+
+    // Upload the image
+    await uploadBytes(imageRef, blob);
+    console.log(existingItems.items.length > 0 ? "Image updated successfully." : "New image uploaded successfully.");
   } catch (error) {
-    console.error("Error updating image in Firebase Storage:", error);
+    console.error("Error updating or uploading image in Firebase Storage:", error);
     throw error;
   }
 }

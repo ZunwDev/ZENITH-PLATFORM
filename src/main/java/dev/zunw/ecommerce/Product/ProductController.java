@@ -3,6 +3,7 @@ package dev.zunw.ecommerce.Product;
 import dev.zunw.ecommerce.ResponseUtils;
 import dev.zunw.ecommerce.ServiceUtils;
 import dev.zunw.ecommerce.dto.CreateProductRequest;
+import dev.zunw.ecommerce.dto.ProductTypeCount;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,6 +82,12 @@ public class ProductController {
         } else {
             return ResponseUtils.successResponse(Optional.of(products));
         }
+    }
+
+    @GetMapping("/type-counts")
+    public ResponseEntity<Object> getProductTypeCounts() {
+        Map<String, List<ProductTypeCount>> typeCounts = productService.getProductTypeCountsByCategory();
+        return ResponseUtils.successResponse(Optional.of(typeCounts));
     }
 
     @GetMapping("/{id}")

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BackArrow } from "@/components/util";
 import { BannerPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
-import { API_URL, fetchBannerDataById, fetchFilterData, fetchStatusIdByName, newAbortSignal } from "@/lib/api";
+import { API_URL, fetchBannerDataById, fetchFilterData, fetchStatusByName, newAbortSignal } from "@/lib/api";
 import { NO_IMAGE_PROVIDED_MESSAGE } from "@/lib/constants";
 import { getImageFromFirebase, updateImageInFirebase } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -70,7 +70,7 @@ export default function EditBanner() {
 
       setSubmittingState(true);
       updateStage("Updating...");
-      const statusId = await fetchStatusIdByName(encodeURIComponent(form.getValues("status")));
+      const statusId = await fetchStatusByName(encodeURIComponent(form.getValues("status")));
 
       const response = await axios.put(`${API_URL}/banners/${bannerId}`, {
         signal: newAbortSignal(),

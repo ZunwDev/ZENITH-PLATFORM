@@ -9,15 +9,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useErrorToast, useSuccessToast } from "@/hooks";
 import { API_URL, newAbortSignal } from "@/lib/api";
+import { getImageFromFirebase, updateImageInFirebase } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosRequestConfig } from "axios";
 import parse from "html-react-parser";
 import { PlusIcon, Trash } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Attribute, AttributeType } from "../dashboard/attributes/interface";
@@ -33,6 +32,8 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Form } from "../ui/form";
+import { Label } from "../ui/label";
+import { InputFormItem, NoValidationInputFile, NoValidationInputFormItem } from "../util";
 
 interface ActionDialogTypes {
   fetchData;
@@ -53,6 +54,7 @@ export default function ActionDialog({
 }: ActionDialogTypes) {
   const showErrorToast = useErrorToast();
   const showSuccessToast = useSuccessToast();
+  const [image, setImage] = useState("");
 
   const form = useForm<z.infer<typeof ActionDialogSchema>>({
     mode: "onChange",
@@ -73,6 +75,10 @@ export default function ActionDialog({
       oldValue?: string
     ) => {
       try {
+        if (endpoint === "categories") {
+          await updateImageInFirebase(`category_images`, item?.categoryId, image);
+        }
+
         const { name, categoryId, attributeTypeId } = values || {};
         const url = `${API_URL}/${endpoint}${["delete", "put"].includes(method) ? `/${id}` : ""}`;
         const requestData = method === "post" || method === "put" ? { name, categoryId, attributeTypeId, oldValue } : {};
@@ -93,22 +99,25 @@ export default function ActionDialog({
         showErrorToast(null, parse(error.response.data.message));
       }
     },
-    [fetchData]
+    [fetchData, image]
   );
 
-  const handleSubmit = useCallback(
-    (values: z.infer<typeof ActionDialogSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof ActionDialogSchema>) => {
+    try {
+      await ActionDialogSchema.parse(values);
       switch (actionType) {
         case "edit":
-          handleRequest("put", endpoint, values, item[attributeId], item.name);
+          await handleRequest("put", endpoint, values, item[attributeId], item.name);
           break;
         case "add":
-          handleRequest("post", endpoint, values);
+          await handleRequest("post", endpoint, values);
           break;
       }
-    },
-    [actionType, handleRequest, endpoint, item, attributeId]
-  );
+    } catch (error) {
+      // Handle any errors here
+      console.error("Error occurred:", error);
+    }
+  };
 
   const handleDelete = useCallback((attributeId: number) => {
     handleRequest("delete", endpoint, null, attributeId);
@@ -116,14 +125,28 @@ export default function ActionDialog({
 
   const handleClose = useCallback(() => {
     form.handleSubmit(handleSubmit)();
+    //setImage("");
     form.reset();
   }, [form, handleSubmit]);
 
+  const handleCategoryChange = async () => {
+    // Load image if it's empty
+    if (!image) {
+      const fetchedImage = await getImageFromFirebase("category_images", item?.categoryId);
+      if (fetchedImage !== null) {
+        setImage(fetchedImage);
+      }
+    } else {
+      // Unload image
+      setImage("");
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={endpoint === "categories" && actionType === "edit" ? handleCategoryChange : undefined}>
       <DialogTrigger asChild>
         {actionType === "edit" ? (
-          <div className="w-fit min-w-16 border py-4 px-2 justify-center items-center flex flex-row rounded-xl hover:shadow-lg transition hover:cursor-pointer relative">
+          <div className="w-fit min-w-16 border p-2 justify-center items-center flex flex-row rounded-xl hover:shadow-lg transition hover:cursor-pointer relative">
             <span className="truncate">
               <strong className="bg-muted p-2 rounded-full text-sm">#{item[attributeId]}</strong> {item?.name}
             </span>
@@ -134,7 +157,7 @@ export default function ActionDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
           <DialogTitle>{actionType === "edit" ? "Edit " + title : "New " + title}</DialogTitle>
           <DialogDescription>
@@ -151,69 +174,57 @@ export default function ActionDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
+          <div className="py-4">
+            <div className="flex flex-col gap-2">
               {endpoint === "attributes" && (
                 <>
                   {actionType === "edit" && (
-                    <>
-                      <Label htmlFor="id" className="text-right">
-                        Attribute ID:
-                      </Label>
-                      <Input id="id" defaultValue={item[attributeId]} className="col-span-3 border rounded-md" disabled />
-                    </>
+                    <NoValidationInputFormItem
+                      id="attribute_id"
+                      label="Attribute ID"
+                      defaultValue={item[attributeId]}
+                      disabled></NoValidationInputFormItem>
                   )}
-
-                  <Label htmlFor="attributetype" className="text-right">
-                    Attribute Type ID:
-                  </Label>
-                  <Input
-                    id="id"
+                  <NoValidationInputFormItem
+                    id="attribute_id"
+                    label="Attribute ID"
                     defaultValue={item.attributeTypeId}
-                    className="col-span-3 border rounded-md"
-                    {...form.register("attributeTypeId")}
-                    disabled
-                  />
-                  <Label htmlFor="categoryid" className="text-right">
-                    Category ID:
-                  </Label>
-                  <Input
-                    id="catid"
-                    defaultValue={item.categoryId}
-                    className="col-span-3 border rounded-md"
-                    type="number"
-                    {...form.register("categoryId")}
-                    placeholder="Set the ID only if it's required"
-                  />
+                    disabled></NoValidationInputFormItem>
                 </>
               )}
 
               {endpoint === "product_types" && (
-                <>
-                  <Label htmlFor="catid" className="text-right">
-                    Category ID:
-                  </Label>
-                  <Input
-                    id="catid"
-                    defaultValue={item.categoryId}
-                    className="col-span-3 border rounded-md"
-                    type="number"
-                    {...form.register("categoryId")}
-                  />
-                </>
+                <InputFormItem
+                  id="categoryId"
+                  label="Category ID"
+                  form={form}
+                  type="number"
+                  defaultValue={item.categoryId}
+                  required
+                  className="w-full"></InputFormItem>
               )}
 
-              <Label htmlFor="name" className="text-right">
-                Name:
-              </Label>
-              <Input
+              {endpoint === "categories" && (
+                <NoValidationInputFile id="category_image" label="Category Image" setImage={setImage}></NoValidationInputFile>
+              )}
+              <InputFormItem
                 id="name"
-                defaultValue={item.name}
-                {...form.register("name")}
+                label="Name"
+                form={form}
                 autoFocus
-                className="col-span-3 border rounded-md"
                 maxLength={64}
-              />
+                defaultValue={item.name}
+                required></InputFormItem>
+              {endpoint === "categories" && (
+                <>
+                  <Label>Image</Label>
+                  {image ? (
+                    <img src={image} className="size-24 object-contain" loading="lazy"></img>
+                  ) : (
+                    <span className="text-xs text-destructive">No image uploaded yet.</span>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </Form>

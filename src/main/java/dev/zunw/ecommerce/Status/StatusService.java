@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static dev.zunw.ecommerce.ServiceUtils.getAllRows;
 
@@ -20,5 +21,7 @@ public class StatusService {
         return getAllRows(statusRepository);
     }
 
-    public long getStatusIdByName(String name) {return statusRepository.findIdByLowerName(name);}
+    public Optional<Status> getStatusIdByName(String name) {return statusRepository.findByLowerName(name);}
+
+    public Optional<Status> getStatusById(Long id) { return statusRepository.findById(id);}
 }

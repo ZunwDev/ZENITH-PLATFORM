@@ -93,7 +93,7 @@ export async function fetchBrandIdByName(name) {
   return handleRequest(axiosInstance.get(`/brands/${name}`));
 }
 
-export async function fetchStatusIdByName(name) {
+export async function fetchStatusByName(name) {
   const axiosInstance = createAxiosInstance();
   return handleRequest(axiosInstance.get(`/status/${name}`));
 }

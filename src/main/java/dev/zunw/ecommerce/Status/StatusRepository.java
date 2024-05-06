@@ -15,6 +15,6 @@ public interface StatusRepository extends JpaRepository<Status, Long> {
 
     Optional<Status> findByName(String name);
 
-    @Query("SELECT s.id FROM Status s WHERE LOWER(s.name) = LOWER(:name)")
-    long findIdByLowerName(@Param("name") String name);
+    @Query(value = "SELECT * FROM Status s WHERE LOWER(s.name) = LOWER(:name)", nativeQuery = true)
+    Optional<Status> findByLowerName(@Param("name") String name);
 }
