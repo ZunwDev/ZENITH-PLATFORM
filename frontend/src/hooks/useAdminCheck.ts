@@ -22,7 +22,7 @@ export const useAdminCheck = () => {
   }, []);
 
   useEffect(() => {
-    if (isAdmin === false) {
+    if (isAdmin === false || isAdmin === null || isAdmin === undefined) {
       goto(BASE_URL);
     }
   }, [isAdmin]);
