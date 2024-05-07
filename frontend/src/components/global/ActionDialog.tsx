@@ -145,7 +145,7 @@ export default function ActionDialog({
     <Dialog onOpenChange={endpoint === "categories" && actionType === "edit" ? handleCategoryChange : undefined}>
       <DialogTrigger asChild>
         {actionType === "edit" ? (
-          <div className="w-fit min-w-16 border p-2 justify-center items-center flex flex-row rounded-xl hover:shadow-lg transition hover:cursor-pointer relative">
+          <div className="w-fit min-w-16 border p-1.5 justify-center items-center flex flex-row rounded-xl hover:shadow-lg transition hover:cursor-pointer relative">
             <span className="truncate">
               <strong className="bg-muted p-2 rounded-full text-sm">#{item[attributeId]}</strong> {item?.name}
             </span>

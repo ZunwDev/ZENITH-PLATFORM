@@ -1,7 +1,6 @@
-import { Attributes, Banners, Orders, Overview, Products } from "@/pages/dashboard";
+import { Attributes, Banners, Orders, Overview, Products, Settings } from "@/pages/dashboard";
 import { EditBanner, EditProduct } from "@/pages/dashboard/edit";
 import { NewBanner, NewProduct } from "@/pages/dashboard/new";
-import { Settings } from "lucide-react";
 
 const dashboard = "/:userId/dashboard";
 export const DashboardRoutes = [

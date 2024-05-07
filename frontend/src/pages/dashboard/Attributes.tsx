@@ -4,6 +4,7 @@ import { FilterData } from "@/components/dashboard/products/interfaces";
 import { ActionDialog } from "@/components/global";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAdminCheck } from "@/hooks";
 import { fetchAttributeTypes, fetchAttributes, fetchFilterData } from "@/lib/api";
 import { sortByIds } from "@/lib/utils";
@@ -106,77 +107,85 @@ export default function Attributes() {
             </CardContent>
           </Card>
         </div>
-        <div className="flex flex-col gap-2">
-          <Card>
-            <div className="flex items-center p-4 border-b">
-              <h1 className="text-lg font-semibold">Categories ({data.filterData.categories.length})</h1>
-              <ActionDialog
-                fetchData={fetchData}
-                title="Category"
-                endpoint="categories"
-                attributeId="categoryId"
-                actionType="add"
-              />
-            </div>
-            <CardContent className="flex flex-wrap gap-3 py-4">
-              {data.filterData.categories.map((item, index) => (
-                <ActionDialog
-                  fetchData={fetchData}
-                  key={index}
-                  title="Category"
-                  item={item}
-                  endpoint="categories"
-                  attributeId="categoryId"
-                />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Card>
-            <div className="flex items-center p-4 border-b">
-              <h1 className="text-lg font-semibold">Product Types ({data.filterData.productTypes.length})</h1>
-              <ActionDialog
-                fetchData={fetchData}
-                title="Product Type"
-                endpoint="product_types"
-                attributeId="productTypeId"
-                actionType="add"
-              />
-            </div>
-            <CardContent className="flex flex-wrap gap-3 py-4">
-              {data.filterData.productTypes.map((item, index) => (
-                <ActionDialog
-                  fetchData={fetchData}
-                  key={index}
-                  title="Product Type"
-                  item={item}
-                  endpoint="product_types"
-                  attributeId="productTypeId"
-                />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Card>
-            <div className="flex items-center p-4 border-b">
-              <h1 className="text-lg font-semibold">Brands ({data.filterData.brands.length})</h1>
-              <ActionDialog fetchData={fetchData} title="Brand" endpoint="brands" attributeId="brandId" actionType="add" />
-            </div>
-            <CardContent className="flex flex-wrap gap-3 py-4">
-              {data.filterData.brands.map((item, index) => (
-                <ActionDialog
-                  fetchData={fetchData}
-                  key={index}
-                  title="Brand"
-                  item={item}
-                  endpoint="brands"
-                  attributeId="brandId"
-                />
-              ))}
-            </CardContent>
-          </Card>
+        <div className="lg:grid lg:grid-cols-2 xl:grid-cols-3 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Card>
+              <ScrollArea className="lg:h-96" type="always">
+                <div className="flex items-center p-4 border-b">
+                  <h1 className="text-lg font-semibold">Categories ({data.filterData.categories.length})</h1>
+                  <ActionDialog
+                    fetchData={fetchData}
+                    title="Category"
+                    endpoint="categories"
+                    attributeId="categoryId"
+                    actionType="add"
+                  />
+                </div>
+                <CardContent className="flex flex-wrap gap-3 py-4">
+                  {data.filterData.categories.map((item, index) => (
+                    <ActionDialog
+                      fetchData={fetchData}
+                      key={index}
+                      title="Category"
+                      item={item}
+                      endpoint="categories"
+                      attributeId="categoryId"
+                    />
+                  ))}
+                </CardContent>
+              </ScrollArea>
+            </Card>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Card>
+              <ScrollArea className="lg:h-96" type="always">
+                <div className="flex items-center p-4 border-b">
+                  <h1 className="text-lg font-semibold">Product Types ({data.filterData.productTypes.length})</h1>
+                  <ActionDialog
+                    fetchData={fetchData}
+                    title="Product Type"
+                    endpoint="product_types"
+                    attributeId="productTypeId"
+                    actionType="add"
+                  />
+                </div>
+                <CardContent className="flex flex-wrap gap-3 py-4">
+                  {data.filterData.productTypes.map((item, index) => (
+                    <ActionDialog
+                      fetchData={fetchData}
+                      key={index}
+                      title="Product Type"
+                      item={item}
+                      endpoint="product_types"
+                      attributeId="productTypeId"
+                    />
+                  ))}
+                </CardContent>
+              </ScrollArea>
+            </Card>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Card>
+              <ScrollArea className="lg:h-96" type="always">
+                <div className="flex items-center p-4 border-b">
+                  <h1 className="text-lg font-semibold">Brands ({data.filterData.brands.length})</h1>
+                  <ActionDialog fetchData={fetchData} title="Brand" endpoint="brands" attributeId="brandId" actionType="add" />
+                </div>
+                <CardContent className="flex flex-wrap gap-3 py-4">
+                  {data.filterData.brands.map((item, index) => (
+                    <ActionDialog
+                      fetchData={fetchData}
+                      key={index}
+                      title="Brand"
+                      item={item}
+                      endpoint="brands"
+                      attributeId="brandId"
+                    />
+                  ))}
+                </CardContent>
+              </ScrollArea>
+            </Card>
+          </div>
         </div>
       </main>
     </DashboardPageLayout>
