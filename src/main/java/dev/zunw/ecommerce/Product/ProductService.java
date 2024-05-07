@@ -9,8 +9,6 @@ import dev.zunw.ecommerce.Category.CategoryRepository;
 import dev.zunw.ecommerce.Status.Status;
 import dev.zunw.ecommerce.Status.StatusRepository;
 import dev.zunw.ecommerce.dto.ProductTypeCount;
-import org.json.JSONException;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -102,18 +100,25 @@ public class ProductService {
         }
     }
 
-    public Map<String, List<ProductTypeCount>> getProductTypeCountsByCategory() {
+    public Map<String, List<ProductTypeCount>>[] getProductTypeCountsByCategory() {
         List<Product> products = productRepository.findAll();
 
         // Group products by category
         Map<Category, List<Product>> productsByCategory = products.stream()
                 .collect(Collectors.groupingBy(Product::getCategory));
 
-        // Initialize result map
-        Map<String, List<ProductTypeCount>> result = new HashMap<>();
+        // Sort categories by categoryId
+        List<Map.Entry<Category, List<Product>>> sortedCategories = productsByCategory.entrySet().stream()
+                .sorted(Comparator.comparing(entry -> entry.getKey().getCategoryId()))
+                .toList();
 
+        // Initialize result array
+        @SuppressWarnings("unchecked")
+        Map<String, List<ProductTypeCount>>[] result = new HashMap[sortedCategories.size()];
+
+        int index = 0;
         // Count occurrences of each product type for each category
-        for (Map.Entry<Category, List<Product>> entry : productsByCategory.entrySet()) {
+        for (Map.Entry<Category, List<Product>> entry : sortedCategories) {
             Category category = entry.getKey();
             List<Product> categoryProducts = entry.getValue();
 
@@ -129,8 +134,12 @@ public class ProductService {
                 typeCounts.add(new ProductTypeCount(typeEntry.getKey(), typeEntry.getValue()));
             }
 
-            // Add to the result map
-            result.put(category.getName(), typeCounts);
+            // Create HashMap for this category
+            Map<String, List<ProductTypeCount>> categoryMap = new HashMap<>();
+            categoryMap.put(category.getName(), typeCounts);
+
+            // Add to the result array
+            result[index++] = categoryMap;
         }
 
         return result;

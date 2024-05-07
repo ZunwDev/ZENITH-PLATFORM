@@ -1,77 +1,58 @@
-import { API_URL, newAbortSignal } from "@/lib/api";
-import axios from "axios";
-import { Battery, Cable, Camera, ChevronDown, Gamepad, Headphones, Laptop, Printer, Smartphone, Watch } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-const getCategories = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/categories`, {
-      signal: newAbortSignal(),
-    });
+import { useApiData } from "@/hooks";
+import { getImagesFromFirebase } from "@/lib/firebase";
+import { useEffect, useState } from "react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import CategoryListItems from "./CategoryListItems";
 
-    const iconMapping: { [key: string]: JSX.Element } = {
-      ["Computers & Tablets"]: <Laptop />,
-      ["Smartphones & Accessories"]: <Smartphone />,
-      ["Audio & Headphones"]: <Headphones />,
-      ["Cameras & Photography"]: <Camera />,
-      ["Home Electronics"]: <Printer />,
-      ["Gaming & Consoles"]: <Gamepad />,
-      ["Cables & Adapters"]: <Cable />,
-      ["Power Banks & Chargers"]: <Battery />,
-      ["Wearable Technology"]: <Watch />,
-    };
-
-    return response?.data?.map((category: { name: string }) => ({
-      name: category.name,
-      icon: iconMapping[category.name]
-        ? React.cloneElement(iconMapping[category.name], {
-            className: "size-8 flex-shrink-0 transition stroke-1",
-          })
-        : null,
-    }));
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    return [];
-  }
-};
-
-export default function ViewCategories() {
-  interface Category {
-    name: string;
-    icon?: JSX.Element;
-  }
-
-  const [categories, setCategories] = useState<Category[]>([]);
+export default function CategoryList() {
+  const { data: categories, loading, error } = useApiData("products/type-counts", "", []);
+  const [categoryImages, setCategoryImages] = useState({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getCategories();
-      setCategories(data);
+    const fetchImages = async () => {
+      if (categories) {
+        const images = await getImagesFromFirebase(`category_images`);
+        setCategoryImages(images);
+      }
     };
-    fetchData();
-  }, []);
+
+    fetchImages();
+  }, [categories]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <section className="flex flex-row gap-4 pb-32 md:min-w-[1600px] min-w-[360px] xs:max-md:px-4">
-      <div className="flex flex-col gap-2 pb-32 md:w-60 w-full">
+      <div className="flex flex-col gap-2 pb-32 md:w-72 w-full">
         <h1 className="text-2xl font-bold">Categories</h1>
         <div className="flex flex-col divide-y">
-          {categories.map((item) => (
-            <Link
-              key={item.name}
-              to={`/category/${item.name.toLowerCase().replace(/\s/g, "-")}`}
-              className="w-full flex py-2 gap-2 items-center justify-between hover:no-underline text-accent-foreground">
-              <div className="flex gap-3 items-center overflow-hidden group">
-                {item.icon ? (
-                  <div className="bg-accent-foreground/5 rounded-2xl p-1">{item.icon}</div>
-                ) : (
-                  <div className="bg-accent-foreground/5 rounded-2xl p-1">Default Icon</div>
-                )}
-                <p className="flex-1 break-words">{item.name}</p>
-              </div>
-              <ChevronDown className="size-3 flex-shrink-0" />
-            </Link>
-          ))}
+          <Accordion type="multiple">
+            {categories?.map((category, index) => (
+              <AccordionItem key={index} value={"item-" + index}>
+                <AccordionTrigger className="">
+                  <div className="flex flex-row gap-2 items-center">
+                    <div className="bg-accent-foreground/5 size-12 rounded-full flex justify-center items-center">
+                      <img
+                        src={categoryImages[index]}
+                        alt={category.categoryId}
+                        className="size-8 flex-shrink-0 object-contain"
+                      />
+                    </div>
+                    <span className="font-semibold text-sm">{Object.keys(category)[0]}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <CategoryListItems category={category} />
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
     </section>

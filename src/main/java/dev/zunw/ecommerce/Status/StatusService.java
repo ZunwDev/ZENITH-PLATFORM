@@ -21,7 +21,11 @@ public class StatusService {
         return getAllRows(statusRepository);
     }
 
-    public Optional<Status> getStatusIdByName(String name) {return statusRepository.findByLowerName(name);}
+    public Optional<Status> getStatusIdByName(String name) {
+        return statusRepository.findByLowerName(name);
+    }
 
-    public Optional<Status> getStatusById(Long id) { return statusRepository.findById(id);}
+    public Optional<Status> getStatusById(Long id) {
+        return statusRepository.findById(id);
+    }
 }

@@ -39,7 +39,7 @@ export default function EditBanner() {
     const fetchData = async () => {
       const { categories } = await fetchFilterData();
       const bannerData = await fetchBannerDataById(bannerId);
-      const image = await getImageFromFirebase("banners", bannerId);
+      const image = await getImageFromFirebase(`banners/${bannerId}`);
 
       setImage(image);
       setFilterData({ categories });
@@ -89,7 +89,7 @@ export default function EditBanner() {
       });
 
       updateStage("Uploading images...");
-      await updateImageInFirebase("banners", response.data.data.bannerId, image);
+      await updateImageInFirebase(`banners/${response.data.data.bannerId}`, image);
       showSuccessToast("Banner Update", `Banner "${values.name}" successfully updated.`);
       setTimeout(() => {
         window.location.reload();

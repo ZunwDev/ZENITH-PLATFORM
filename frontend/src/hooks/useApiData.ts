@@ -2,7 +2,7 @@ import { API_URL, newAbortSignal } from "@/lib/api";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export const useApiData = (endpoint, queryParams, dependencies) => {
+export const useApiData = (endpoint, queryParams = "", dependencies) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

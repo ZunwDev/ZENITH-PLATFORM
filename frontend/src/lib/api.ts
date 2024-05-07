@@ -97,3 +97,8 @@ export async function fetchStatusByName(name) {
   const axiosInstance = createAxiosInstance();
   return handleRequest(axiosInstance.get(`/status/${name}`));
 }
+
+export async function fetchProductTypeCounts() {
+  const axiosInstance = createAxiosInstance();
+  return handleRequest(axiosInstance.get(`/products/type-counts`));
+}

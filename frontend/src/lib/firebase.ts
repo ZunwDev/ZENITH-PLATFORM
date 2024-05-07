@@ -52,15 +52,15 @@ export async function uploadImageToFirebase(path: string, blob: string) {
   }
 }
 
-export async function updateImageInFirebase(path: string, id: string | number, imageUrl: string) {
+export async function updateImageInFirebase(path: string, imageUrl: string) {
   try {
     const storage = initializeFirebase();
-    const storageRef = ref(storage, `${path}/${id}`);
+    const storageRef = ref(storage, path);
     const blob = await fetch(imageUrl).then((response) => response.blob());
 
     // Check if an image already exists at the storageRef path
     const existingItems = await listAll(storageRef);
-    const imageRef = existingItems.items.length > 0 ? existingItems.items[0] : ref(storage, `${path}/${id}/image_${uuidv4()}`);
+    const imageRef = existingItems.items.length > 0 ? existingItems.items[0] : ref(storage, path);
 
     // Upload the image
     await uploadBytes(imageRef, blob);
@@ -71,10 +71,10 @@ export async function updateImageInFirebase(path: string, id: string | number, i
   }
 }
 
-export async function getImageFromFirebase(path: string, id: string) {
+export async function getImageFromFirebase(path: string) {
   try {
     const storage = initializeFirebase();
-    const storageRef = ref(storage, `${path}/${id}`);
+    const storageRef = ref(storage, path);
 
     const items = await listAll(storageRef);
     if (items.items.length > 0) {
@@ -90,10 +90,18 @@ export async function getImageFromFirebase(path: string, id: string) {
   }
 }
 
-export async function getImagesFromFirebase(path: string, id: string) {
+export async function getImageByIdFromFirebase(path: string, id: string | number) {
+  const storage = initializeFirebase();
+  const storageRef = ref(storage, `${path}/${id}`);
+
+  const downloadURL = await getDownloadURL(storageRef);
+  return downloadURL;
+}
+
+export async function getImagesFromFirebase(path: string) {
   try {
     const storage = initializeFirebase();
-    const storageRef = ref(storage, `${path}/${id}`);
+    const storageRef = ref(storage, path);
 
     const items = await listAll(storageRef);
     const downloadURLs = await Promise.all(items.items.map(async (itemRef) => getDownloadURL(itemRef)));

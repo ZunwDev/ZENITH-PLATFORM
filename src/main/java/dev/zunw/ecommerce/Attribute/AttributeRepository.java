@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface AttributeRepository extends JpaRepository<Attribute, Long> {
     List<Attribute> findByAttributeTypeIdOrderByAttributeId(Long attributeId);
+
     Optional<Attribute> findByName(String name);
 }

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useErrorToast, useSuccessToast } from "@/hooks";
 import { API_URL, newAbortSignal } from "@/lib/api";
-import { getImageFromFirebase, updateImageInFirebase } from "@/lib/firebase";
+import { getImageByIdFromFirebase, updateImageInFirebase } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosRequestConfig } from "axios";
 import parse from "html-react-parser";
@@ -76,7 +76,7 @@ export default function ActionDialog({
     ) => {
       try {
         if (endpoint === "categories") {
-          await updateImageInFirebase(`category_images`, item?.categoryId, image);
+          await updateImageInFirebase(`category_images/${item?.categoryId}`, image);
         }
 
         const { name, categoryId, attributeTypeId } = values || {};
@@ -125,14 +125,13 @@ export default function ActionDialog({
 
   const handleClose = useCallback(() => {
     form.handleSubmit(handleSubmit)();
-    //setImage("");
     form.reset();
   }, [form, handleSubmit]);
 
   const handleCategoryChange = async () => {
     // Load image if it's empty
     if (!image) {
-      const fetchedImage = await getImageFromFirebase("category_images", item?.categoryId);
+      const fetchedImage = await getImageByIdFromFirebase(`category_images`, item?.categoryId);
       if (fetchedImage !== null) {
         setImage(fetchedImage);
       }
@@ -240,7 +239,7 @@ export default function ActionDialog({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete attribute <strong>{item.name}</strong>.{" "}
+                    This action cannot be undone. This will permanently delete attribute <strong>{item.name}</strong>.
                     {(title.toLowerCase() === "brand" || title.toLowerCase() === "category") && (
                       <span className="text-destructive">
                         This action won't complete if there are products assigned to this attribute

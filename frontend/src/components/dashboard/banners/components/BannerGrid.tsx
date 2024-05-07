@@ -1,3 +1,4 @@
+import { InfoRow } from "@/components/dashboard/global";
 import { FailedToLoad, Loading } from "@/components/global";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -7,7 +8,6 @@ import { getImagesFromFirebase } from "@/lib/firebase";
 import { goto } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { InfoRow } from "@/components/dashboard/global";
 
 export default function BannerGrid({ data, pageError }) {
   const { handlePageChange, calculateShowingRange, currentPage } = usePageControls(data);
@@ -19,7 +19,7 @@ export default function BannerGrid({ data, pageError }) {
       setLoading(true); // Set loading state to true when fetching thumbnails
       if (data?.content?.length > 0) {
         const promises = data.content.map(async (item) => {
-          const thumbnail = await getImagesFromFirebase("banners", item.bannerId);
+          const thumbnail = await getImagesFromFirebase(`banners/${item.bannerId}`);
           return thumbnail;
         });
         const thumbnails = await Promise.all(promises);

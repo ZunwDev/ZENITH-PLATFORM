@@ -86,7 +86,7 @@ public class ProductController {
 
     @GetMapping("/type-counts")
     public ResponseEntity<Object> getProductTypeCounts() {
-        Map<String, List<ProductTypeCount>> typeCounts = productService.getProductTypeCountsByCategory();
+        Map<String, List<ProductTypeCount>>[] typeCounts = productService.getProductTypeCountsByCategory();
         return ResponseUtils.successResponse(Optional.of(typeCounts));
     }
 
