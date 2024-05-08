@@ -1,17 +1,23 @@
+import { ToggleIDButton } from "@/components/dashboard/attributes/components";
 import { Attribute, AttributeType } from "@/components/dashboard/attributes/interface";
-import { DashboardPageLayout, PageHeader } from "@/components/dashboard/global";
+import { DashboardPageLayout, PageHeader, SearchBar } from "@/components/dashboard/global";
 import { FilterData } from "@/components/dashboard/products/interfaces";
 import { ActionDialog } from "@/components/global";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAdminCheck } from "@/hooks";
+import { useAdminCheck, useSearch } from "@/hooks";
 import { fetchAttributeTypes, fetchAttributes, fetchFilterData } from "@/lib/api";
 import { sortByIds } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 
 export default function Attributes() {
   useAdminCheck();
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const { handleSearch, getSearchQueryFromURL } = useSearch(setLocalSearchQuery);
+  const [isShowID, setIsShowID] = useState(true);
+  const [dbcSearch] = useDebounce(localSearchQuery, 250);
 
   const [data, setData] = useState<{
     attributeTypes: AttributeType[];
@@ -54,6 +60,19 @@ export default function Attributes() {
           <PageHeader title="Attribute Manager" />
         </div>
         <div className="flex flex-col gap-2">
+          <div className="flex md:flex-row flex-wrap md:justify-between items-center xs:px-4 sm:px-0 gap-1.5">
+            <div className="flex flex-row gap-1.5">
+              <SearchBar
+                searchQuery={localSearchQuery || getSearchQueryFromURL}
+                type="attributes"
+                className="md:flex hidden"
+                handleSearch={handleSearch}
+              />
+            </div>
+            <div className="flex flex-row gap-1.5">
+              <ToggleIDButton isShowID={isShowID} setIsShowID={setIsShowID} />{" "}
+            </div>
+          </div>
           <Card>
             <div className="flex items-center p-4 border-b">
               <h1 className="text-lg font-semibold">Attribute Types ({data.attributeTypes.length})</h1>
@@ -71,7 +90,8 @@ export default function Attributes() {
                   <AccordionItem value={`item-${index}`}>
                     <AccordionTrigger>
                       <span className="truncate">
-                        <strong className="bg-muted p-2 rounded-full text-sm">#{item.attributeTypeId}</strong> {item.name}
+                        {isShowID && <strong className="bg-muted p-2 rounded-full text-sm">#{item.attributeTypeId}</strong>}{" "}
+                        {item.name}
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="flex flex-col">
@@ -82,6 +102,7 @@ export default function Attributes() {
                             <ActionDialog
                               fetchData={fetchData}
                               key={index}
+                              isShowID={isShowID}
                               title={item.name}
                               item={filteredAttribute}
                               endpoint="attributes"
@@ -128,6 +149,7 @@ export default function Attributes() {
                       key={index}
                       title="Category"
                       item={item}
+                      isShowID={isShowID}
                       endpoint="categories"
                       attributeId="categoryId"
                     />
@@ -156,6 +178,7 @@ export default function Attributes() {
                       key={index}
                       title="Product Type"
                       item={item}
+                      isShowID={isShowID}
                       endpoint="product_types"
                       attributeId="productTypeId"
                     />
@@ -178,6 +201,7 @@ export default function Attributes() {
                       key={index}
                       title="Brand"
                       item={item}
+                      isShowID={isShowID}
                       endpoint="brands"
                       attributeId="brandId"
                     />

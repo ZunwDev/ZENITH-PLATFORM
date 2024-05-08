@@ -39,6 +39,7 @@ interface ActionDialogTypes {
   fetchData;
   title: string;
   item?: AttributeType | Attribute | any;
+  isShowID?: boolean;
   actionType?: "edit" | "add" | "delete";
   endpoint?: "categories" | "brands" | "attributes" | "attribute_types" | "product_types";
   attributeId: string;
@@ -47,6 +48,7 @@ interface ActionDialogTypes {
 export default function ActionDialog({
   fetchData,
   title,
+  isShowID,
   item = {},
   attributeId,
   endpoint,
@@ -147,7 +149,8 @@ export default function ActionDialog({
         {actionType === "edit" ? (
           <div className="w-fit min-w-16 border p-1.5 justify-center items-center flex flex-row rounded-xl hover:shadow-lg transition hover:cursor-pointer relative">
             <span className="truncate">
-              <strong className="bg-muted p-2 rounded-full text-sm">#{item[attributeId]}</strong> {item?.name}
+              {isShowID && <strong className="bg-muted p-2 rounded-full text-sm">#{item[attributeId]}</strong>}
+              <span className="ml-1">{item?.name}</span>
             </span>
           </div>
         ) : (
