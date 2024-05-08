@@ -1,6 +1,6 @@
 package dev.zunw.ecommerce.dto;
 
-import dev.zunw.ecommerce.Product.Product;
+import dev.zunw.ecommerce.model.Product;
 import lombok.Getter;
 import lombok.Setter;
 

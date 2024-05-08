@@ -1,9 +1,9 @@
 package dev.zunw.ecommerce;
 
-import dev.zunw.ecommerce.User.User;
-import dev.zunw.ecommerce.User.UserRepository;
-import dev.zunw.ecommerce.User.UserService;
-import dev.zunw.ecommerce.UserCredentials.UserCredentials;
+import dev.zunw.ecommerce.model.User;
+import dev.zunw.ecommerce.repository.UserRepository;
+import dev.zunw.ecommerce.service.UserService;
+import dev.zunw.ecommerce.model.UserCredentials;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = EcommerceApplication.class)
+@SpringBootTest(classes = Application.class)
 @Import(TestConfig.class)
 public class UserTests {
 
@@ -33,10 +33,10 @@ public class UserTests {
         String formattedCurrentDateTime = currentDateTime.format(formatter);
 
         User newUser = new User();
-        newUser.setUsername("john_doe");
+        //newUser.setUsername("john_doe");
         newUser.setEmail("john.doe@example.com");
-        newUser.setUserRoleId(1);
-        newUser.setCreatedAt(formattedCurrentDateTime);
+        //newUser.setUserRoleId(1);
+        //newUser.setCreatedAt(formattedCurrentDateTime);
 
         UserCredentials newUserCredentials = new UserCredentials();
         newUserCredentials.setUserId(newUser.getUserId());

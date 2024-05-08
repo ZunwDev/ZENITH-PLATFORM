@@ -1,6 +1,6 @@
 package dev.zunw.ecommerce.dto;
 
-import dev.zunw.ecommerce.Banner.Banner;
+import dev.zunw.ecommerce.model.Banner;
 import lombok.Getter;
 import lombok.Setter;
 
