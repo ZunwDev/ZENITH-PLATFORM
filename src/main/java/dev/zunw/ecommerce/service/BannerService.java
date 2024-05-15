@@ -25,6 +25,8 @@ public class BannerService {
         return bannerRepository.findById(id);
     }
 
+    public List<Banner> getAllBannersByPosition(String position) {return bannerRepository.findByPosition(position);}
+
     public Map<String, Object> filterData(List<String> positions, List<String> categories,
                                           List<String> statuses, List<String> aspectRatios,
                                           Pageable pageable, String searchQuery) {

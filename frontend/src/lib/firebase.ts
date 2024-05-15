@@ -92,7 +92,7 @@ export async function getImageFromFirebase(path: string) {
 
 export async function getImageByIdFromFirebase(path: string, id: string | number) {
   const storage = initializeFirebase();
-  const storageRef = ref(storage, `${path}/${id}`);
+  const storageRef = ref(storage, `${path}/${id}/`);
 
   const downloadURL = await getDownloadURL(storageRef);
   return downloadURL;

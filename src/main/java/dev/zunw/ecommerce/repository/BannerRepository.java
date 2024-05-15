@@ -18,6 +18,8 @@ public interface BannerRepository extends JpaRepository<Banner, UUID>,
         JpaSpecificationExecutor<Banner> {
     Optional<Banner> findByName(String name);
 
+    List<Banner> findByPosition(String position);
+
     @Query(value = "SELECT DISTINCT b.* FROM Banner b " +
             "LEFT JOIN Status s ON b.status_id = s.status_id " +
             "LEFT JOIN Category c ON b.category_id = c.category_id " +

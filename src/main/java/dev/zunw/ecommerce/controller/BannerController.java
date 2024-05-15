@@ -66,6 +66,16 @@ public class BannerController {
         }
     }
 
+    @GetMapping("/homepage")
+    public ResponseEntity<Object> getBannerByPosition() {
+        List<Banner> banners = bannerService.getAllBannersByPosition("homepage");
+        if (!banners.isEmpty()) {
+            return ResponseUtils.successResponse(banners);
+        } else {
+            return ResponseUtils.notFoundResponse("No banners found");
+        }
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Object> createBanner(@RequestBody CreateBannerRequest requestBody) {
         Banner banner = requestBody.getData();

@@ -17,7 +17,7 @@ export default function EditBannerForm({ bannerData, form, date, setDate, setIma
   return (
     <Card className="w-full border h-fit rounded-md">
       <CardHeader>
-        <CardTitle>Product Information</CardTitle>
+        <CardTitle>Banner Information</CardTitle>
         <CardDescription>Update key product details for comprehensive information.</CardDescription>
       </CardHeader>
       <CardContent>

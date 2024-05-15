@@ -29,5 +29,5 @@ export const useApiData = (endpoint, queryParams = "", dependencies) => {
     fetchData();
   }, dependencies);
 
-  return { data, loading, error };
+  return { data, loading, error, setData };
 };

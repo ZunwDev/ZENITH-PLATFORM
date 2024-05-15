@@ -8,7 +8,7 @@ import { BannerPreview } from "@/components/view/previews";
 import { useAdminCheck, useErrorToast, useFormStatus, useSuccessToast } from "@/hooks";
 import { API_URL, fetchBannerDataById, fetchFilterData, fetchStatusByName, newAbortSignal } from "@/lib/api";
 import { NO_IMAGE_PROVIDED_MESSAGE } from "@/lib/constants";
-import { getImageFromFirebase, updateImageInFirebase } from "@/lib/firebase";
+import { getImageByIdFromFirebase, updateImageInFirebase } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import parse from "html-react-parser";
@@ -39,9 +39,9 @@ export default function EditBanner() {
     const fetchData = async () => {
       const { categories } = await fetchFilterData();
       const bannerData = await fetchBannerDataById(bannerId);
-      const image = await getImageFromFirebase(`banners/${bannerId}`);
+      const image = await getImageByIdFromFirebase("banners", bannerId);
 
-      setImage(image);
+      setImage(image || "");
       setFilterData({ categories });
       setBannerData(bannerData);
       const { name, position, aspectRatio, link, status, category, activationDate, expirationDate, includeButton } = bannerData;
